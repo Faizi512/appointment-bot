@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  solidus_sku: MyString
+  supplier: 
+  product: 
+  quantity: MyString
+
+two:
+  solidus_sku: MyString
+  supplier: 
+  product: 
+  quantity: MyString
