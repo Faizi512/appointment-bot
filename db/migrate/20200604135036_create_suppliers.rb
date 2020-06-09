@@ -3,7 +3,7 @@ class CreateSuppliers < ActiveRecord::Migration[5.1]
     create_table :suppliers do |t|
       t.string :supplier_id
       t.string :name
-      t.string :solidus_sku, null: false
+      t.string :solidus_sku
 
       t.timestamps
     end

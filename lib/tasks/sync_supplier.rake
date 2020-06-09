@@ -1,26 +1,14 @@
 
 task :sync_supplier => :environment do
-	CLIENT_ID = "7240703f3c248ec80d9fd1350c69908aab972b44"
-	CLIENT_SECRET = "b199db64f3c696cf6266866471930b4f574bcbc4"
-
-	# stock_location_id = "2"
-	# items_response = Curl.get("https://spagetticar.herokuapp.com/api/stock_locations/#{stock_location_id}/stock_items") do |http|
-	# 	http.headers['Authorization'] = 'Bearer 3d24da66469820411b63dbef50493b13f89c07a2028de220'
-	# end
-	items_response = Curl.get("https://spagetticar.herokuapp.com/api/products") do |http|
-		http.headers['Authorization'] = 'Bearer 3d24da66469820411b63dbef50493b13f89c07a2028de220'
+	items_response = Curl.get(ENV['SOLIDUS_STORE']) do |http|
+		http.headers['Authorization'] = "Bearer #{ENV['SOLIDUS_AUTHORIZATION']}"
 	end
 	items = JSON.parse items_response.body_str
-	
-	#turn14 auth	
-	res = Curl.post("https://api.turn14.com/v1/token", "client_id=#{CLIENT_ID}&client_secret=#{CLIENT_SECRET}&grant_type=client_credentials")
-	data = JSON.parse res.body_str
+	turn14_ids = []
 
 	items["products"].each do |item|
 		product_name = item["name"]
-		sku =  item["master"]["sku"]
-		brand_hash = item["product_properties"].select{ |property| property["property_name"] == "Brand"}.first
-		brand_name = brand_hash["value"]
+		solidus_sku =  item["master"]["sku"]
 
 		mpn_hash = item["product_properties"].select{ |property| property["property_name"] == "MPN"}.first
 		mpn_id = mpn_hash["value"]
@@ -28,23 +16,28 @@ task :sync_supplier => :environment do
 		supplier_name = "Turn14ID"
 		turn14ID_hash = item["product_properties"].select{ |property| property["property_name"] == supplier_name}.first
 		turn14_id = turn14ID_hash["value"]
-		
+		turn14_ids << turn14_id
 		quantity = item["total_on_hand"]
 
-		supplier = Supplier.find_or_create_by(supplier_id: turn14_id, solidus_sku: sku)
-		supplier.update!(name: supplier_name)
+		supplier ||= Supplier.find_by(supplier_id: "solidus")
+		pod = supplier.products.find_or_create_by(supplier_id: supplier.id , name: product_name, solidus_sku: solidus_sku, mpn: mpn_id)
+		supplier.inventories.find_or_create_by(supplier_id: supplier.id,product_id: pod.id).update(solidus_sku: solidus_sku, quantity: quantity)
+	end
 
-		pod = supplier.products.find_or_create_by(supplier_id: supplier.id)
-		pod.update!(name: product_name, solidus_sku: sku, mpn: mpn_id)
+	#turn14 auth	
+	res = Curl.post("https://api.turn14.com/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+	data = JSON.parse res.body_str
 
-		supplier.inventories.find_or_create_by(supplier_id: supplier.id,product_id: pod.id).update(solidus_sku: sku, quantity: quantity)
-		# sleep 0.2
-		# turn14_res = Curl.get("https://api.turn14.com/v1/items/#{mpn_id}") do |http| http.headers['Authorization'] = "Bearer #{data["access_token"]}" end		
-		# turn14_res = Curl.get("https://api.turn14.com/v1/items/#{turn14_id}") do |http|
-		# 	http.headers['Authorization'] = "Bearer #{data["access_token"]}"
-		# end
-		# turn14_item = JSON.parse turn14_res.body_str
-		# Supplier.find_or_create(supplier_id: id = item["id"]).update(name: name,solidus_sku: sku)
-		# byebug
+	turn14_res = Curl.get("https://api.turn14.com/v1/inventory/#{turn14_ids.join(",")}") do |http| http.headers['Authorization'] = "Bearer #{data["access_token"]}" end
+	turn14_data = JSON.parse turn14_res.body_str
+	supplier = Supplier.find_or_create_by(supplier_id: "turn14", name: "Turn 14")
+
+	turn14_ids.each do |id|
+	   res = Curl.get("https://api.turn14.com/v1/items/#{id}") do |http| http.headers['Authorization'] = "Bearer #{data["access_token"]}" end
+	   item = JSON.parse res.body_str
+	   it = turn14_data["data"].select{|it| it["id"] == id}.first
+	   quantity = it["attributes"]["manufacturer"]["stock"] rescue 0
+	   pod = supplier.products.find_or_create_by(supplier_id: supplier.id, name: item["data"]["attributes"]["product_name"], mpn: item["data"]["attributes"]["mfr_part_number"])
+	   supplier.inventories.find_or_create_by(supplier_id: supplier.id,product_id: pod.id).update(quantity: quantity)
 	end
 end

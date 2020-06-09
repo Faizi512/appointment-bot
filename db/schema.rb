@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 20200605060228) do
   create_table "suppliers", force: :cascade do |t|
     t.string "supplier_id"
     t.string "name"
-    t.string "solidus_sku", null: false
+    t.string "solidus_sku"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["supplier_id"], name: "index_suppliers_on_supplier_id"
