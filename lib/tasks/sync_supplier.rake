@@ -19,7 +19,7 @@ task :sync_supplier => :environment do
 	turn14_ids.each do |id|
 	   item = make_get_request("#{ENV['TURN14_STORE']}/items/#{id}", auth_data["access_token"])
 	   inventory_item = inventory_data["data"].select{|it| it["id"] == id}.first
-	   quantity = it["attributes"]["manufacturer"]["stock"] rescue 0
+	   quantity = inventory_item["attributes"]["inventory"]["01"] + inventory_item["attributes"]["inventory"]["02"] +inventory_item["attributes"]["inventory"]["59"]
 
 	   supplier ||= Supplier.find_or_create_by(supplier_id: "turn14", name: "Turn 14")
 	   add_product_in_inventory(supplier,item["data"]["attributes"]["product_name"],item["data"]["attributes"]["mfr_part_number"],quantity)
@@ -38,7 +38,7 @@ def make_post_request(url,parameters)
 	JSON.parse response.body_str
 end
 
-def add_product_in_inventory(supplier,product_name,part_number,quantity,solidus_sku = "")
+def add_product_in_inventory(supplier,product_name,part_number,quantity,solidus_sku = nil)
 	product = supplier.products.find_or_create_by(supplier_id: supplier.id, name: product_name, mpn: part_number, solidus_sku: solidus_sku)
 	supplier.inventories.find_or_create_by(supplier_id: supplier.id,product_id: product.id).update(quantity: quantity, solidus_sku: solidus_sku)
 end
