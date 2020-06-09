@@ -13,11 +13,11 @@ task :sync_supplier => :environment do
 	end
 
 	#turn14 auth
-	auth_data = make_post_request("#{ENV['TURN14_STORE']}/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
-	inventory_data = make_get_request("#{ENV['TURN14_STORE']}/inventory/#{turn14_ids.join(",")}",auth_data["access_token"])
+	auth_data = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+	inventory_data = make_get_request("#{ENV['TURN14_STORE']}/v1/inventory/#{turn14_ids.join(",")}",auth_data["access_token"])
 
 	turn14_ids.each do |id|
-	   item = make_get_request("#{ENV['TURN14_STORE']}/items/#{id}", auth_data["access_token"])
+	   item = make_get_request("#{ENV['TURN14_STORE']}/v1/items/#{id}", auth_data["access_token"])
 	   inventory_item = inventory_data["data"].select{|it| it["id"] == id}.first
 	   quantity = inventory_item["attributes"]["inventory"]["01"] + inventory_item["attributes"]["inventory"]["02"] +inventory_item["attributes"]["inventory"]["59"]
 
