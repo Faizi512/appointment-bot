@@ -8,6 +8,8 @@ task :sync_supplier => :environment do
 		part_number = item["product_properties"].select{ |property| property["property_name"] == "Turn14ID"}.first
 		part_number_array << part_number["value"]
 	end
+	t14_auth_data = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+
 	until part_number_array.empty?
 		batch = part_number_array.shift(250)
 		t14_products = Turn14Product.where(part_number: batch)
@@ -15,11 +17,11 @@ task :sync_supplier => :environment do
 		retries = 0
 		begin
 			retries ||= 0
-			t14_auth_data = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
 			inventory_items = make_get_request("#{ENV['TURN14_STORE']}/v1/inventory/#{item_ids.join(",")}",t14_auth_data["access_token"])
 		rescue => exception
 			puts "Exception #{exception}"
 			sleep 1
+			t14_auth_data = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
 			retry if (retries += 1) < 3
 		end
 		t14_products.each do |item|
