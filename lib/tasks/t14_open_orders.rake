@@ -14,7 +14,12 @@ task :t14_open_orders => :environment do
 				purchase_order = order["attributes"]["purchase_order_number"]
 				date = order["attributes"]["date"]
 				order["attributes"]["lines"].each do |line|
-					add_t14_order(supplier,date,purchase_order,sales_order,line["part_number"],line["quantity"],line["open_quantity"])
+					if line["esd"].first["quantity"] != 0
+						eta_info = "#{line["esd"].first["quantity"]} expected on #{line["esd"].first["date"]} per MFR update on #{line["esd"].first["last_updated"]}" rescue "Awating Update"
+					else
+						eta_info = "Awating Update"
+					end
+					add_t14_order(supplier,date,purchase_order,sales_order,line["part_number"],line["quantity"],line["open_quantity"],eta_info)
 				end
 			end
 			break if orders["links"]["next"].nil?
@@ -41,6 +46,6 @@ def make_post_request(url,parameters)
 	JSON.parse response.body_str
 end
 
-def add_t14_order(supplier,date,purchase_order,sales_order,part_number,quantity,open_quantity,eta_info=nil,warehouse=nil)
+def add_t14_order(supplier,date,purchase_order,sales_order,part_number,quantity,open_quantity,eta_info,warehouse=nil)
 	supplier.turn14_open_orders.create(supplier_id: supplier.id, date: date,purchase_order:purchase_order,sales_order:sales_order,part_number: part_number, quantity: quantity, open_qty: open_quantity, eta_information: eta_info,warehouse:warehouse)
 end
