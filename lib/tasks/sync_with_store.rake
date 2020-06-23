@@ -19,21 +19,25 @@ task :sync_with_store => :environment do
 				product_id = variant["product_id"]
 				variant_sku = variant["sku"]
 				variant_href = "#{ENV['UROTURN']}/#{product_slug}?variant=#{variant_id}"
-				begin
-					file = URI.open(variant_href)
-					doc = Nokogiri::HTML(file)
-					brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
-					mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
-					inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
-					puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity}"
+				file = begin
+					URI.open(variant_href)
 				rescue OpenURI::HTTPError => e
 					puts "EXception in OpenURI #{e}"
 					sleep 60 * 5
 					retry
+				end
+				retries = 0
+				begin
+					retries ||= 0
+					doc = Nokogiri::HTML(file)
+					brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
+					mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
+					inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
+					puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant_sku}}"
 				rescue => e
-					puts "EXception in Nokogiri::HTML #{e}"
-					sleep 60 * 5
-					retry
+					puts "EXception in Parsing Nokogiri::HTML #{e}"
+					sleep 1
+					retry if (retries += 1) < 3
 				end
 		rescue => e
 			puts "EXception in finding product variant #{e}"
