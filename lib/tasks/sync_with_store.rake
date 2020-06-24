@@ -4,8 +4,9 @@ require 'nokogiri'
 require 'open-uri'
 
 task :sync_with_store => :environment do
-	products = begin 
-		get_request("#{ENV['UROTURN']}.json")
+	store = Store.find_by_store_id("urotuning")
+	products = begin
+		get_request("#{store.href}.json")
 	rescue => e
 		puts "Exception throws getting products"
 		sleep 60
@@ -15,10 +16,7 @@ task :sync_with_store => :environment do
 		begin
 			product_slug = product["handle"]
 			product["variants"].each do |variant|
-				variant_id = variant["id"]
-				product_id = variant["product_id"]
-				variant_sku = variant["sku"]
-				variant_href = "#{ENV['UROTURN']}/#{product_slug}?variant=#{variant_id}"
+				variant_href = "#{store.href}/#{product_slug}?variant=#{variant["id"]}"
 				file = begin
 					URI.open(variant_href)
 				rescue OpenURI::HTTPError => e
@@ -33,7 +31,8 @@ task :sync_with_store => :environment do
 					brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
 					mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
 					inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
-					puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant_sku}}"
+					add_product_in_store(store,brand,mpn,variant["sku"],inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
+					puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
 				rescue => e
 					puts "EXception in Parsing Nokogiri::HTML #{e}"
 					sleep 1
@@ -57,8 +56,8 @@ def get_request(urll)
 	JSON.parse response.read_body
 end
 
-def add_product_in_inventory(supplier,product_name,part_number,quantity,solidus_sku)
-	product = supplier.products.find_or_create_by(supplier_id: supplier.id,mpn: part_number)
-	product.update(name: product_name, solidus_sku: solidus_sku)
-	supplier.inventories.find_or_create_by(supplier_id: supplier.id,product_id: product.id).update(quantity: quantity, solidus_sku: solidus_sku)
+def add_product_in_store(store,brand,mpn,sku,inventory_quantity,slug,variant_id,product_id,href)
+	latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)
+	latest.update(brand: brand,mpn: mpn,sku: sku,inventory_quantity: inventory_quantity,slug: slug,href: href)
+	latest.archive_products.create(store_id:store.id,brand: brand,mpn: mpn,sku: sku,inventory_quantity: inventory_quantity,slug: slug,variant_id: variant_id,product_id: product_id,href: href)
 end

@@ -10,10 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200616110204) do
+ActiveRecord::Schema.define(version: 20200624151106) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "archive_products", force: :cascade do |t|
+    t.string "brand"
+    t.string "mpn"
+    t.string "sku"
+    t.integer "inventory_quantity"
+    t.string "slug"
+    t.string "variant_id"
+    t.string "product_id"
+    t.string "href"
+    t.bigint "store_id"
+    t.bigint "latest_product_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["latest_product_id"], name: "index_archive_products_on_latest_product_id"
+    t.index ["store_id"], name: "index_archive_products_on_store_id"
+  end
 
   create_table "inventories", force: :cascade do |t|
     t.string "solidus_sku"
@@ -26,6 +43,21 @@ ActiveRecord::Schema.define(version: 20200616110204) do
     t.index ["supplier_id"], name: "index_inventories_on_supplier_id"
   end
 
+  create_table "latest_products", force: :cascade do |t|
+    t.string "brand"
+    t.string "mpn"
+    t.string "sku"
+    t.integer "inventory_quantity"
+    t.string "slug"
+    t.string "variant_id"
+    t.string "product_id"
+    t.string "href"
+    t.bigint "store_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_latest_products_on_store_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "solidus_sku"
     t.bigint "supplier_id"
@@ -34,6 +66,14 @@ ActiveRecord::Schema.define(version: 20200616110204) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["supplier_id"], name: "index_products_on_supplier_id"
+  end
+
+  create_table "stores", force: :cascade do |t|
+    t.string "name"
+    t.string "href"
+    t.string "store_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "suppliers", force: :cascade do |t|
