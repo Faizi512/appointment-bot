@@ -6,4 +6,4 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 Supplier.find_or_create_by(supplier_id: "solidus").update(name: "Solidus Store")
-Store.find_or_create_by(store_id: "urotuning").update(name: "Urotuning", href:"https://www.urotuning.com/products")
+Store.find_or_create_by(store_id: "urotuning").update(name: "Urotuning", href:"https://www.urotuning.com/collections/all/products")

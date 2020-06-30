@@ -5,52 +5,63 @@ require 'open-uri'
 
 task :sync_with_store => :environment do
 	store = Store.find_by_store_id("urotuning")
-	products = begin
-		get_request("#{store.href}.json")
-	rescue => e
-		puts "Exception throws getting products"
-		sleep 60
-		retry
-	end		
-	products["products"].each do |product|
-		begin
-			product_slug = product["handle"]
-			product["variants"].each do |variant|
-				variant_href = "#{store.href}/#{product_slug}?variant=#{variant["id"]}"
-				file = begin
-					URI.open(variant_href)
-				rescue OpenURI::HTTPError => e
-					puts "EXception in OpenURI #{e}"
-					sleep 60 * 5
-					retry
-				end
-				retries = 0
-				begin
-					retries ||= 0
-					doc = Nokogiri::HTML(file)
-					brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
-					mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
-					inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
-					add_product_in_store(store,brand,mpn,variant["sku"],inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
-					puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
-				rescue => e
-					puts "EXception in Parsing Nokogiri::HTML #{e}"
-					sleep 1
-					retry if (retries += 1) < 3
-				end
+	
+	page_number = 0
+
+	loop do
+		page_number+=1
+		products = begin
+			get_request("#{store.href}.json?limit=99999&page=#{page_number}")
 		rescue => e
-			puts "EXception in finding product variant #{e}"
-			next			
+			puts "Exception throws getting products"
+			sleep 60
+			retry
+		end	
+		if products["products"].empty?
+			puts "no record found"
+			break
 		end
+
+		products["products"].each do |product|
+			begin
+				product_slug = product["handle"]
+				product["variants"].each do |variant|
+					variant_href = "#{store.href}/#{product_slug}?variant=#{variant["id"]}"
+					file = begin
+						URI.open(variant_href)
+					rescue OpenURI::HTTPError => e
+						puts "EXception in OpenURI #{e}"
+						sleep 60 * 5
+						retry
+					end
+					retries = 0
+					begin
+						retries ||= 0
+						doc = Nokogiri::HTML(file)
+						brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
+						mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
+						inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
+						add_product_in_store(store,brand,mpn,variant["sku"],inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
+						puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
+					rescue => e
+						puts "EXception in Parsing Nokogiri::HTML #{e}"
+						sleep 1
+						retry if (retries += 1) < 3
+					end
+			rescue => e
+				puts "EXception in finding product variant #{e}"
+				next			
+			end
 		end
 	end
+end
 end
 
 def get_request(urll)
 	url = URI(urll)
 	https = Net::HTTP.new(url.host, url.port);
 	https.use_ssl = true
-
+	
 	request = Net::HTTP::Get.new(url)
 	response = https.request(request)
 	JSON.parse response.read_body
