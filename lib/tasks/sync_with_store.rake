@@ -4,8 +4,7 @@ require 'nokogiri'
 require 'open-uri'
 
 task :sync_with_store => :environment do
-	store = Store.find_by_store_id("urotuning")
-	
+	store = Store.find_by_store_id(ENV["STORE_ID"])
 	page_number = 0
 
 	loop do
@@ -25,6 +24,7 @@ task :sync_with_store => :environment do
 		products["products"].each do |product|
 			begin
 				product_slug = product["handle"]
+				product_brand = product["vendor"]
 				product["variants"].each do |variant|
 					variant_href = "#{store.href}/#{product_slug}?variant=#{variant["id"]}"
 					file = begin
@@ -37,10 +37,10 @@ task :sync_with_store => :environment do
 					retries = 0
 					begin
 						retries ||= 0
-						doc = Nokogiri::HTML(file)
-						brand = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'brand'}).first.attributes["content"].value rescue nil
-						mpn = doc.xpath('.//meta[@itemprop=$value]', nil, {:value => 'mpn'}).first.attributes["content"].value rescue nil
-						inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
+						product_values = Parser.new(file,store.store_id).parse
+						inventory_quantity = product_values[:inventory_quantity]
+						mpn = product_values[:mpn]
+						brand = product_values[:brand] || product_brand
 						add_product_in_store(store,brand,mpn,variant["sku"],inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
 						puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
 					rescue => e
