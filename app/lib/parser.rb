@@ -20,7 +20,7 @@ class Parser
 		elsif store_id == "performancebyie"
 			txt = doc.xpath('//script')[27].children.text
 			@inventory_quantity = txt.split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
-			@mpn = doc.at('p').children.text.strip
+			@mpn = @mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
 		end
 		to_json
 	end
