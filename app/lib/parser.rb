@@ -1,12 +1,12 @@
+require 'nokogiri'
 class Parser
-
-	require 'nokogiri'
 	attr_reader :file
 	attr_reader :store_id
 
-	def initialize(file, store_id)
+	def initialize(file, store_id,variant_id)
 		@file = file		
 		@store_id = store_id
+		@variant_id = variant_id
 	end
 
 	def parse
@@ -19,18 +19,13 @@ class Parser
 
 		elsif store_id == "performancebyie"
 			txt = doc.xpath('//script')[27].children.text
-			@inventory_quantity = txt.split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
-			@mpn = @mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
+			@inventory_quantity =  txt.split("\"id\":#{@variant_id}")[2].split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
+			@mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
 		end
-		to_json
-	end
-
-	def to_json
 		{
 			inventory_quantity: @inventory_quantity, 
 			mpn: @mpn,
 			brand: @brand
 		}
-
 	end
 end

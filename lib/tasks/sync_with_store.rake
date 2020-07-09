@@ -37,7 +37,7 @@ task :sync_with_store => :environment do
 					retries = 0
 					begin
 						retries ||= 0
-						product_values = Parser.new(file,store.store_id).parse
+						product_values = Parser.new(file,store.store_id,variant["id"]).parse
 						inventory_quantity = product_values[:inventory_quantity]
 						mpn = product_values[:mpn]
 						brand = product_values[:brand] || product_brand
