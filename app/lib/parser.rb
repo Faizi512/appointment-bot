@@ -3,10 +3,12 @@ class Parser
 	attr_reader :file
 	attr_reader :store_id
 
-	def initialize(file, store_id,variant_id)
+	def initialize(file, store_id,variant,brand)
 		@file = file		
 		@store_id = store_id
-		@variant_id = variant_id
+		@variant = variant
+		@brand = brand
+		@sku = variant["sku"]
 	end
 
 	def parse
@@ -19,13 +21,18 @@ class Parser
 
 		elsif store_id == "performancebyie"
 			txt = doc.xpath('//script')[27].children.text
-			@inventory_quantity =  txt.split("\"id\":#{@variant_id}")[2].split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
+			@inventory_quantity =  txt.split("\"id\":#{@variant["id"]}")[2].split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
 			@mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
+		elsif store_id == "bmptuning"
+			txt = doc.xpath('.//script[@id=$value]', nil, {:value => 'ProductJson-product-template'}).first.text rescue nil			
+			@inventory_quantity = txt.split("\"id\":#{@variant["id"]}",2).last.split('inventory_quantity',2).last.split(',')[0].split(':')[1] rescue nil
+			@mpn = @variant["product_id"]
 		end
 		{
 			inventory_quantity: @inventory_quantity, 
 			mpn: @mpn,
-			brand: @brand
+			brand: @brand,
+			sku: @sku
 		}
 	end
 end

@@ -20,11 +20,11 @@ task :sync_with_store => :environment do
 			puts "no record found"
 			break
 		end
-
 		products["products"].each do |product|
 			begin
 				product_slug = product["handle"]
 				product_brand = product["vendor"]
+
 				product["variants"].each do |variant|
 					variant_href = "#{store.href}/#{product_slug}?variant=#{variant["id"]}"
 					file = begin
@@ -37,12 +37,13 @@ task :sync_with_store => :environment do
 					retries = 0
 					begin
 						retries ||= 0
-						product_values = Parser.new(file,store.store_id,variant["id"]).parse
+						product_values = Parser.new(file,store.store_id,variant,product_brand).parse
 						inventory_quantity = product_values[:inventory_quantity]
 						mpn = product_values[:mpn]
-						brand = product_values[:brand] || product_brand
-						add_product_in_store(store,brand,mpn,variant["sku"],inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
-						puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
+						brand = product_values[:brand]
+						sku = product_values[:sku]
+						add_product_in_store(store,brand,mpn,sku,inventory_quantity,product_slug,variant["id"],variant["product_id"],variant_href)
+						# puts "brand #{brand} mpn #{mpn} inventory_quantity #{inventory_quantity} sku #{variant["sku"]}}"
 					rescue => e
 						puts "EXception in Parsing Nokogiri::HTML #{e}"
 						sleep 1
