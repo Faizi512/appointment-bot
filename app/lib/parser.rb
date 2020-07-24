@@ -20,7 +20,7 @@ class Parser
 			@inventory_quantity =JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, {:value => 'esc-out-of-stock'}).first.children.first).first["inventory_quantity"] rescue nil
 
 		elsif store_id == "performancebyie"
-			txt = doc.xpath('//script')[27].children.text
+			txt = doc.xpath("//script[contains(text(), 'inventory_quantity')]").text
 			@inventory_quantity =  txt.split("\"id\":#{@variant["id"]}")[2].split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
 			@mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
 		elsif store_id == "bmptuning"
