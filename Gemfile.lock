@@ -61,6 +61,7 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
+    csv (0.0.1)
     curb (0.9.10)
     dotenv (2.7.5)
     dotenv-rails (2.7.5)
@@ -180,6 +181,7 @@ DEPENDENCIES
   byebug
   capybara (~> 2.13)
   coffee-rails (~> 4.2)
+  csv (~> 0.0.1)
   curb
   dotenv-rails
   jbuilder (~> 2.5)
