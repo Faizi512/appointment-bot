@@ -1,14 +1,18 @@
 module Curb
-  def self.request(url, token)
-    response = Curl.get(url) do |http|
-      http.headers['Authorization'] = "Bearer #{token}"
+  def self.t14_inventory_api(ids, token)
+    items = begin
+      response = Curl.get("#{ENV['TURN14_STORE']}/v1/inventory/#{ids.join(',')}") do |http|
+        http.headers['Authorization'] = "Bearer #{token}"
+      end
+      JSON.parse response.body_str
     end
-    JSON.parse response.body_str
   end
 
-  def self.request_token(url, parameters)
-    response = Curl.post(url, parameters)
-    JSON.parse response.body_str
+  def self.t14_auth_token
+    token = begin
+      response = Curl.post("#{ENV['TURN14_STORE']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+      JSON.parse response.body_str
+    end
   end
 
   def self.open_uri(url)
