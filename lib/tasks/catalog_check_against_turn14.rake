@@ -5,12 +5,12 @@ task catalog_check_against_turn14: :environment do
   CSV.parse(file,
             headers: true,
             header_converters: :symbol) do |row|
-    mpn_numbers << row[:mpn]
+    mpn_numbers << row[:turn14id]
   end
   auth_token = Curb.t14_auth_token
   until mpn_numbers.empty?
     batch = mpn_numbers.shift(250)
-    items = Turn14Product.where(mfr_part_number: batch)
+    items = Turn14Product.where(part_number: batch)
     items_ids = items.map(&:item_id)
 
     retries = 0
