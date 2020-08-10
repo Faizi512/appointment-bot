@@ -13,6 +13,7 @@ module Api
           RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(
             order_number: order[:Order_Number],
             shipment_number: order[:Shipment_Number],
+            email: order[:email],
             product_name: order[:Product_Name],
             order_state: order[:Order_State],
             shipment_state: order[:shipment_state],
