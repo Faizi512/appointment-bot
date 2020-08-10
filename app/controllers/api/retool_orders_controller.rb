@@ -6,8 +6,8 @@ module Api
     end
 
     def update
-      params[:retool_order].each do |order|
-        RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(eta_date: order[:eta_date], contracted_date: order[:contracted_date])
+      params[:_json].each do |order|
+        RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(eta_date: order[:"Calculated Column 2"], contracted_date: order[:"Calculated Column 1"])
       end
       render json: "success".to_json, status: :ok
     end
