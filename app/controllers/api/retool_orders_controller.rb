@@ -11,10 +11,10 @@ module Api
       if params.present?
         params[:Key1].each do |order|
           RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(
-            order_number: order[:order_number],
-            shipment_number: order[:shipment_number],
-            product_name: order[:product_name],
-            order_state: order[:order_state],
+            order_number: order[:Order_Number],
+            shipment_number: order[:Shipment_Number],
+            product_name: order[:Product_Name],
+            order_state: order[:Order_State],
             shipment_state: order[:shipment_state],
             payment_state: order[:payment_state],
             completed_at: order[:completed_at],
