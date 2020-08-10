@@ -1,0 +1,2 @@
+class RetoolOrder < ApplicationRecord
+end
