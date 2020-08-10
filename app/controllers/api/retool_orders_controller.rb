@@ -20,8 +20,8 @@ module Api
             payment_state: order[:payment_state],
             completed_at: order[:completed_at],
             store_location_id: order[:stock_location_id],
-            eta_date: order[:"Calculated Column 2"],
-            contracted_date: order[:"Calculated Column 1"])
+            eta_date: order[:estimated_eta],
+            contracted_date: order[:contracted_date])
         end
       end
       render json: "success".to_json, status: :ok
