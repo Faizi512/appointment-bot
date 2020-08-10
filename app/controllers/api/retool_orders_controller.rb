@@ -18,7 +18,7 @@ module Api
             shipment_state: order[:shipment_state],
             payment_state: order[:payment_state],
             completed_at: order[:completed_at],
-            stock_location_id: order[:stock_location_id],
+            store_location_id: order[:stock_location_id],
             eta_date: order[:"Calculated Column 2"],
             contracted_date: order[:"Calculated Column 1"])
         end
