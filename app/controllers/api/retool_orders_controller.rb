@@ -9,10 +9,11 @@ module Api
       if params.present?
         params[:Key1].each do |order|
           if order[:estimated_eta].present? || order[:contracted_date].present?
-            RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(eta_date: order[:estimated_eta],
+            RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(eta_date: order[:estimated_eta],
             contracted_date: order[:contracted_date])
           else  
-            RetoolOrder.find_or_create_by(order_id: order[:order_id]).update(
+            RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(
+              order_id: order[:order_id],
               order_number: order[:order_number],
               shipment_number: order[:shipment_number],
               email: order[:email],
