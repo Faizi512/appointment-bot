@@ -8,12 +8,7 @@ module Api
     def update
       if params.present?
         params[:Key1].each do |order|
-          if order[:estimated_eta].present? || order[:contracted_date].present?
-            RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(eta_date: order[:estimated_eta],
-            contracted_date: order[:contracted_date])
-          else  
-            RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(
-              order_id: order[:order_id],
+          data1 = {order_id: order[:order_id],
               order_number: order[:order_number],
               shipment_number: order[:shipment_number],
               email: order[:email],
@@ -23,8 +18,15 @@ module Api
               payment_state: order[:payment_state],
               completed_at: order[:completed_at],
               store_location_id: order[:store_location_id],
-              stock_location_name: order[:stock_location_name])
-          end 
+              stock_location_name: order[:stock_location_name]}
+              
+          data2 = {eta_date: order[:estimated_eta],
+              contracted_date: order[:contracted_date]}
+          if order[:estimated_eta].present? || order[:contracted_date].present?    
+            data1.merge!(data2)
+          end
+
+          RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(data1) 
         end
       end
       render json: "success".to_json, status: :ok
