@@ -26,7 +26,7 @@ module Api
             data1.merge!(data2)
           end
 
-          RetoolOrder.find_or_create_by(item_id: order[:item_id]).update(data1) 
+          RetoolOrder.find_or_create_by(item_id: order[:item_id],shipment_number: order[:shipment_number]).update(data1) 
         end
       end
       render json: "success".to_json, status: :ok
