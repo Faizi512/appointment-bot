@@ -39,7 +39,7 @@ module Api
 
     def update_record
       if params.present?
-        params[:_json].each do |order|
+        params[:Key1].each do |order|
           data1 = {order_id: order[:order_id],
               order_number: order[:order_number],
               shipment_number: order[:shipment_number],
