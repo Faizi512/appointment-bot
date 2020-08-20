@@ -3,5 +3,6 @@ Rails.application.routes.draw do
   namespace :api do
   	get "/retool_orders" => "retool_orders#index"
   	patch "/retool_orders" => "retool_orders#update"
+  	patch "/retool_orders/update_record" => "retool_orders#update_record"
   end
 end

@@ -37,5 +37,28 @@ module Api
       render json: "success".to_json, status: :ok
     end
 
+    def update_record
+      if params.present?
+        params[:_json].each do |order|
+          data1 = {order_id: order[:order_id],
+              order_number: order[:order_number],
+              shipment_number: order[:shipment_number],
+              email: order[:email],
+              product_name: order[:product_name],
+              order_state: order[:order_state],
+              shipment_state: order[:shipment_state],
+              payment_state: order[:payment_state],
+              completed_at: order[:completed_at],
+              store_location_id: order[:store_location_id],
+              stock_location_name: order[:stock_location_name],
+              eta_date: order[:estimated_eta],
+              contracted_date: order[:contracted_date]}
+
+          RetoolOrder.find_or_create_by(item_id: order[:item_id],shipment_number: order[:shipment_number]).update(data1)
+        end
+      end
+      render json: "success".to_json, status: :ok
+    end
+
   end
 end
