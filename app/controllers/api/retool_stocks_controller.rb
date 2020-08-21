@@ -4,8 +4,7 @@ module Api
     def update
       if params.present?
         process_stock_ids = []
-        params[:_json].each do |stock|
-          byebug
+        params[:Key1].each do |stock|
           data1 = 
             {
               variant_id:           stock[:variant_id],
