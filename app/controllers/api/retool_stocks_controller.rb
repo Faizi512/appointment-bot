@@ -23,8 +23,8 @@ module Api
             data1.merge!(data2)
           end
 
-          RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku]).update(data1) 
-          db_stock = RetoolStock.find_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
+          db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
+          db_stock.update(data1)
           process_stock_ids << db_stock.id
         end
         RetoolStock.where.not(id: process_stock_ids).delete_all

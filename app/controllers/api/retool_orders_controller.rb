@@ -28,8 +28,8 @@ module Api
             data1.merge!(data2)
           end
 
-          RetoolOrder.find_or_create_by(item_id: order[:item_id],shipment_number: order[:shipment_number]).update(data1) 
-          dborder = RetoolOrder.find_by(item_id: order[:item_id],shipment_number: order[:shipment_number])
+          dborder = RetoolOrder.find_or_create_by(item_id: order[:item_id],shipment_number: order[:shipment_number]) 
+          dborder.update(data1)
           process_oder_id << dborder.id
         end
         RetoolOrder.where.not(id: process_oder_id).delete_all
