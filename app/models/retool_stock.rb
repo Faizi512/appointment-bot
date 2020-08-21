@@ -1,0 +1,2 @@
+class RetoolStock < ApplicationRecord
+end

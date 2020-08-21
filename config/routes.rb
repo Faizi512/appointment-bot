@@ -4,5 +4,7 @@ Rails.application.routes.draw do
   	get "/retool_orders" => "retool_orders#index"
   	patch "/retool_orders" => "retool_orders#update"
   	patch "/retool_orders/update_record" => "retool_orders#update_record"
+
+  	patch "/retool_stocks" => "retool_stocks#update"
   end
 end
