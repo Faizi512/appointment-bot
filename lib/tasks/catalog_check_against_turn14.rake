@@ -2,17 +2,19 @@ desc 'To check Catalog from dropbox to turn14'
 task catalog_check_against_turn14: :environment do
   file = Curb.open_uri(ENV['DROPBOX_URL'])
   mpn_numbers = []
+  sku_numbers = {}
   CSV.parse(file,
             headers: true,
             header_converters: :symbol) do |row|
     mpn_numbers << row[:turn14id]
+    sku_numbers[row[:turn14id].to_s] = row[:sku]
   end
   auth_token = Curb.t14_auth_token
   until mpn_numbers.empty?
     batch = mpn_numbers.shift(250)
-    items = Turn14Product.where(mfr_part_number: batch)
+    items = Turn14Product.where(mfr_part_number: batch).or(Turn14Product.where(part_number: batch))
     items_ids = items.map(&:item_id)
-
+    next if items_ids.blank?
     retries = 0
     begin
       retries ||= 0
@@ -29,7 +31,7 @@ task catalog_check_against_turn14: :environment do
       next unless t14_item
 
       quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
-      Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['part_number'], quantity)
+      Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['part_number'], quantity,sku_numbers[item.part_number])
     end
   end
 end
