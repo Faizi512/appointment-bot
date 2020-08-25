@@ -23,12 +23,12 @@ module Api
           elsif stock[:stock_location_name] == "Integrated Engineering"
             store_id = Store.find_by(name:"performancebyie").id
           end
-
+          
           product = LatestProduct.where(store_id: store_id).find_by(sku: stock[:variant_sku])
           if product.present?
-            # data1[:count_on_hand] = product.inventory_quantity
-            data2 = {t14_inventory: product.inventory_quantity}
--           data1.merge!(data2)
+            data1[:count_on_hand] = product.inventory_quantity
+            # data2 = {t14_inventory: product.inventory_quantity}
+            # data1.merge!(data2)
           end
         
           db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
