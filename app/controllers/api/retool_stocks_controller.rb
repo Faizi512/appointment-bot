@@ -5,6 +5,9 @@ module Api
       if params.present?
         process_stock_ids = []
         count = 0
+        t14_products = LatestProduct.where(store_id: Store.find_by(name:"turn14").id)
+        ie_products = LatestProduct.where(store_id: Store.find_by(name:"performancebyie").id)
+        #ie_products means Integrated Engineering products coming from performancebyie
         params[:Key1].each do |stock|
           data1 = 
             {
@@ -19,17 +22,14 @@ module Api
               brand_name:           stock[:brand_name]
             }
 
-          if stock[:stock_location_name] == "Turn 14" 
-            store_id = Store.find_by(name:"turn14").id
+          if stock[:stock_location_name] == "Turn 14"
+            product = t14_products.find_by(sku: stock[:variant_sku])
           elsif stock[:stock_location_name] == "Integrated Engineering"
-            store_id = Store.find_by(name:"performancebyie").id
+            product = ie_products.find_by(sku: stock[:variant_sku])
           end
-
-          product = LatestProduct.where(store_id: store_id).find_by(sku: stock[:variant_sku])
+          
           if product.present?
             data1[:count_on_hand] = product.inventory_quantity
-            # data2 = {t14_inventory: product.inventory_quantity}
-            # data1.merge!(data2)
           end
           
           puts "Data_entry_count = #{count}"
