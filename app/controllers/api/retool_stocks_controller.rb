@@ -33,7 +33,7 @@ module Api
           end
           
           puts "Data_entry_count = #{count}"
-          count++
+          count = count + 1
           db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
           db_stock.update(data1)
           process_stock_ids << db_stock.id
