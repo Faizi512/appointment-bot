@@ -4,6 +4,7 @@ module Api
     def update
       if params.present?
         process_stock_ids = []
+        count = 0
         params[:Key1].each do |stock|
           data1 = 
             {
@@ -23,14 +24,16 @@ module Api
           elsif stock[:stock_location_name] == "Integrated Engineering"
             store_id = Store.find_by(name:"performancebyie").id
           end
-          
+
           product = LatestProduct.where(store_id: store_id).find_by(sku: stock[:variant_sku])
           if product.present?
             data1[:count_on_hand] = product.inventory_quantity
             # data2 = {t14_inventory: product.inventory_quantity}
             # data1.merge!(data2)
           end
-        
+          
+          puts "Data_entry_count = #{count}"
+          count++
           db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
           db_stock.update(data1)
           process_stock_ids << db_stock.id
