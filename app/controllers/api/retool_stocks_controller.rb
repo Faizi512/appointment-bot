@@ -17,12 +17,20 @@ module Api
               stock_location_name:  stock[:stock_location_name],
               brand_name:           stock[:brand_name]
             }
-          product = LatestProduct.find_by(sku: stock[:variant_sku])
-          if product.present?
-            data2 = {t14_inventory: product.inventory_quantity}
-            data1.merge!(data2)
+
+          if stock[:stock_location_name] == "Turn 14" 
+            store_id = Store.find_by(name:"turn14").id
+          elsif stock[:stock_location_name] == "Integrated Engineering"
+            store_id = Store.find_by(name:"performancebyie").id
           end
 
+          product = LatestProduct.where(store_id: store_id).find_by(sku: stock[:variant_sku])
+          if product.present?
+            # data1[:count_on_hand] = product.inventory_quantity
+            data2 = {t14_inventory: product.inventory_quantity}
+-           data1.merge!(data2)
+          end
+        
           db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
           db_stock.update(data1)
           process_stock_ids << db_stock.id
