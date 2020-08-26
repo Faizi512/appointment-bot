@@ -24,7 +24,7 @@ class Parser
 			@inventory_quantity =  txt.split("\"id\":#{@variant["id"]}")[2].split('inventory_quantity: ', 2).last.split('product_id:')[0].split(',')[0] rescue nil
 			@mpn = doc.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), 'product-single__sku')]").text.strip
 		elsif store_id == "bmptuning"
-			txt = doc.xpath('.//script[@id=$value]', nil, {:value => 'ProductJson-product-template'}).first.text rescue nil			
+			txt = doc.xpath("//script[contains(text(), 'inventory_quantity')]").text
 			@inventory_quantity = txt.split("\"id\":#{@variant["id"]}",2).last.split('inventory_quantity',2).last.split(',')[0].split(':')[1] rescue nil
 			@mpn = @variant["product_id"]
 		end

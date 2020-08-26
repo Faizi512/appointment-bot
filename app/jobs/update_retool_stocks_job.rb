@@ -3,7 +3,6 @@ class UpdateRetoolStocksJob < ApplicationJob
 
   def perform(records)
     process_stock_ids = []
-    count = 0
     t14_products = LatestProduct.where(store_id: Store.find_by(name:"turn14").id)
     ie_products = LatestProduct.where(store_id: Store.find_by(name:"performancebyie").id)
     #ie_products means Integrated Engineering products coming from performancebyie
@@ -31,13 +30,10 @@ class UpdateRetoolStocksJob < ApplicationJob
         data1[:count_on_hand] = product.inventory_quantity
       end
       
-      puts "Data_entry_count = #{count}"
-      count = count + 1
       db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
       db_stock.update(data1)
       process_stock_ids << db_stock.id
     end
     RetoolStock.where.not(id: process_stock_ids).delete_all
-    # render json: "success".to_json, status: :ok
   end
 end
