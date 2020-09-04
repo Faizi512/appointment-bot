@@ -28,12 +28,17 @@ module Api
             data1.merge!(data2)
           end
 
+
           data3 = {product_eta: order[:brand_eta]}
 
           if order[:product_eta].present?
             data3[:product_eta] = order[:product_eta]
           end
 
+          if order[:stock_location_name] == "default"
+            data3[:product_eta] = "In Stock & Ships The Same Business Day"
+          end
+          
           data1.merge!(data3)
 
           dborder = RetoolOrder.find_or_create_by(item_id: order[:item_id],shipment_number: order[:shipment_number]) 
