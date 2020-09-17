@@ -17,7 +17,7 @@ module Curb
 
   def self.open_uri(url)
     retries = 0
-    @open_uri ||= begin
+    open_uri ||= begin
       retries ||= 0
       open(url)
                   rescue StandardError => e
@@ -25,5 +25,9 @@ module Curb
                     sleep 1
                     retry if (retries += 1) < 3
     end
+  end
+  def self.get(url)
+    response = Curl.get(url)
+    JSON.parse response.body_str
   end
 end

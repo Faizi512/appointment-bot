@@ -10,3 +10,5 @@ Store.find_or_create_by(store_id: "urotuning").update(name: "Urotuning", href:"h
 Store.find_or_create_by(store_id: "performancebyie").update(name: "performancebyie", href:"https://www.performancebyie.com/collections/all/products")
 Store.find_or_create_by(store_id: "bmptuning").update(name: "bmptuning", href:"https://www.bmptuning.com/collections/all/products")
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')
+Section.find_or_create_by(name: "Volkswagen",section_id: "Volkswagen-parts", href: "https://www.fcpeuro.com/Volkswagen-parts/")
+Section.find_or_create_by(name: "Audi",section_id: "Audi-parts", href: "https://www.fcpeuro.com/Audi-parts/")

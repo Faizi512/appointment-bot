@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  brand: MyString
+  sku: MyString
+  price: 9.99
+  available_at: MyString
+  fcp_euro_id: MyString
+  quality: MyString
+  oe_numbers: MyText
+  mfg_numbers: MyText
+  slug: MyString
+  href: MyString
+
+two:
+  title: MyString
+  brand: MyString
+  sku: MyString
+  price: 9.99
+  available_at: MyString
+  fcp_euro_id: MyString
+  quality: MyString
+  oe_numbers: MyText
+  mfg_numbers: MyText
+  slug: MyString
+  href: MyString
