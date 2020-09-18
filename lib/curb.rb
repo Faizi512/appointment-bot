@@ -34,7 +34,7 @@ module Curb
       Curl.get(url)
                   rescue StandardError => e
                     puts "Exception in opening file #{e}"
-                    sleep 5
+                    sleep 30
                     retry if (retries += 1) < 3
     end
     JSON.parse response.body_str
