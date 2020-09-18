@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 task scrape_fcp_products: :environment do
-  section_ids = %w[Audi-parts]
+  section_ids = %w[Audi-parts Volkswagen-parts]
   section_ids.each do |id|
     section = Section.find_by(section_id: id)
     # byebug    
