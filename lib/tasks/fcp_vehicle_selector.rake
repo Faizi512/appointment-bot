@@ -35,7 +35,7 @@ task fcp_vehicle_selector: :environment do
                 }
                 # User.select(:year,:make,:base_vehicle,:vehicle,:body_style_config,:engine_config,:transmission).group(:year,:make,:base_vehicle,:vehicle,:body_style_config,:engine_config,:transmission).having("count(*) > 1").size
                 VehicleSelector.save(params)
-                puts "Year #{params[:year]} Make #{params[:make]} Base_V #{params[:base_vehicle]} Vehicle #{params[:vehicle]} Body #{params[:body_style_config]} Engine #{params[:engine_config]} Transmission #{params[:transmission]}"
+                #puts "Year #{params[:year]} Make #{params[:make]} Base_V #{params[:base_vehicle]} Vehicle #{params[:vehicle]} Body #{params[:body_style_config]} Engine #{params[:engine_config]} Transmission #{params[:transmission]}"
               end
             end
           end
