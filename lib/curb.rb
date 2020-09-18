@@ -26,8 +26,17 @@ module Curb
                     retry if (retries += 1) < 3
     end
   end
+
   def self.get(url)
-    response = Curl.get(url)
+    retries = 0
+    response ||= begin
+      retries ||= 0
+      Curl.get(url)
+                  rescue StandardError => e
+                    puts "Exception in opening file #{e}"
+                    sleep 5
+                    retry if (retries += 1) < 3
+    end
     JSON.parse response.body_str
   end
 end
