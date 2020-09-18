@@ -10,7 +10,10 @@ task scrape_fcp_products: :environment do
       file = Curb.open_uri(section.href + "?page=#{page}")
       doc = Nokogiri::HTML(file)
       doc.css('.browse .group').each_with_index do |group, index1|
-        category_name = group.css('.group__heading .crumbs__item .crumbs__name').last.text
+        category_name = group.css('.group__heading .crumbs__item .crumbs__name').last.text rescue nil
+        if category_name.blank?
+          category_name = group.css('.group__heading .crumbs__item span').text.split("Home").second rescue nil
+        end
         category = section.categories.find_or_create_by(name: category_name)
         # puts "Category #{index1} Name: #{category.name}"
         group.css('.grid-x.hit').each_with_index do |item,index2|
