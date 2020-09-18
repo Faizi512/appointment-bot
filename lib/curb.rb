@@ -37,6 +37,6 @@ module Curb
                     sleep 60
                     retry if (retries += 1) < 3
     end
-    JSON.parse response.body_str
+    JSON.parse response.body_str rescue []
   end
 end
