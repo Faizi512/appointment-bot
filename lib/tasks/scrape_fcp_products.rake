@@ -4,6 +4,7 @@ task scrape_fcp_products: :environment do
   section_ids = %w[Audi-parts Volkswagen-parts]
   section_ids.each do |id|
     section = Section.find_by(section_id: id)
+    # puts "Section: #{section.section_id}"
     # byebug    
     page = 1
     until page.blank?
@@ -64,6 +65,7 @@ task scrape_fcp_products: :environment do
                   rescue StandardError
                     nil
                   end
+      break if next_page.blank?
       puts "Next Page: #{next_page}"
       page = next_page.split('page=')[1]
     end
