@@ -32,11 +32,12 @@ module Curb
     response ||= begin
       retries ||= 0
       Curl.get(url)
+      sleep ENV['SLEEP_TIME']
                   rescue StandardError => e
                     puts "Exception in opening file #{e}"
-                    sleep 60
+                    sleep ENV['SLEEP_TIME']
                     retry if (retries += 1) < 3
     end
-    JSON.parse response.body_str rescue []
+    JSON.parse response.body_str
   end
 end
