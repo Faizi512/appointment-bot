@@ -4,8 +4,7 @@ task scrape_fcp_products: :environment do
   section_ids = %w[Audi-parts Volkswagen-parts]
   section_ids.each do |id|
     section = Section.find_by(section_id: id)
-    # puts "Section: #{section.section_id}"
-    # byebug    
+    puts "Section: #{section.section_id}"
     page = 1
     until page.blank?
       file = Curb.open_uri(section.href + "?page=#{page}")
@@ -24,8 +23,8 @@ task scrape_fcp_products: :environment do
           async_url = "#{ENV['FCP_STORE']}#{item_doc.at('.extended')['data-load-async']}"
           async_doc = Nokogiri::HTML(Curb.open_uri(async_url))
           desc = async_doc.at('#description').at('.extended__details').css('ul').css('li').text.strip
-          if async_doc.css('.extended__kit')
-            # puts "Kit #{index2}"
+          if async_doc.css('.extended__kit').present?
+            puts "Kit #{index2}"
             kit = category.kits.find_or_create_by({
                                          title: item_doc.at('.listing__name').text.strip,
                                          brand: item_doc.at('.//meta[@property=$value]', nil, { value: 'product:brand' })['content'],
