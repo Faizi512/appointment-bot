@@ -3,6 +3,7 @@ class UpdateRetoolStocksJob < ApplicationJob
 
   def perform(records)
     process_stock_ids = []
+    data_location = records[:Key1].first[:stock_location_name]
     t14_products = LatestProduct.where(store_id: Store.find_by(name:"turn14").id)
     ie_products = LatestProduct.where(store_id: Store.find_by(name:"performancebyie").id)
     #ie_products means Integrated Engineering products coming from performancebyie
@@ -24,17 +25,20 @@ class UpdateRetoolStocksJob < ApplicationJob
       if stock[:stock_location_name] == "Turn 14"
         product = t14_products.find_by(sku: stock[:variant_sku])
       elsif stock[:stock_location_name] == "Integrated Engineering"
-        product = ie_products.find_by(sku: stock[:variant_sku])
+        product = ie_products.find_by(sku: stock[:variant_mpn])
       end
       
       if product.present?
         data1[:count_on_hand] = product.inventory_quantity
+      else
+        next
       end
       
       db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id],variant_sku: stock[:variant_sku])
       db_stock.update(data1)
       process_stock_ids << db_stock.id
     end
-    RetoolStock.where.not(id: process_stock_ids).delete_all
+    data = RetoolStock.where(stock_location_name: data_location)
+    data.where.not(id: process_stock_ids).delete_all
   end
 end
