@@ -14,6 +14,7 @@ class UpdateRetoolStocksJob < ApplicationJob
           variant_sku:          stock[:variant_sku],
           variant_mpn:          stock[:variant_mpn],
           count_on_hand:        stock[:count_on_hand],
+          product_id:           stock[:product_id], 
           product_name:         stock[:product_name],
           product_available_on: stock[:product_available_on],
           stock_location_name:  stock[:stock_location_name],
