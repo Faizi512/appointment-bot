@@ -3,11 +3,13 @@ class UpdateRetoolStocksJob < ApplicationJob
 
   def perform(records)
     process_stock_ids = []
-    data_location = records[:Key1].first[:stock_location_name]
+    sym = "Key1"
+    data_location = records[sym.to_sym].first[:stock_location_name]
+    available_on = records[sym.to_sym].first[:product_available_on]
     t14_products = LatestProduct.where(store_id: Store.find_by(name:"turn14").id)
     ie_products = LatestProduct.where(store_id: Store.find_by(name:"performancebyie").id)
     #ie_products means Integrated Engineering products coming from performancebyie
-    records[:Key1].each do |stock|
+    records[sym.to_sym].each do |stock|
       data1 = 
         {
           variant_id:           stock[:variant_id],
@@ -22,9 +24,9 @@ class UpdateRetoolStocksJob < ApplicationJob
           brand_name:           stock[:brand_name]
         }
 
-      if stock[:stock_location_name] == "Turn 14"
+      if data_location == "Turn 14"
         product = t14_products.find_by(sku: stock[:variant_sku])
-      elsif stock[:stock_location_name] == "Integrated Engineering"
+      elsif data_location == "Integrated Engineering"
         product = ie_products.find_by(sku: stock[:variant_mpn])
       end
       
@@ -38,7 +40,18 @@ class UpdateRetoolStocksJob < ApplicationJob
       db_stock.update(data1)
       process_stock_ids << db_stock.id
     end
-    data = RetoolStock.where(stock_location_name: data_location)
+
+    # byebug
+    if data_location == "Turn 14"
+      data = RetoolStock.where(stock_location_name: data_location)
+      if available_on == nil || available_on >= DateTime.now
+        data = data.where("product_available_on >= ? OR product_available_on = ?", DateTime.now,nil)
+      elsif available_on != nil || available_on <= DateTime.now
+        data = data.where("product_available_on <= ? OR product_available_on != ?", DateTime.now,nil)
+      end
+    else
+      data = RetoolStock.where(stock_location_name: data_location)
+    end
     data.where.not(id: process_stock_ids).delete_all
   end
 end
