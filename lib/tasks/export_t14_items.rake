@@ -6,25 +6,17 @@ task export_t14_items: :environment do
   loop do
     items = Curb.make_get_request(items_url, token)
     puts 'start inserting a page into db'
-    items['data'].each_with_index do |item, index|
-      item_hash = item['attributes']
-      product = Turn14Product.add_t14_product(supplier, item['id'], item_hash['product_name'], item_hash['part_number'], item_hash['mfr_part_number'], item_hash['brand_id'])
-      item_data = Curb.t14_inventory_api_sigle_item(item['id'], token)
-      stock = begin
-           item_data['data'][0]['attributes']['manufacturer']['stock']
-              rescue StandardError
-                nil
-         end
-      esd = begin
-         item_data['data'][0]['attributes']['manufacturer']['esd']
-            rescue StandardError
-              nil
-       end
-      if stock.present? && esd.present?
-        puts "manufacturer present #{index}"
-        Manufacturer.add_manufacturer(product, stock, esd)
-      else
-        puts (item['id']).to_s
+    if items['data'].present?
+      items['data'].each do |item|
+        item_hash = item['attributes']
+        product = Turn14Product.add_t14_product(supplier, item['id'], item_hash['product_name'], item_hash['part_number'], item_hash['mfr_part_number'], item_hash['brand_id'])
+        item_data = Curb.t14_inventory_api_sigle_item(item['id'], token)
+        stock = item_data['data'][0]['attributes']['manufacturer']['stock'] rescue nil
+        esd = item_data['data'][0]['attributes']['manufacturer']['esd'] rescue nil
+        if stock.present? && esd.present?
+          puts 'Manufacturer added'
+          Manufacturer.add_manufacturer(product, stock, esd)
+        end
       end
     end
     break if items['links']['next'].nil?

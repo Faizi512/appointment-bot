@@ -5,7 +5,7 @@ class Manufacturer < ApplicationRecord
     if product.manufacturer.nil?
       product.create_manufacturer(stock: stock, esd: esd)
     else
-      product.manufacturer.update_attributes(stock: stock, esd: esd)
+      product.manufacturer.update(stock: stock, esd: esd)
     end
   end
 end
