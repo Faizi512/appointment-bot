@@ -11,11 +11,18 @@ task export_t14_items: :environment do
         item_hash = item['attributes']
         product = Turn14Product.add_t14_product(supplier, item['id'], item_hash['product_name'], item_hash['part_number'], item_hash['mfr_part_number'], item_hash['brand_id'])
         item_data = Curb.t14_inventory_api_sigle_item(item['id'], token)
+
         stock = item_data['data'][0]['attributes']['manufacturer']['stock'] rescue nil
         esd = item_data['data'][0]['attributes']['manufacturer']['esd'] rescue nil
         if stock.present? && esd.present?
           puts 'Manufacturer added'
           Manufacturer.add_manufacturer(product, stock, esd)
+        end
+
+        eta = item_data['data'][0]['attributes']['eta']
+        if eta.present?
+          LatestPurchaseOrder.add_latest_purchase_order(product, eta)
+          ArchivedPurchaseOrder.add_archived_purchase_order(product, eta)
         end
       end
     end
