@@ -8,15 +8,6 @@ module Curb
     end
   end
 
-  def self.t14_inventory_api_sigle_item(id, token)
-    items = begin
-      response = Curl.get("#{ENV['TURN14_STORE']}/v1/inventory/#{id}") do |http|
-        http.headers['Authorization'] = "Bearer #{token}"
-      end
-      JSON.parse response.body_str
-    end
-  end
-
   def self.t14_auth_token
     token = begin
       response = Curl.post("#{ENV['TURN14_STORE']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
