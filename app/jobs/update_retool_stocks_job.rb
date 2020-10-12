@@ -13,11 +13,6 @@ class UpdateRetoolStocksJob < ApplicationJob
       product = get_product(location, stock[:variant_sku], stock[:variant_mpn])
       if product.present?
         data[:count_on_hand] = product.inventory_quantity
-        product = Turn14Product.find_by(item_id: product['sku'])
-        if product.present? && product.manufacturer.present?
-          data1 = { mfr_stock: product.manufacturer['stock'], mfr_esd: product.manufacturer['esd'] }
-          data.merge!(data1)
-        end
       else
         next
       end
