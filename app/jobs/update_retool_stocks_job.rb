@@ -25,12 +25,12 @@ class UpdateRetoolStocksJob < ApplicationJob
 end
 
 def t14_products
-  LatestProduct.where(store_id: Store.find_by(name: 'turn14').id)
+  @t14_products =|| LatestProduct.where(store_id: Store.find_by(name: 'turn14').id)
 end
 
 def ie_products
   # ie_products means Integrated Engineering products coming from performancebyie
-  LatestProduct.where(store_id: Store.find_by(name: 'performancebyie').id)
+  @ie_products =|| LatestProduct.where(store_id: Store.find_by(name: 'performancebyie').id)
 end
 
 def data_hash stock

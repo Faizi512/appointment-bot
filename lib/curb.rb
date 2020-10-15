@@ -22,18 +22,6 @@ module Curb
     JSON.parse response.body_str
   end
 
-  def self.open_uri(url)
-    retries = 0
-    open_uri ||= begin
-      retries ||= 0
-      open(url)
-                 rescue StandardError => e
-                   puts "Exception in opening file #{e}"
-                   sleep 1
-                   retry if (retries += 1) < 3
-    end
-  end
-
   def self.get(url)
     retries = 0
     response ||= begin
@@ -46,5 +34,22 @@ module Curb
                    retry if (retries += 1) < 3
     end
     JSON.parse response.body_str
+  end
+
+  def self.open_uri(url)
+    retries = 0
+    open_uri ||= begin
+      retries ||= 0
+      open(url)
+                 rescue StandardError => e
+                   puts "Exception in opening file #{e}"
+                   sleep 1
+                   retry if (retries += 1) < 3
+    end
+  end
+
+  def self.get_doc(url)
+    file = Curb.open_uri(url)
+    doc = Nokogiri::HTML(file)
   end
 end
