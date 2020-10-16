@@ -10,7 +10,12 @@ class UpdateRetoolStocksJob < ApplicationJob
     available_on = records[sym.to_sym].first[:product_available_on]
     records[sym.to_sym].each do |stock|
       data = data_hash(stock)
-      product = get_product(location, stock[:variant_sku], stock[:variant_mpn])
+      product = if stock[:is_master] == 1
+                  get_product(location, stock[:variant_sku], stock[:value])
+                else
+                  get_product(location, stock[:variant_sku], stock[:variant_mpn])
+                end
+
       if product.present?
         data[:count_on_hand] = product.inventory_quantity
       else
