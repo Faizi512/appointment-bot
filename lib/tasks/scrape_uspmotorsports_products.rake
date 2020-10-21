@@ -1,6 +1,6 @@
 task scrape_uspmotorsports_products: :environment do
   store = Store.find_by(name: 'uspmotorsports')
-  home_doc = Curb.get_doc((ENV['USP_STORE']).to_s)
+  home_doc = Curb.get_doc(store.href)
   categories = home_doc.at('.top-categories-dropdown').css('ul').css('li')
   puts 'categories fetched'
   categories.each do |category|
