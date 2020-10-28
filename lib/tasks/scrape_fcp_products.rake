@@ -1,5 +1,5 @@
 task scrape_fcp_products: :environment do
-  sections = Section.all
+  sections = Section.find_by(section_id: ["Volkswagen-parts", "Audi-parts"])
   sections.each do |section|
     puts "Section: #{section.section_id}"
     page = 1
