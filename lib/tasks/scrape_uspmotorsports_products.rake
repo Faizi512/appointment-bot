@@ -6,11 +6,11 @@ task scrape_uspmotorsports_products: :environment do
   categories.each do |category|
     category_url = category.children[1].attributes['href'].value
     category_doc = Curb.get_doc(category_url)
-    scrape_pages(category_url, store) if category_doc.at('.subcategories-div .subcategories-wrap').blank?
+    scrape_usp_pages(category_url, store) if category_doc.at('.subcategories-div .subcategories-wrap').blank?
   end
 end
 
-def scrape_pages page_url, store
+def scrape_usp_pages page_url, store
   page = 1
   until page.blank?
     puts "Page: #{page_url}?page=#{page}"
@@ -20,7 +20,7 @@ def scrape_pages page_url, store
       puts "product #{index}"
       product_url = product.css('.image').children[1].attributes['href'].value
       product_doc = Curb.get_doc(product_url)
-      data = scrap_product_values(product_doc)
+      data = scrap_usp_product_values(product_doc)
       add_product_to_store(store, data[:brand], data[:mpn], data[:sku], data[:inventory], data[:slug], product_url)
       # puts "brand = #{data[:brand]} mpn = #{data[:mpn]} inventory = #{data[:inventory]} sku = #{data[:sku]}"
       # puts "URL = #{product_url}"
@@ -43,7 +43,7 @@ def add_product_to_store(store, brand, mpn, sku, stock, slug, href)
   latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug, href: href)
 end
 
-def scrap_product_values doc
+def scrap_usp_product_values doc
   data = doc.xpath("//script[contains(text(), 'dataLayer')]").text
   {
     sku: data.split('productSKU')[1].split("': '")[1].split("'")[0],

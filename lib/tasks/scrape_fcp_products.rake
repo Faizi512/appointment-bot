@@ -24,7 +24,7 @@ task scrape_fcp_products: :environment do
             puts "Kit #{index2}"
             kit = category.kits.find_by(sku: sku)
             if kit.blank?
-              kit = category.kits.create(scrap_values(item_doc, desc, async_doc, item_url))
+              kit = category.kits.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
               sku_list = async_doc.css('.extended__kit table tbody tr .extended__tableSku').text.strip.split("\n").reject { |s| s.empty? }
               sku_list.each_with_index do |product_sku,index3|
                 prod = category.fcp_products.find_or_create_by(sku: product_sku)
@@ -32,14 +32,14 @@ task scrape_fcp_products: :environment do
                 # puts "#{index3} Product of kit inserted" if pk.present?
               end
             end
-            add_fitments(async_doc, kit)
+            add_fcp_fitments(async_doc, kit)
           else
             puts "#{index2} Product single inserted"
             product = category.fcp_products.find_by(sku: sku)
             if product.blank?
-              product = category.fcp_products.create(scrap_values(item_doc, desc, async_doc, item_url))
+              product = category.fcp_products.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
             end
-            add_fitments(async_doc, product)
+            add_fcp_fitments(async_doc, product)
           end
         end
       end
@@ -55,14 +55,14 @@ task scrape_fcp_products: :environment do
   end
 end
 
-def add_fitments doc, product
+def add_fcp_fitments doc, product
   doc.at('#fitment').css('.fitmentGuide .fitmentGuide__models .fitmentGuide__applicationGroup').css('ul').css('li').each do |li| 
     model = li.at('div').text.strip
     product.fitments.find_or_create_by(fitment_model: model)
   end
 end
 
-def scrap_values item_doc, desc, async_doc, item_url
+def scrap_fcp_values item_doc, desc, async_doc, item_url
   params = 
     {
       title: item_doc.at('.listing__name').text.strip,
