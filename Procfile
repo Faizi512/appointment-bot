@@ -1,0 +1,1 @@
+ecs_products: bundle exec rake scrape_ecs_products
