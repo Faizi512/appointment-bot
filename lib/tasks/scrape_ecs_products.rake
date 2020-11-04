@@ -1,6 +1,6 @@
 task scrape_ecs_products: :environment do
   store = Store.find_by(name: 'ecstuning')
-  sections = %w[/b-genuine-bmw-parts/v-bmw /b-genuine-volkswagen-audi-parts]
+  sections = %w[/b-genuine-volkswagen-audi-parts/v-audi /b-genuine-volkswagen-audi-parts/v-volkswagen /b-genuine-bmw-parts/v-bmw]
   sections.each do |section|
     url = "#{store.href}#{section}"
     home_doc = Curb.get_doc("#{store.href}#{section}")
