@@ -15,12 +15,12 @@ class UpdateRetoolStocksJob < ApplicationJob
                 else
                   get_product(location, stock[:variant_sku], stock[:variant_mpn])
                 end
-
       if product.present?
-        data[:count_on_hand] = product.inventory_quantity
+        data[:t14_inventory] = product.inventory_quantity
       else
         next
       end
+      byebug
       db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id], variant_sku: stock[:variant_sku])
       db_stock.update(data)
       process_stock_ids << db_stock.id
@@ -49,7 +49,8 @@ def data_hash stock
     product_name:         stock[:product_name],
     product_available_on: stock[:product_available_on],
     stock_location_name:  stock[:stock_location_name],
-    brand_name:           stock[:brand_name]
+    brand_name:           stock[:brand_name],
+    t14_inventory:        nil 
   }
 end
 
