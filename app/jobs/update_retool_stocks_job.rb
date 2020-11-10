@@ -10,17 +10,10 @@ class UpdateRetoolStocksJob < ApplicationJob
     available_on = records[sym.to_sym].first[:product_available_on]
     records[sym.to_sym].each do |stock|
       data = data_hash(stock)
-      product = if stock[:is_master] == 1
-                  get_product(location, stock[:variant_sku], stock[:value])
-                else
-                  get_product(location, stock[:variant_sku], stock[:variant_mpn])
-                end
-      if product.present?
-        data[:t14_inventory] = product.inventory_quantity
-      else
-        next
-      end
-      # byebug
+      product = get_product(location, stock[:variant_sku], stock[:is_master] ? stock[:value] : stock[:variant_mpn])
+      next if product.blank?
+
+      data[:t14_inventory] = product.inventory_quantity
       db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id], variant_sku: stock[:variant_sku])
       db_stock.update(data)
       process_stock_ids << db_stock.id
@@ -55,7 +48,7 @@ def data_hash stock
 end
 
 def get_product location, sku, mpn
-  if location == 'Turn 14'
+  if location == 'Turn 14' || location == 'default'
     t14_products.find_by(sku: sku)
   elsif location == 'Integrated Engineering'
     ie_products.find_by(sku: mpn)
@@ -64,7 +57,7 @@ end
 
 def remove_records ids, location, available_on
   data = RetoolStock.where(stock_location_name: location)
-  if location == 'Turn 14'
+  if location == 'Turn 14' || location == 'default'
     if available_on.nil? || available_on >= DateTime.now
       data = data.where('product_available_on >= ? OR product_available_on = ?', DateTime.now, nil)
     elsif available_on.present? || available_on <= DateTime.now
