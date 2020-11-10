@@ -11,9 +11,9 @@ class UpdateRetoolStocksJob < ApplicationJob
     records[sym.to_sym].each do |stock|
       data = data_hash(stock)
       product = get_product(location, stock[:variant_sku], stock[:is_master] ? stock[:value] : stock[:variant_mpn])
-      next if product.blank?
+      # next if product.blank?
 
-      data[:t14_inventory] = product.inventory_quantity
+      data[:t14_inventory] = product.inventory_quantity if product.present?
       db_stock = RetoolStock.find_or_create_by(variant_id: stock[:variant_id], variant_sku: stock[:variant_sku])
       db_stock.update(data)
       process_stock_ids << db_stock.id
