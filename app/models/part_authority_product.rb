@@ -1,0 +1,2 @@
+class PartAuthorityProduct < ApplicationRecord
+end
