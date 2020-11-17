@@ -13,7 +13,7 @@ task parts_authority_catalog: :environment do
       content = entry.get_input_stream.read
       CSV.parse(content, headers: true, header_converters: :symbol) do |row|
         puts "Line #{row[:line]} Part #{row[:part]} Cost #{row[:cost]} Count #{row[:qtyonhand]} Packs #{row[:packs]}"
-        product = PartAuthorityProduct.find_or_create_by(part_number: row[:part])
+        product = PartAuthorityProduct.find_or_create_by(part_number: row[:part], product_line: row[:line])
         product.update(product_line: row[:line], price: row[:cost], core_price: row[:coreprice], qty_on_hand: row[:qtyonhand], packs: row[:packs])
       end
     end
