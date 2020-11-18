@@ -20,36 +20,40 @@ def scrape_usp_pages page_url, store
       puts "product #{index}"
       product_url = product.css('.image').children[1].attributes['href'].value
       product_doc = Curb.get_doc(product_url)
+      slug = product_url.split('/').last.split('.html').first
       data = scrap_usp_product_values(product_doc)
-      add_product_to_store(store, data[:brand], data[:mpn], data[:sku], data[:inventory], data[:slug], product_url)
-      # puts "brand = #{data[:brand]} mpn = #{data[:mpn]} inventory = #{data[:inventory]} sku = #{data[:sku]}"
+      add_product_to_store(store, data[:brand], data[:mpn], data[:sku], data[:inventory], slug, product_url, data[:price], data[:title])
       # puts "URL = #{product_url}"
-      # byebug
+      # puts "brand = #{data[:brand]} mpn = #{data[:mpn]} inventory = #{data[:inventory]} sku = #{data[:sku]}"
+      # puts "Price #{data[:price]} Title #{data[:title]}"
     end
     next_page = begin
-                  page_doc.xpath('//*[@class="right-arrow"]')[0].attributes['href'].value
-                rescue StandardError
-                  nil
-                end
+      page_doc.xpath('//*[@class="right-arrow"]')[0].attributes['href'].value
+    rescue StandardError
+      nil
+    end
     break if next_page.blank?
 
     page = next_page.split('page=')[1]
   end
 end
 
-def add_product_to_store(store, brand, mpn, sku, stock, slug, href)
+def add_product_to_store(store, brand, mpn, sku, stock, slug, href, price, title)
   latest = store.latest_products.find_or_create_by(sku: sku)
-  latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug, href: href)
-  latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug, href: href)
+  latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug, href: href, price: price, product_title: title)
+  latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug, href: href, price: price, product_title: title)
 end
 
 def scrap_usp_product_values doc
+  price_line = doc.xpath("//span[@class='currency']").children.last
+  price = price_line.text if price_line.present?
   data = doc.xpath("//script[contains(text(), 'dataLayer')]").text
   {
     sku: data.split('productSKU')[1].split("': '")[1].split("'")[0],
-    slug: data.split('productName')[1].split("': '")[1].split("',")[0],
     brand: data.split('productManufacturer')[1].split("': '")[1].split("',")[0],
     inventory: data.split('productStock')[1].split("': ")[1].split(',')[0].to_i,
-    mpn: doc.at('.product-mfg-value').children.text
+    mpn: doc.at('.product-mfg-value').children.text,
+    title: doc.xpath("//h1[@class='product-title']").children.text,
+    price: price
   }
 end
