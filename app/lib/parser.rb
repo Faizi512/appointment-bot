@@ -57,7 +57,7 @@ class Parser
 
   def data_points_hash
     {
-      inventory_quantity: @stock, mpn: @mpn, brand: @brand,
+      stock: @stock, mpn: @mpn, brand: @brand,
       sku: @sku, price: @price, title: @title
     }
   end
