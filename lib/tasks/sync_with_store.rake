@@ -27,29 +27,33 @@ task sync_with_store: :environment do
       product['variants'].each do |variant|
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
         puts variant_href.to_s
+        retry_uri = 0
         file = begin
+          retry_uri ||= 0
           URI.open(variant_href)
         rescue OpenURI::HTTPError => e
-          puts "EXception in OpenURI #{e}"
-          sleep 60 * 5
-          retry
+          puts "Exception in OpenURI #{e}"
+          puts "URI = #{variant_href}"
+          sleep 2
+          retry if (retry_uri += 1) < 2
         end
+
         retries = 0
         begin
           retries ||= 0
           data = Parser.new(file, store.store_id, variant, product_brand).parse
-          add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock],
-                               product_slug, variant['id'], variant['product_id'], variant_href,
-                               data[:price], data[:title])
+          add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,
+                               variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
           # puts "brand #{brand} mpn #{mpn} stock #{stock} sku #{variant["sku"]}}"
           puts "Price #{data[:price]} Title #{data[:title]}"
         rescue StandardError => e
-          puts "EXception in Parsing Nokogiri::HTML #{e}"
+          puts "Exception in Parsing Nokogiri::HTML #{e}"
           sleep 1
           retry if (retries += 1) < 3
         end
       rescue StandardError => e
-        puts "EXception in finding product variant #{e}"
+        puts "Exception in finding product variant #{e}"
+        puts "URI = #{variant_href}"
         next
       end
     end
