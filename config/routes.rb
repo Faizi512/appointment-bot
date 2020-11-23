@@ -9,5 +9,7 @@ Rails.application.routes.draw do
 
     patch '/retool_me_new_products' => 'retool_me_new_products#update'
     patch '/retool_me_new_products/add_product' => 'retool_me_new_products#add_product'
+
+    patch '/retool_me_purchase_orders' => 'retool_me_purchase_orders#update'
   end
 end
