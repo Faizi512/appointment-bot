@@ -50,7 +50,7 @@ class Parser
     price = doc.xpath("//span[@class='price']").children.last
     @price = price.text if price.present?
     txt = doc.xpath("//script[contains(text(), 'inventory_quantity')]").text
-    @stock = txt.split("\"id\":#{@variant['id']}", 2).last.split('inventory_quantity', 2).last.split(',')[0].split(':')[1] rescue nil
+    @stock = txt.split("\"id\":#{@variant['id']}", 2).last.split('inventory_quantity', 2).last.split(',')[0].split(':')[1].to_i rescue nil
     @mpn = @variant['product_id']
     data_points_hash
   end
