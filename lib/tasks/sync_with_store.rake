@@ -26,15 +26,14 @@ task sync_with_store: :environment do
 
       product['variants'].each do |variant|
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
-        puts variant_href.to_s
+        # puts variant_href.to_s
         retry_uri = 0
         file = begin
           retry_uri ||= 0
           URI.open(variant_href)
         rescue OpenURI::HTTPError => e
-          puts "Exception in OpenURI #{e}"
-          puts "URI = #{variant_href}"
-          sleep 2
+          puts "Exception in method OpenURI #{e} for #{store.name} URL:#{variant_href}"
+          sleep 1
           retry if (retry_uri += 1) < 2
         end
 
@@ -45,7 +44,7 @@ task sync_with_store: :environment do
           add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,
                                variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
           # puts "brand #{brand} mpn #{mpn} stock #{stock} sku #{variant["sku"]}}"
-          puts "Price #{data[:price]} Title #{data[:title]}"
+          # puts "Price #{data[:price]} Title #{data[:title]}"
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
           sleep 1
@@ -72,10 +71,11 @@ end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
   latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)
-
+  # puts "Before Stock: #{latest.inventory_quantity} Before Date: #{latest.updated_at}"
   latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
     href: href, price: price, product_title: title)
-
+  # latest = store.latest_products.find_by(variant_id: variant_id, product_id: product_id)
+  # puts "After Stock: #{latest.inventory_quantity} After Date: #{latest.updated_at}"
   latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,
     inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
     href: href, price: price, product_title: title)
