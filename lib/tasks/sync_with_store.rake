@@ -32,7 +32,9 @@ task sync_with_store: :environment do
           retry_uri ||= 0
           URI.open(variant_href)
         rescue OpenURI::HTTPError => e
-          puts "Exception in method OpenURI #{e} for #{store.name} URL:#{variant_href}"
+          puts "Exception in method OpenURI #{e} for #{store.name} URL:#{variant_href}" if retry_uri.positive?
+          removed_product = store.latest_products.find_by(variant_id: variant['id'], product_id: variant['product_id']) if retry_uri.positive?
+          removed_product.delete if removed_product.present?
           sleep 1
           retry if (retry_uri += 1) < 2
         end
