@@ -12,12 +12,6 @@ module Api
       render json: 'success'.to_json, status: :ok
     end
 
-    def add_product
-      product = MeNewProduct.find_or_create_by(id: params[:id]) if params.present?
-      product.update(status: 'Added') if product.present?
-      render json: 'success'.to_json, status: :ok
-    end
-
   end
   # end class
 end
