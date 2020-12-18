@@ -2,7 +2,7 @@ task scrape_ebay_products: :environment do
   store = Store.find_by(name: 'ebay')
   home_doc = Curb.get_doc(store.href)
   products_url = home_doc.css('ul').css('li').css('h3').css('a')
-  byebug
+  # byebug
   puts "Products #{products_url.count} Fetched"
   products_url.each_with_index do |product_url, index|
     url = product_url.attributes['href'].value
