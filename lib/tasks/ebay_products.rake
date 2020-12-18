@@ -2,7 +2,6 @@ task scrape_ebay_products: :environment do
   store = Store.find_by(name: 'ebay')
   home_doc = Curb.get_doc(store.href)
   products_url = home_doc.css('ul').css('li').css('h3').css('a')
-  # byebug
   puts "Products #{products_url.count} Fetched"
   products_url.each_with_index do |product_url, index|
     url = product_url.attributes['href'].value
@@ -15,6 +14,7 @@ task scrape_ebay_products: :environment do
     price = product_doc.xpath('.//span[@itemprop=$value]', nil, { value: 'price' }).children.text.split(' ').last
     batch = product_doc.xpath('.//span[@id=$value]', nil, { value: 'qtySubTxt' })
     qty = batch.children[1].children.text.strip.split(' ').first if batch.present?
+    qty = 1 if qty.blank?
     puts "URL: #{url}"
     puts "Title: #{title}"
     puts "Index: #{index+1} SKU: #{sku} Price #{price} QTY: #{qty}"
