@@ -15,6 +15,14 @@ module Api
       end
       render json: 'success'.to_json, status: :ok
     end
+
+    def update_tracking
+      orders = MePurchaseOrder.where(modded_po: params[:modded_po]) if params.present?
+      orders.update(tracking: params[:tracking]) if orders.present?
+      render json: 'success'.to_json, status: :ok
+    end
+
+    # write new method here
   end
   # end class
 end
