@@ -22,6 +22,16 @@ module Api
       render json: 'success'.to_json, status: :ok
     end
 
+    def add_purchase_order
+      MePurchaseOrder.create(modded_po: params[:modded_po], vendor: params[:vendor], vendor_po: params[:vendor_po],
+          brand: params[:brand], product_name: params[:product_name], mpn: params[:mpn], sku: params[:sku], qty: params[:qty],
+          cost: params[:cost], shipping_eta: params[:shipping_eta], tracking: params[:tracking])
+      if params[:sku].present?
+        entry = MeInventoryDB.find_or_create_by(sku: params[:sku])
+        qty = entry.qty == nil ? 0 : entry.qty 
+        entry.update(qty: (params[:qty].to_i + qty), brand: params[:brand], product_name: params[:product_name], mpn: params[:mpn])
+      end
+    end
     # write new method here
   end
   # end class
