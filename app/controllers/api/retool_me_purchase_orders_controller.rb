@@ -10,7 +10,7 @@ module Api
 
           product.update(modded_po: rec[:modded_po], vendor: rec[:vendor], vendor_po: rec[:vendor_po],
           brand: rec[:brand], product_name: rec[:product_name], mpn: rec[:mpn], sku: rec[:sku], qty: rec[:qty],
-          cost: rec[:cost], shipping_eta: rec[:shipping_eta], tracking: rec[:tracking])
+          cost: rec[:cost], shipping_eta: rec[:shipping_eta], tracking: rec[:tracking], stock_state: rec[:stock_state])
         end
       end
       render json: 'success'.to_json, status: :ok
