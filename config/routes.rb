@@ -15,5 +15,6 @@ Rails.application.routes.draw do
     post '/add_purchase_order' => 'retool_me_purchase_orders#add_purchase_order'
 
     patch '/retool_me_inventory_db' => 'retool_me_inventory_dbs#update'
+    post '/add_inventory' => 'retool_me_inventory_dbs#add_inventory'
   end
 end
