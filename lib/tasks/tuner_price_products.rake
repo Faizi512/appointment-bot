@@ -18,7 +18,7 @@ task tuner_price_products: :environment do
     until page.blank?
       url = "#{store.href}#{sec}?p=#{page}"
       browser.goto url
-      puts "\n *********************************************************************************"
+      puts "\n ***********************************************************************************"
       catagories = []
       browser.element(xpath: '//div[@class="category-products"]').elements(css: 'ul li a').select{|a| catagories<<a.href}
       catagories.each_with_index do |prod_url, index|
