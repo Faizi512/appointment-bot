@@ -3,7 +3,8 @@ require 'webdrivers/chromedriver'
 task tuner_price_products: :environment do
   store = Store.find_by(name: 'tunerprice')
   sections = %w[/index.php/audi.html /index.php/vw.html]
-  browser = Watir::Browser.new
+  # browser = Watir::Browser.new
+  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
   
   # Navigate to Page
   browser.goto store.href
