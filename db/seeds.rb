@@ -8,6 +8,7 @@ Store.find_or_create_by(store_id: 'uspmotorsports').update(name: 'uspmotorsports
 Store.find_or_create_by(store_id: 'ctsturbo').update(name: 'ctsturbo', href: 'https://www.ctsturbo.com/product-category/nissan/')
 Store.find_or_create_by(store_id: 'ecstuning').update(name: 'ecstuning', href: 'https://www.ecstuning.com')
 Store.find_or_create_by(store_id: 'ebay').update(name: 'ebay', href: 'https://www.ebay.com/sch/usedeuroparts/m.html?_nkw=&_armrs=1&_ipg=&_from=')
+Store.find_or_create_by(store_id: 'tunerprice').update(name: 'tunerprice', href: 'https://www.tunerprice.com/wholesale')
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')
