@@ -39,6 +39,7 @@ task tuner_price_products: :environment do
         qty = browser.p(class: 'availability-only').text.split(' ')[1].to_i if browser.p(class: 'availability-only').present?
         # puts "Title=#{title} SKU=#{sku} Avail=#{availability} Qty=#{qty}"
         # puts "#########################################################"
+        add_emotion_products_to_store(store, title, sku, qty, prod_url)
         new_product = EmotionProduct.find_or_create_by(sku: sku)
         new_product.update(title: title, brand: 'Emotion', qty: qty, href: prod_url)   
       end
@@ -55,4 +56,10 @@ task tuner_price_products: :environment do
     
   end
   browser.close
+end
+
+def add_emotion_products_to_store(store, title, sku, qty, href)
+  latest = store.latest_products.find_or_create_by(sku: sku)
+  latest.update(product_title: title, brand: 'Emotion', sku: sku, inventory_quantity: qty, href: href)
+  latest.archive_products.create(store_id: store.id, product_title: title, brand: 'Emotion', sku: sku, inventory_quantity: qty, href: href)
 end
