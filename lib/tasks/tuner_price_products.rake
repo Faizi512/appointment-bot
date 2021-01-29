@@ -1,14 +1,15 @@
 require 'watir'
 require 'webdrivers/chromedriver'
 task tuner_price_products: :environment do
-  # byebug
   store = Store.find_by(name: 'tunerprice')
   sections = %w[/index.php/audi.html /index.php/vw.html]
-  # browser = Watir::Browser.new
-  # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
-  Selenium::WebDriver::Chrome.path = "/app/.apt/usr/bin/google-chrome" 
-  Selenium::WebDriver::Chrome.driver_path = "/app/.chromedriver/bin/chromedriver" 
-  browser = Watir::Browser.new :chrome
+  
+  Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+  Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH'] 
+  
+  # browser = Watir::Browser.new :chrome
+  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
+  
   # Navigate to Page
   browser.goto store.href
 
@@ -22,13 +23,13 @@ task tuner_price_products: :environment do
     until page.blank?
       url = "#{store.href}#{sec}?p=#{page}"
       browser.goto url
-      puts "\n *******************************************************************************"
+      # puts "\n *******************************************************************************"
       catagories = []
       browser.element(xpath: '//div[@class="category-products"]').elements(css: 'ul li a').select{|a| catagories<<a.href}
       catagories.each_with_index do |prod_url, index|
         next if index.even?
         next if prod_url.include? 'catalog'
-        puts "Index=#{index} URL=#{prod_url}"
+        # puts "Index=#{index} URL=#{prod_url}"
         browser.goto prod_url
         title = browser.div(class: 'product-name').text
         availability = browser.p(class: 'availability').text.split(': ').last
@@ -36,8 +37,8 @@ task tuner_price_products: :environment do
         qty = 0 if availability == 'Out of stock'
         qty = 12 if availability == 'In stock'
         qty = browser.p(class: 'availability-only').text.split(' ')[1].to_i if browser.p(class: 'availability-only').present?
-        puts "Title=#{title} SKU=#{sku} Avail=#{availability} Qty=#{qty}"
-        puts "#########################################################"
+        # puts "Title=#{title} SKU=#{sku} Avail=#{availability} Qty=#{qty}"
+        # puts "#########################################################"
         new_product = EmotionProduct.find_or_create_by(sku: sku)
         new_product.update(title: title, brand: 'Emotion', qty: qty, href: prod_url)   
       end
