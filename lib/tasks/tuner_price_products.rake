@@ -6,8 +6,9 @@ task tuner_price_products: :environment do
   sections = %w[/index.php/audi.html /index.php/vw.html]
   # browser = Watir::Browser.new
   # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
-  caps = {"chromeOptions" => {"binary" => '/app/.apt/usr/bin/google-chrome'}}
-  browser = Watir::Browser.new(:chrome, desired_capabilities: caps)
+  Selenium::WebDriver::Chrome.path = "/app/.apt/usr/bin/google-chrome" 
+  Selenium::WebDriver::Chrome.driver_path = "/app/.chromedriver/bin/chromedriver" 
+  browser = Watir::Browser.new :chrome
   # Navigate to Page
   browser.goto store.href
 
