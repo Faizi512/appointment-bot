@@ -1,3 +1,4 @@
+require 'roo'
 desc 'To scrape products of neuspeed from dropbox xlsx file'
 task neuspeed_products: :environment do
   store = Store.find_by(name: 'neuspeed')
