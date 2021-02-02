@@ -8,6 +8,7 @@ end
 ruby '2.5.7'
 gem 'rails', '~> 5.1.6'
 gem 'csv', '~> 0.0.1'
+gem "roo", "~> 2.8.0"
 gem 'nokogiri'
 gem 'rubyzip'
 gem 'watir'

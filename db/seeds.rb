@@ -10,6 +10,7 @@ Store.find_or_create_by(store_id: 'ecstuning').update(name: 'ecstuning', href: '
 Store.find_or_create_by(store_id: 'ebay').update(name: 'ebay', href: 'https://www.ebay.com/sch/usedeuroparts/m.html?_nkw=&_armrs=1&_ipg=&_from=')
 Store.find_or_create_by(store_id: 'tunerprice').update(name: 'tunerprice', href: 'https://www.tunerprice.com/wholesale')
 Store.find_or_create_by(store_id: 'bcracing').update(name: 'bcracing', href: 'https://portal.nowcommerce.com/signin.aspx')
+Store.find_or_create_by(store_id: 'neuspeed').update(name: 'neuspeed', href: '')
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')
