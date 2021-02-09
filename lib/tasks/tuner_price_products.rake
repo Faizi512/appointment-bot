@@ -40,8 +40,8 @@ task tuner_price_products: :environment do
         # puts "Title=#{title} SKU=#{sku} Avail=#{availability} Qty=#{qty}"
         # puts "#########################################################"
         add_emotion_products_to_store(store, title, sku, qty, prod_url)
-        new_product = EmotionProduct.find_or_create_by(sku: sku)
-        new_product.update(title: title, brand: 'Emotion', qty: qty, href: prod_url)   
+        # new_product = EmotionProduct.find_or_create_by(sku: sku)
+        # new_product.update(title: title, brand: 'Emotion', qty: qty, href: prod_url)   
       end
       browser.goto url
       next_page = begin
@@ -60,6 +60,6 @@ end
 
 def add_emotion_products_to_store(store, title, sku, qty, href)
   latest = store.latest_products.find_or_create_by(sku: sku)
-  latest.update(product_title: title, brand: 'Emotion', sku: sku, inventory_quantity: qty, href: href)
-  latest.archive_products.create(store_id: store.id, product_title: title, brand: 'Emotion', sku: sku, inventory_quantity: qty, href: href)
+  latest.update(product_title: title, brand: 'Emotion', sku: sku, mpn: sku, inventory_quantity: qty, href: href)
+  latest.archive_products.create(store_id: store.id, product_title: title, brand: 'Emotion', sku: sku, mpn: sku, inventory_quantity: qty, href: href)
 end
