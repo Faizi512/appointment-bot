@@ -1,3 +1,4 @@
+desc 'To scrape turn14 items through api call'
 task export_t14_items: :environment do
   token = Curb.t14_auth_token['access_token']
   items_url = "#{ENV['TURN14_STORE']}/v1/items?page=1"

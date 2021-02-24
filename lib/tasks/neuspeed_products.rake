@@ -1,5 +1,5 @@
 require 'roo'
-desc 'To scrape products of neuspeed from dropbox xlsx file'
+desc 'To scrape products of neuspeed from dropbox xlsx file using roo gem'
 task neuspeed_products: :environment do
   if Date.today.saturday?
     store = Store.find_by(name: 'neuspeed')

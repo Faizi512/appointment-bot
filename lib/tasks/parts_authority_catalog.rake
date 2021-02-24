@@ -1,7 +1,6 @@
-desc 'To check parts authority products catalog'
-
 require 'net/ftp'
 require 'zip'
+desc 'To scrape parts authority products catalog'
 task parts_authority_catalog: :environment do
   ftp = Net::FTP.new('ftp.panetny.com')
   ftp.login('moddeurospf', 'DmZ7e44k')

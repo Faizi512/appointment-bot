@@ -1,5 +1,6 @@
 require 'watir'
 require 'webdrivers/chromedriver'
+desc 'To scrape tunerprice products using automation watir gem'
 task tuner_price_products: :environment do
   store = Store.find_by(name: 'tunerprice')
   sections = %w[/index.php/audi.html /index.php/vw.html]

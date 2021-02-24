@@ -1,3 +1,4 @@
+desc 'To scrape all products available on clients ebay store without login'
 task scrape_ebay_products: :environment do
   store = Store.find_by(name: 'ebay')
   home_doc = Curb.get_doc(store.href)

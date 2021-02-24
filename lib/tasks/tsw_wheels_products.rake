@@ -1,4 +1,3 @@
-require 'roo'
 desc 'To scrape tsw wheels products reading CSV through api'
 task tsw_wheels_products: :environment do
 	store = Store.find_by(name: 'tsw_wheels')
@@ -20,5 +19,5 @@ end
 def add_tsw_wheels_products_to_store(store, title, brand, mpn, qty, price)
   latest = store.latest_products.find_or_create_by(mpn: mpn)
   latest.update(product_title: title, brand: brand, mpn: mpn, inventory_quantity: qty, price: price)
-  # latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, mpn: mpn, inventory_quantity: qty, price: price)
+  latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, mpn: mpn, inventory_quantity: qty, price: price)
 end

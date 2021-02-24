@@ -1,3 +1,4 @@
+desc 'To scrape vehicle selector data of AUDI, Volkswagen from fcpeuro.com'
 task fcp_vehicle_selector: :environment do
   file = Curb.open_uri(ENV['FCP_STORE'])
   doc = Nokogiri::HTML(file)

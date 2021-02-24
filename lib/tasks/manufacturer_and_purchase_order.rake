@@ -1,3 +1,4 @@
+desc 'To scrape mfr count of turn14 products through api'
 task manufacturer_and_purchase_order: :environment do
   token = Curb.t14_auth_token['access_token']
   Turn14Product.find_in_batches(batch_size: 250) do |item_batch|

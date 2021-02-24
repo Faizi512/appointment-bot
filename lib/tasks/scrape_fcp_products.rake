@@ -1,3 +1,4 @@
+desc 'To scrape fcpeuro products from fcpeuro.com'
 task scrape_fcp_products: :environment do
   sections = Section.find_by(section_id: ["Volkswagen-parts", "Audi-parts"])
   sections.each do |section|

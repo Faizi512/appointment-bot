@@ -1,3 +1,4 @@
+desc 'To scrape usp motor sports products from uspmotorsports.com'
 task scrape_uspmotorsports_products: :environment do
   store = Store.find_by(name: 'uspmotorsports')
   home_doc = Curb.get_doc(store.href)

@@ -1,3 +1,4 @@
+desc 'To scrape ecs tuning products from ecstuning.com'
 task scrape_ecs_products: :environment do
   store = Store.find_by(name: 'ecstuning')
   sections = %w[/b-genuine-volkswagen-audi-parts/v-audi /b-genuine-volkswagen-audi-parts/v-volkswagen /b-genuine-bmw-parts/v-bmw]

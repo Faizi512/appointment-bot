@@ -1,5 +1,6 @@
 require 'watir'
 require 'webdrivers/chromedriver'
+desc 'To scrape bc racing products using automation watir gem'
 task bc_racing_products: :environment do
   store = Store.find_by(name: 'bcracing')
   

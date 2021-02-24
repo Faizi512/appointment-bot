@@ -1,4 +1,4 @@
-
+desc 'To sync suppliers data'
 task :sync_supplier => :environment do
 	solidus_products = make_get_request("#{ENV['SOLIDUS_STORE']}/products",ENV['SOLIDUS_AUTHORIZATION'])
 	part_number_array = []

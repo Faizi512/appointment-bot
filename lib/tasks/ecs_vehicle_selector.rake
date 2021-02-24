@@ -1,3 +1,4 @@
+desc 'To scrape vehicle selector data of AUDI, BMW, Volkswagen from ecstuning.com'
 task ecs_vehicle_selector: :environment do
   sections = Section.where(section_id: %w[ECS-Audi ECS-BMW ECS-Volkswagen])
   # sections = Section.where(section_id: ["ECS-Audi"])

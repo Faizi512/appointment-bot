@@ -1,4 +1,4 @@
-
+desc 'To check turn14 open orders through api'
 task :t14_open_orders => :environment do	
 	t14_token = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
 	order_url = "#{ENV['TURN14_STORE']}/v1/orders"
