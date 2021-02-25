@@ -75,6 +75,7 @@ def scrap__cts_product_values doc, url
   availability = doc.xpath("//div[@class='single-product-meta-wrapper']").children[2].text
   qty = 0
   qty = 10 if availability == 'In Stock'
+  qty = 10 if availability == '10 in stock'
 
   {
     price: doc.xpath("//span[@class='woocommerce-Price-amount amount']")[2].text.split('US')[1],
