@@ -67,8 +67,8 @@ end
 
 def add_cts_product_to_store(store, brand, sku, slug, title, price, qty, href)
   latest = store.latest_products.find_or_create_by(sku: sku)
-  latest.update(brand: brand, sku: sku, slug: slug, product_title: title, price: price, inventory_quantity: qty, href: href)
-  latest.archive_products.create(store_id: store.id, brand: brand, sku: sku, product_title: title, price: price, inventory_quantity: qty, href: href)
+  latest.update(brand: brand, sku: sku, mpn: sku, slug: slug, product_title: title, price: price, inventory_quantity: qty, href: href)
+  latest.archive_products.create(store_id: store.id, brand: brand, sku: sku, mpn: sku, product_title: title, price: price, inventory_quantity: qty, href: href)
 end
 
 def scrap__cts_product_values doc, url
