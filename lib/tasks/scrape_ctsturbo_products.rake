@@ -18,6 +18,8 @@ task scrape_ctsturbo_products: :environment do
     else
       scrape_cts_turbo_products(products, store)
     end
+
+    update_products_having_nil_mpn(store)
   end
 end
 
@@ -62,6 +64,22 @@ def scrape_other_pages page_url, store
     break if next_page.blank?
 
     page = next_page.split('page/')[1].split('/')[0]
+  end
+end
+
+def update_products_having_nil_mpn store
+  products = LatestProduct.where(store_id: store.id, mpn: nil)
+  products.each do |product|
+    file ||=  begin
+      open(product.href)
+              rescue StandardError => e
+                puts "Exception in opening file #{e}"
+                next
+    end
+    product_doc = Nokogiri::HTML(file) if file.present?
+    data = scrap__cts_product_values(product_doc, product.href)
+    puts "QTY=#{data[:qty]} Price = #{data[:price]} SKU = #{data[:sku]} Title = #{data[:title]}"
+    add_cts_product_to_store(store, 'CTS Turbo', data[:sku], data[:slug], data[:title], data[:price], data[:qty], product.href)
   end
 end
 
