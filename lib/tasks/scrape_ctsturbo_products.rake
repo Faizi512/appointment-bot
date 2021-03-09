@@ -1,6 +1,9 @@
 desc 'To scrape ctsturbo products from ctsturbo.com'
 task scrape_ctsturbo_products: :environment do
   store = Store.find_by(name: 'ctsturbo')
+
+  update_products_having_nil_mpn(store)
+  
   home_doc = Curb.get_doc(store.href)
   categories = home_doc.css('aside').css('ul').css('li').css('a')
   puts "Categories Fetched #{categories.count}"
@@ -18,8 +21,6 @@ task scrape_ctsturbo_products: :environment do
     else
       scrape_cts_turbo_products(products, store)
     end
-
-    update_products_having_nil_mpn(store)
   end
 end
 
