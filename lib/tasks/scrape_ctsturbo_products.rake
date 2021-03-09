@@ -3,7 +3,7 @@ task scrape_ctsturbo_products: :environment do
   store = Store.find_by(name: 'ctsturbo')
 
   update_products_having_nil_mpn(store)
-  
+
   home_doc = Curb.get_doc(store.href)
   categories = home_doc.css('aside').css('ul').css('li').css('a')
   puts "Categories Fetched #{categories.count}"
@@ -70,6 +70,7 @@ end
 
 def update_products_having_nil_mpn store
   products = LatestProduct.where(store_id: store.id, mpn: nil)
+  count = 0
   products.each do |product|
     file ||=  begin
       open(product.href)
@@ -78,10 +79,12 @@ def update_products_having_nil_mpn store
                 next
     end
     product_doc = Nokogiri::HTML(file) if file.present?
+    count = count + 1
     data = scrap__cts_product_values(product_doc, product.href)
     puts "QTY=#{data[:qty]} Price = #{data[:price]} SKU = #{data[:sku]} Title = #{data[:title]}"
     add_cts_product_to_store(store, 'CTS Turbo', data[:sku], data[:slug], data[:title], data[:price], data[:qty], product.href)
   end
+  puts "Valid URL's = #{count}"
 end
 
 def add_cts_product_to_store(store, brand, sku, slug, title, price, qty, href)
