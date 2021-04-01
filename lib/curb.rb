@@ -31,7 +31,7 @@ module Curb
                  rescue StandardError => e
                    puts "Exception in opening file #{e}"
                    sleep ENV['SLEEP_TIME'].to_i
-                   retry if (retries += 1) < 3
+                   retry if (retries += 1) < 2
     end
     JSON.parse response.body_str
   end
@@ -44,7 +44,7 @@ module Curb
                  rescue StandardError => e
                    puts "Exception in opening file #{e}"
                    sleep 1
-                   retry if (retries += 1) < 3
+                   retry if (retries += 1) < 2
     end
   end
 

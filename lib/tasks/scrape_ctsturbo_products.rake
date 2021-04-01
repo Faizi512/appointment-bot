@@ -68,6 +68,7 @@ def scrape_other_pages page_url, store
   end
 end
 
+# Currently this method is not executed because the nil products sku's was changed by the site owner
 def update_products_having_nil_mpn store
   products = LatestProduct.where(store_id: store.id, mpn: nil)
   count = 0
@@ -97,7 +98,7 @@ def scrap__cts_product_values doc, url
   availability = doc.xpath("//div[@class='single-product-meta-wrapper']").children[2].text
   qty = 0
   qty = 10 if availability == 'In Stock'
-  qty = 10 if availability == '10 in stock'
+  qty = availability.split(' in stock')[0].to_i if availability.include?('in stock')
 
   {
     price: doc.xpath("//span[@class='woocommerce-Price-amount amount']")[2].text.split('US')[1],
