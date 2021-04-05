@@ -31,7 +31,7 @@ task catalog_check_against_turn14: :environment do
       next unless t14_item
 
       quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
-      Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity,sku_numbers[item.part_number])
+      Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'])
     end
   end
 end
