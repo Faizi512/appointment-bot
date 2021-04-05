@@ -15,6 +15,13 @@ module Curb
     end
   end
 
+  def self.t14_auth_token_test
+    token = begin
+      response = Curl.post("#{ENV['TURN14_STORE_TEST']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+      JSON.parse response.body_str
+    end
+  end
+
   def self.make_get_request(url, token)
     response = Curl.get(url) do |http|
       http.headers['Authorization'] = "Bearer #{token}"

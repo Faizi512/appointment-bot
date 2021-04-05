@@ -11,14 +11,6 @@ task export_t14_items: :environment do
         item_hash = item['attributes']
         next if item_hash.blank?
         
-        item_price_url = "#{ENV['TURN14_STORE']}/v1/pricing/#{item['id']}"
-        # item_price = Curb.make_get_request(item_price_url, token)
-        @price = nil
-        # if item_price['data']['attributes']['pricelists'][0]['name'] == 'MAP'
-        #   @price = item_price['data']['attributes']['pricelists'][0]['price']
-        # elsif item_price['data']['attributes']['pricelists'][0]['name'] == 'Retail'
-        #   @price = item_price['data']['attributes']['pricelists'][0]['price']
-        # end
         puts 'Turn14 Product added'
         Turn14Product.add_t14_product(
           supplier,
@@ -26,8 +18,7 @@ task export_t14_items: :environment do
           item_hash['product_name'],
           item_hash['part_number'],
           item_hash['mfr_part_number'],
-          item_hash['brand_id'],
-          @price
+          item_hash['brand_id']
         )
       end
     end
