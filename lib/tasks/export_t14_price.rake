@@ -1,11 +1,19 @@
 desc 'To scrape turn14 price through api call'
 task export_t14_price: :environment do
   token = Curb.t14_auth_token['access_token']
+  # single_item_url = "#{ENV['TURN14_STORE']}/v1/pricing/103238"
+  # si_price = Curb.make_get_request(single_item_url, token)
   price_url = "#{ENV['TURN14_STORE']}/v1/pricing?page=1"
   retries = 0
   loop do
     all_price = Curb.make_get_request(price_url, token)
     puts "Page_URL: #{price_url}"
+
+    if all_price['data'].blank?
+      price_url = ENV['TURN14_STORE'] + all_price['links']['next']
+      next 
+    end
+
     all_price['data'].each_with_index do |item, index|
       next if item['attributes']['pricelists'].blank?
 
@@ -19,7 +27,7 @@ task export_t14_price: :environment do
       end
 
       product.update(price: @price)
-      puts "Count: #{index}"
+      # puts "Count: #{index}"
     end
 
     exit if all_price['links']['next'].nil?
