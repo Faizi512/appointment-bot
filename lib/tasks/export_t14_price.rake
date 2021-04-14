@@ -9,10 +9,10 @@ task export_t14_price: :environment do
     all_price = Curb.make_get_request(price_url, token)
     puts "Page_URL: #{price_url}"
 
-    if all_price['data'].blank?
-      price_url = ENV['TURN14_STORE'] + all_price['links']['next']
-      next 
-    end
+    # if all_price['data'].blank?
+    #   price_url = ENV['TURN14_STORE'] + all_price['links']['next']
+    #   next 
+    # end
 
     all_price['data'].each_with_index do |item, index|
       next if item['attributes']['pricelists'].blank?
@@ -26,6 +26,8 @@ task export_t14_price: :environment do
         @price = item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }['price']
       end
 
+      next if product.price.present?
+      
       product.update(price: @price)
       # puts "Count: #{index}"
     end
@@ -35,6 +37,7 @@ task export_t14_price: :environment do
     price_url = ENV['TURN14_STORE'] + all_price['links']['next']
   rescue StandardError => e
     puts "exception #{e}"
+    puts "backtrace #{e.backtrace.join('\n')}"
     sleep 1
     token = Curb.t14_auth_token['access_token']
     exit if (retries += 1) < 2
