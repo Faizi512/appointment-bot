@@ -3,7 +3,7 @@ task export_t14_price: :environment do
   token = Curb.t14_auth_token['access_token']
   # single_item_url = "#{ENV['TURN14_STORE']}/v1/pricing/103238"
   # si_price = Curb.make_get_request(single_item_url, token)
-  price_url = "#{ENV['TURN14_STORE']}/v1/pricing?page=1"
+  price_url = "#{ENV['TURN14_STORE']}/v1/pricing?page=#{ENV['PRICE_PAGE_START']}"
   retries = 0
   loop do
     all_price = Curb.make_get_request(price_url, token)
