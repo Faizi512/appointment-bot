@@ -17,7 +17,7 @@ task export_t14_price: :environment do
     all_price['data'].each_with_index do |item, index|
       next if item['attributes']['pricelists'].blank?
 
-      product = Turn14Product.find_by(id: item['id'])
+      product = Turn14Product.find_by(item_id: item['id'])
       next if product.blank?
 
       if item['attributes']['pricelists'].find { |x| x['name'] == 'MAP' }.present?
@@ -26,13 +26,16 @@ task export_t14_price: :environment do
         @price = item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }['price']
       end
 
-      next if product.price.present?
+      # next if product.price.present?
       
       product.update(price: @price)
-      # puts "Count: #{index}"
+      puts "Count: #{index}"
     end
 
-    exit if all_price['links']['next'].nil?
+    if all_price['links']['next'].nil?
+      puts "next price page not found."
+      exit 
+    end
 
     price_url = ENV['TURN14_STORE'] + all_price['links']['next']
   rescue StandardError => e
