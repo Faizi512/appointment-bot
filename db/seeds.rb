@@ -1,11 +1,11 @@
 Supplier.find_or_create_by(supplier_id: 'solidus').update(name: 'Solidus Store')
 
-Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: 'https://www.urotuning.com/collections/all/products')
+Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: 'https://www.urotuning.com/collections/all/products') # store_id:1
 Store.find_or_create_by(store_id: 'performancebyie').update(name: 'performancebyie', href: 'https://www.performancebyie.com/collections/all/products')
 Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: 'https://www.bmptuning.com/collections/all/products')
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')
 Store.find_or_create_by(store_id: 'uspmotorsports').update(name: 'uspmotorsports', href: 'https://www.uspmotorsports.com/')
-Store.find_or_create_by(store_id: 'ctsturbo').update(name: 'ctsturbo', href: 'https://www.ctsturbo.com/product-category/nissan/')
+Store.find_or_create_by(store_id: 'ctsturbo').update(name: 'ctsturbo', href: 'https://www.ctsturbo.com/product-category/accessories/')
 Store.find_or_create_by(store_id: 'ecstuning').update(name: 'ecstuning', href: 'https://www.ecstuning.com')
 Store.find_or_create_by(store_id: 'ebay').update(name: 'ebay', href: 'https://www.ebay.com/sch/usedeuroparts/m.html?_nkw=&_armrs=1&_ipg=&_from=')
 Store.find_or_create_by(store_id: 'tunerprice').update(name: 'tunerprice', href: 'https://www.tunerprice.com/wholesale')

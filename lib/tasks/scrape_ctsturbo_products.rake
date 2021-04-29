@@ -1,9 +1,6 @@
 desc 'To scrape ctsturbo products from ctsturbo.com'
 task scrape_ctsturbo_products: :environment do
   store = Store.find_by(name: 'ctsturbo')
-
-  update_products_having_nil_mpn(store)
-
   home_doc = Curb.get_doc(store.href)
   categories = home_doc.css('aside').css('ul').css('li').css('a')
   puts "Categories Fetched #{categories.count}"
@@ -15,29 +12,30 @@ task scrape_ctsturbo_products: :environment do
     next if category_doc.css('.img-wrapper').css('a').blank?
 
     puts "Index = #{index} URL = #{category_url}"
-    products = category_doc.css('.img-wrapper').css('a')
-    if category_url.include? 'product-category/other'
-      scrape_other_pages(category_url, store)
-    else
-      scrape_cts_turbo_products(products, store)
-    end
+    # products = category_doc.css('.img-wrapper').css('a')
+    scrape_other_pages(category_url, store)
+    # if category_url.include? 'product-category/other'
+    #   scrape_other_pages(category_url, store)
+    # else
+    #   scrape_cts_turbo_products(products, store)
+    # end
   end
 end
 
-def scrape_cts_turbo_products products, store
-  products.each do |product|
-    product_url = product.attributes['href'].value
-    if product_url.include? 'product/'
-      puts "Product URL = #{product_url}"
-      product_doc = Curb.get_doc(product_url)
-      data = scrap__cts_product_values(product_doc, product_url)
-      puts "QTY=#{data[:qty]} Price = #{data[:price]} SKU = #{data[:sku]} Title = #{data[:title]}"
-      add_cts_product_to_store(store, 'CTS Turbo', data[:sku], data[:slug], data[:title], data[:price], data[:qty], product_url)
-    else
-      next
-    end
-  end
-end
+# def scrape_cts_turbo_products products, store
+#   products.each do |product|
+#     product_url = product.attributes['href'].value
+#     if product_url.include? 'product/'
+#       puts "Product URL = #{product_url}"
+#       product_doc = Curb.get_doc(product_url)
+#       data = scrap__cts_product_values(product_doc, product_url)
+#       puts "QTY=#{data[:qty]} Price = #{data[:price]} SKU = #{data[:sku]} Title = #{data[:title]}"
+#       add_cts_product_to_store(store, 'CTS Turbo', data[:sku], data[:slug], data[:title], data[:price], data[:qty], product_url)
+#     else
+#       next
+#     end
+#   end
+# end
 
 def scrape_other_pages page_url, store
   page = 1
@@ -66,26 +64,6 @@ def scrape_other_pages page_url, store
 
     page = next_page.split('page/')[1].split('/')[0]
   end
-end
-
-# Currently this method is not executed because the nil products sku's was changed by the site owner
-def update_products_having_nil_mpn store
-  products = LatestProduct.where(store_id: store.id, mpn: nil)
-  count = 0
-  products.each do |product|
-    file ||=  begin
-      open(product.href)
-              rescue StandardError => e
-                puts "Exception in opening file #{e}"
-                next
-    end
-    product_doc = Nokogiri::HTML(file) if file.present?
-    count = count + 1
-    data = scrap__cts_product_values(product_doc, product.href)
-    puts "QTY=#{data[:qty]} Price = #{data[:price]} SKU = #{data[:sku]} Title = #{data[:title]}"
-    add_cts_product_to_store(store, 'CTS Turbo', data[:sku], data[:slug], data[:title], data[:price], data[:qty], product.href)
-  end
-  puts "Valid URL's = #{count}"
 end
 
 def add_cts_product_to_store(store, brand, sku, slug, title, price, qty, href)
