@@ -10,7 +10,7 @@ task export_t14_items: :environment do
       items['data'].each do |item|
         item_hash = item['attributes']
         next if item_hash.blank?
-
+        
         puts 'Turn14 Product added'
         Turn14Product.add_t14_product(
           supplier,

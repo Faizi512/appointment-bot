@@ -15,6 +15,13 @@ module Curb
     end
   end
 
+  def self.t14_auth_token_test
+    token = begin
+      response = Curl.post("#{ENV['TURN14_STORE_TEST']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+      JSON.parse response.body_str
+    end
+  end
+
   def self.make_get_request(url, token)
     response = Curl.get(url) do |http|
       http.headers['Authorization'] = "Bearer #{token}"
@@ -31,7 +38,7 @@ module Curb
                  rescue StandardError => e
                    puts "Exception in opening file #{e}"
                    sleep ENV['SLEEP_TIME'].to_i
-                   retry if (retries += 1) < 3
+                   retry if (retries += 1) < 2
     end
     JSON.parse response.body_str
   end
@@ -44,7 +51,7 @@ module Curb
                  rescue StandardError => e
                    puts "Exception in opening file #{e}"
                    sleep 1
-                   retry if (retries += 1) < 3
+                   retry if (retries += 1) < 2
     end
   end
 
