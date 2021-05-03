@@ -10,7 +10,7 @@ task apr_holly_performance: :environment do
       price = row[:map_price].to_i
       title = row[:description]
       if brand == 'APR'
-        # add_holly_performance_products_to_store(store, title, brand, mpn, qty, price)
+        add_holly_performance_products_to_store(store, title, brand, mpn, qty, price)
         puts "Title= #{title}"
         puts "Brand=#{brand} MPN=#{mpn} qty=#{qty} price=#{price}"
       end
