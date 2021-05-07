@@ -59,4 +59,27 @@ module Curb
     file = Curb.open_uri(url)
     doc = Nokogiri::HTML(file)
   end
+
+  def self.fetch_x_force_inventory(url,token)
+      response = Curl.get(url) do |http|
+      http.headers['Authorization'] = "Bearer #{token}"
+    end
+    JSON.parse response.body_str
+  end
+  
+  def self.get_x_force_token(url)
+      response = Curl.post(url, '{
+          "grant_type": "client_credentials",
+          "tpl": "{174a1752-fd73-4fea-8006-eba6af5aa463}",
+          "user_login_id": "12"
+      }') do |curl|
+                  curl.headers['Accept'] = 'application/json'
+                  curl.headers['Content-Type'] = 'application/json; charset=utf-8'
+                  curl.headers['Authorization'] = "Basic #{ENV['AUTH_ID_X_FORCE']}"
+                  curl.headers['Accept-Encoding'] = 'gzip,deflate,sdch'
+                  curl.headers['Host'] = 'secure-wms.com'
+                  curl.verbose=true
+              end
+    JSON.parse response.body_str
+  end
 end

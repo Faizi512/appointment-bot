@@ -14,6 +14,7 @@ Store.find_or_create_by(store_id: 'neuspeed').update(name: 'neuspeed', href: '')
 Store.find_or_create_by(store_id: 'unitronic').update(name: 'unitronic', href: 'https://chip2.unitronic.ca/hw-api/get-stock.php?')
 Store.find_or_create_by(store_id: 'tsw_wheels').update(name: 'tsw_wheels', href: 'https://www.tsw.com/api/inv-SpcPrc_v3.php?key=tsw01xml&type=csv&l=.40&brand=&funct=All')
 Store.find_or_create_by(store_id: 'holly_performance').update(name: 'holly_performance', href: 'https://b2b.holley.com/data/atp/?api_key=0.shxzht2953')
+Store.find_or_create_by(store_id: 'xforce').update(name: 'xforce', href: 'https://secure-wms.com')
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')
