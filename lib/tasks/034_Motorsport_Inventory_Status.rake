@@ -22,6 +22,6 @@ end
 
 def add_034_motorsport_products_to_store(store, title, mpn, qty)
     latest = store.latest_products.find_or_create_by(mpn: mpn)
-    latest.update(product_title: title, brand: 'Motorsport', mpn: mpn, inventory_quantity: qty)
-    latest.archive_products.create(store_id: store.id, product_title: title, brand: 'Neuspeed', mpn: mpn, inventory_quantity: qty)
+    latest.update(product_title: title, brand: '034 Motorsport', mpn: mpn, inventory_quantity: qty)
+    latest.archive_products.create(store_id: store.id, product_title: title, brand: '034 Motorsport', mpn: mpn, inventory_quantity: qty)
 end
