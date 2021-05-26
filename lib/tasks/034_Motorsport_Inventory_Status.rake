@@ -2,7 +2,7 @@ require "google_drive"
 require "roo"
 desc 'To scrape products of 034 Motorsport from google spreadsheet file using google_drive gem'
 task motorsport_inventory: :environment do
-    store = Store.find_by(name: 'motorsport')
+    store = Store.find_by(name: '034 motorsport')
     count = 0
     session = GoogleDrive::Session.from_config("#{Rails.root}/lib/tasks/config.json")
     ws = session.spreadsheet_by_key("#{ENV['MOTORSPORT_SPREADSHEET_ID']}").worksheets[0]
