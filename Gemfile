@@ -13,6 +13,7 @@ gem 'nokogiri'
 gem 'rubyzip'
 gem 'watir'
 gem 'webdrivers', '~> 4.0', require: false
+gem 'google_drive'
 
 # Use Puma as the app server
 gem 'puma', '~> 3.7'
