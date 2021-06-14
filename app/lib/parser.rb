@@ -1,7 +1,7 @@
 require 'nokogiri'
 class Parser
   attr_reader :file, :store
-
+  @index = 1
   def initialize(file, store, variant, brand)
     @file = file
     @store = store
@@ -22,6 +22,8 @@ class Parser
       performancebyie_data_points(doc)
     when 'bmptuning'
       bmptuning_data_points(doc)
+    when 'maxtondesignusa'
+      maxtondesignusa_data_points(doc)
     end
   end
 
@@ -54,6 +56,23 @@ class Parser
     @mpn = @variant['product_id']
     data_points_hash
   end
+
+  def maxtondesignusa_data_points doc
+    regex = "[0-9]"
+    title = doc.xpath("//a/div[2]/div")[0].text
+    @title = "#{title} #{@variant["title"]}"
+    price = doc.xpath("//span[@class='product__price']").text.strip
+    @price = price if price.present?
+    if(doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match(regex)[0] != nil)
+      @stock = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match(regex)[0].to_i
+    else
+      regex << "+#{regex}"
+      @stock = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match("regex")[0].to_i
+    end
+    @mpn = @variant['product_id']
+    data_points_hash
+  end
+
 
   def data_points_hash
     {

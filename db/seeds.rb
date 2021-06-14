@@ -1,8 +1,12 @@
 Supplier.find_or_create_by(supplier_id: 'solidus').update(name: 'Solidus Store')
 
+#shopify stores
 Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: 'https://www.urotuning.com/collections/all/products') # store_id:1
 Store.find_or_create_by(store_id: 'performancebyie').update(name: 'performancebyie', href: 'https://www.performancebyie.com/collections/all/products')
 Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: 'https://www.bmptuning.com/collections/all/products')
+Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net/collections/all/products')
+#end shopify stores
+
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')
 Store.find_or_create_by(store_id: 'uspmotorsports').update(name: 'uspmotorsports', href: 'https://www.uspmotorsports.com/')
 Store.find_or_create_by(store_id: 'ctsturbo').update(name: 'ctsturbo', href: 'https://www.ctsturbo.com/product-category/accessories/')
@@ -16,6 +20,7 @@ Store.find_or_create_by(store_id: 'tsw_wheels').update(name: 'tsw_wheels', href:
 Store.find_or_create_by(store_id: 'holly_performance').update(name: 'holly_performance', href: 'https://b2b.holley.com/data/atp/?api_key=0.shxzht2953')
 Store.find_or_create_by(store_id: 'xforce').update(name: 'xforce', href: 'https://secure-wms.com')
 Store.find_or_create_by(store_id: '034 motorsport').update(name: '034 motorsport', href: 'https://docs.google.com/spreadsheets/d/13O0EqWI5aTyMO_egXHFe1QSkCUWxjZ9iztgfyk1n7vo/edit#gid=1302382781')
+
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')

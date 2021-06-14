@@ -6,11 +6,10 @@ require 'open-uri'
 task sync_with_store: :environment do
   store = Store.find_by(store_id: ENV['STORE_ID'])
   page_number = 0
-
   loop do
     page_number += 1
     products = begin
-      get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+    get_request("#{store.href}.json?limit=99999&page=#{page_number}")
     rescue StandardError => e
       puts 'Exception throws getting products'
       sleep 60
@@ -43,10 +42,8 @@ task sync_with_store: :environment do
         begin
           retries ||= 0
           data = Parser.new(file, store.store_id, variant, product_brand).parse
-          add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,
-                               variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
-          # puts "brand #{brand} mpn #{mpn} stock #{stock} sku #{variant["sku"]}}"
-          # puts "Price #{data[:price]} Title #{data[:title]}"
+          add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
+          puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
           sleep 1
