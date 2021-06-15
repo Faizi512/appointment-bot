@@ -25,8 +25,8 @@ task parts_authority: :environment do
   end
   puts "============================================"
   puts "Total products in catalog: #{itemFoundCount+itemNotFoundCount}"
-  puts "Total items match with solidus: #{itemFoundCount}"
-  puts "Total items found in solidus: #{itemNotFoundCount}"
+  puts "Total items found in solidus: #{itemFoundCount}"
+  puts "Total items not found in solidus: #{itemNotFoundCount}"
   puts "============================================"
 end
 
