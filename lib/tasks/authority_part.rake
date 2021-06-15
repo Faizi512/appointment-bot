@@ -1,6 +1,6 @@
 desc 'To add parts authority products matching with solidus products'
 task parts_authority: :environment do
-  store = Store.find_by(store_id: 'parts_authority')
+  store = Store.find_by(name: 'Parts Authority')
   itemFoundCount = 0
   itemNotFoundCount = 0
   PartAuthorityProduct.all.each do |row|
