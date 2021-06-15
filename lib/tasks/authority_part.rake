@@ -1,22 +1,20 @@
 desc 'To add parts authority products matching with solidus products'
 task parts_authority: :environment do
+  @product_line = ""
   store = Store.find_by(name: 'Parts Authority')
   itemFoundCount = 0
   itemNotFoundCount = 0
-  PartAuthorityProduct.all.each do |row|
-    product_line = row["product_line"]
-    part_number = row["part_number"]
-    if(isItemPresent(product_line, part_number))
+  PartAuthorityBrandsMpn.all.each do |row|
+    brand_name = row["brand"]
+    mpn = row["mpn"]
+    if(isItemPresent(brand_name, mpn))
       itemFoundCount += 1
-      product = PartAuthorityProduct.where(product_line: product_line, part_number: part_number)
+      product = PartAuthorityProduct.where(product_line: @product_line, part_number: mpn)
       title = product[0][:product_line]
       mpn = product[0][:part_number]
-      brand = PartAuthorityBrand.where(product_line: product_line)[0][:brand_name]
+      brand = PartAuthorityBrand.where(product_line: @product_line)[0][:brand_name]
       price = product[0][:price]
-      # core_price = product[0][:core_price]
       qty = product[0][:qty_on_hand]
-      # v_qty = product[0][:vendor_qty_on_hand]
-      # packs = product[0][:packs]
       puts "#{itemFoundCount}: product_line: #{title}, part_number: #{mpn}, name: #{brand}, price: #{price}, inventory_quantity: #{qty}"
       add_parts_authority_products_to_store(store, title, brand, mpn, qty, price)
     else
@@ -24,17 +22,17 @@ task parts_authority: :environment do
     end
   end
   puts "============================================"
-  puts "Total products in catalog: #{itemFoundCount+itemNotFoundCount}"
+  puts "Total items in solidus: #{itemFoundCount+itemNotFoundCount}"
   puts "Total items found in solidus: #{itemFoundCount}"
   puts "Total items not found in solidus: #{itemNotFoundCount}"
   puts "============================================"
 end
 
-def isItemPresent(product_line, part_number)
-  if(PartAuthorityBrand.where(product_line: product_line).present?)
-    name = PartAuthorityBrand.where(product_line: product_line)[0][:brand_name]
+def isItemPresent(brand_name, mpn)
+  if(PartAuthorityBrand.where(brand_name: brand_name).present?)
+    @product_line = PartAuthorityBrand.where(brand_name: brand_name)[0][:product_line]
   end
-  if(PartAuthorityBrandsMpn.where(brand: name, mpn: part_number).present? )
+  if(PartAuthorityProduct.where(product_line: @product_line, part_number: mpn).present?)
     return true
   end
   return false
