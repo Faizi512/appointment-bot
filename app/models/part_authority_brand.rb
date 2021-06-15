@@ -1,0 +1,2 @@
+class PartAuthorityBrand < ApplicationRecord
+end
