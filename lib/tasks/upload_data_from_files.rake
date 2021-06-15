@@ -1,7 +1,6 @@
 require 'roo'
 desc "Upload data from files to heroku table"
 task push_data: :environment do
-    byebug
     workbook = Roo::Spreadsheet.open("#{Rails.root}/app/DataFiles/parts_authority_solidus_products.xlsx", extension: :xlsx)
     worksheets = workbook.sheets
     puts "Found #{worksheets.count} worksheets"
