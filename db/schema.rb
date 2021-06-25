@@ -280,6 +280,17 @@ ActiveRecord::Schema.define(version: 20210416063324) do
     t.string "product_line", limit: 255
   end
 
+  create_table "part_authority_brands_mpns", force: :cascade do |t|
+    t.string "brand"
+    t.string "mpn"
+    t.string "sku"
+    t.string "product_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand"], name: "index_part_authority_brands_mpns_on_brand"
+    t.index ["mpn"], name: "index_part_authority_brands_mpns_on_mpn"
+  end
+
   create_table "part_authority_products", force: :cascade do |t|
     t.string "product_line"
     t.string "part_number"
