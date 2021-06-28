@@ -8,7 +8,6 @@ task scrape_ebay_products: :environment do
     url = product_url.attributes['href'].value
     # url = 'https://www.ebay.com/itm/MDI-Adapter-Cable-3-5mm-AUX-Beetle-CC-Golf-GTI-Jetta-Passat-R-000-051-446-D/293452129091?hash=item44531c2343:g:wQ0AAOSwrcReMz-x'
     product_doc = Curb.get_doc(url)
-  	# byebug
     # title = product_doc.css('h1').children.last
     title = product_doc.xpath('.//h1[@id=$value]', nil, { value: 'itemTitle' }).children.text.split('Details about  ').last
     sku = product_doc.xpath('.//h2[@itemprop=$value]', nil, { value: 'mpn' }).children.text

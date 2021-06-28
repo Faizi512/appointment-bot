@@ -9,7 +9,7 @@ task :xForce_Inventory => :environment do
     inventory["ResourceList"].each do |item|
         mpn     = item['ItemIdentifier']['Sku']
         brand   = 'XForce'
-        qty     = item['OnHandQty']
+        qty     = item["AvailableQty"]
         title   = item['ItemDescription']
         p_id    = item['ReceiveItemId']
         sumedQty = sumQty(mpn,qty, mpnArray, productHash)

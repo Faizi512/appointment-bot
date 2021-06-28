@@ -4,7 +4,6 @@ task t14_items_eta: :environment do
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   supplier = Supplier.find_or_create_by(supplier_id: 'turn14', name: 'Turn 14')
   loop do
-    byebug
     items = Curb.make_get_request(items_url, token)
     if items['data'].present?
       items['data'].each do |item|
