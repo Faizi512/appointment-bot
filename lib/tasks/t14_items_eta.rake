@@ -1,18 +1,21 @@
-desc 'To scrape turn14 items through api call'
-task export_t14_items: :environment do
+desc 'To scrape eta of turn14 items through api call'
+task t14_items_eta: :environment do
   token = Curb.t14_auth_token['access_token']
-  items_url = "#{ENV['TURN14_STORE']}/v1/items?page=1"
+  items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   supplier = Supplier.find_or_create_by(supplier_id: 'turn14', name: 'Turn 14')
   loop do
+    byebug
     items = Curb.make_get_request(items_url, token)
-    puts 'start inserting a page into db'
     if items['data'].present?
       items['data'].each do |item|
-        byebug
-        item_hash = item['attributes']
-        next if item_hash.blank?
-        
-        puts 'Turn14 Product added'
+        if item["attributes"]["eta"].present?
+            id = item["id"]
+            qty_on_order = item["attributes"]["eta"]["qty_on_order"]
+            est_availability = item["attributes"]["eta"]["estimated_availability"]
+        else
+            next
+        end
+        # puts 'Turn14 Product added'
         # Turn14Product.add_t14_product(
         #   supplier,
         #   item['id'],
