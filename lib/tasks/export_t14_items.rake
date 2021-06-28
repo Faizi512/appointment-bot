@@ -8,7 +8,6 @@ task export_t14_items: :environment do
     puts 'start inserting a page into db'
     if items['data'].present?
       items['data'].each do |item|
-        byebug
         item_hash = item['attributes']
         next if item_hash.blank?
         
