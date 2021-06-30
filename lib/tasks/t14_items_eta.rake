@@ -1,16 +1,18 @@
 desc 'To scrape eta of turn14 items through api call'
 task t14_items_eta: :environment do
   token = Curb.t14_auth_token['access_token']
+  puts "Deleting the items from the table to clear the redundant data."
   Turn14AvailablePromise.destroy_all
+  puts "Ready to load new data"
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
+  itemsCount = 0
   loop do
     items = Curb.make_get_request(items_url, token)
-    # byebug
-    puts "#{1000 * items['links']['self'][19..-1].to_i} Items processed"
     if items['data'].present?
+      itemsCount += items["data"].count
       items['data'].each do |item|
         mpn = item["id"]
-        if item["attributes"]["eta"].present?
+        if item["attributes"]["eta"].present? && item["attributes"]["eta"]["qty_on_order"].present?
           item["attributes"]["eta"]["qty_on_order"].each do |element|
             location = element[0]
             qty_on_order = element[1]
@@ -22,13 +24,13 @@ task t14_items_eta: :environment do
         end
       end
     end
+    puts "#{itemsCount} Items processed"
     exit if items['links']['next'].nil?
     items_url = ENV['TURN14_STORE'] + items['links']['next']
   rescue StandardError => e
     puts "exception #{e}"
     sleep 1
     token = Curb.t14_auth_token['access_token']
-    # items_url = ENV['TURN14_STORE'] + items['links']['next']
     retry
   end
 end
