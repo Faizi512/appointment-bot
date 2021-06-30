@@ -15,7 +15,7 @@ task t14_items_eta: :environment do
             location = element[0]
             qty_on_order = element[1]
             est_availability = get_est_date(location, item)
-            set_location_est_date = set_location_est_dates(mpn, location, qty_on_order, est_availability)
+            add_to_table(mpn, location, qty_on_order, est_availability)
           end
         else
             next
@@ -33,7 +33,7 @@ task t14_items_eta: :environment do
   end
 end
 
-def set_location_est_dates mpn, location, qty, est_availability
+def add_to_table mpn, location, qty, est_availability
   Turn14AvailablePromise.find_or_create_by(mpn: mpn, location: location,  quantity: qty, est_date:est_availability)
 end
 
