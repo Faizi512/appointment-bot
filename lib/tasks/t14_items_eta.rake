@@ -3,14 +3,11 @@ task t14_items_eta: :environment do
   token = Curb.t14_auth_token['access_token']
   Turn14AvailablePromise.destroy_all
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
-  supplier = Supplier.find_or_create_by(supplier_id: 'turn14', name: 'Turn 14')
-
   loop do
     items = Curb.make_get_request(items_url, token)
     # byebug
     puts "#{1000 * items['links']['self'][19..-1].to_i} Items processed"
     if items['data'].present?
-    
       items['data'].each do |item|
         mpn = item["id"]
         if item["attributes"]["eta"].present?
@@ -31,8 +28,7 @@ task t14_items_eta: :environment do
     puts "exception #{e}"
     sleep 1
     token = Curb.t14_auth_token['access_token']
-    
-    items_url = ENV['TURN14_STORE'] + items['links']['next']
+    # items_url = ENV['TURN14_STORE'] + items['links']['next']
     retry
   end
 end
