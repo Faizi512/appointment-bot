@@ -12,14 +12,14 @@ task export_t14_items: :environment do
         next if item_hash.blank?
         
         puts 'Turn14 Product added'
-        # Turn14Product.add_t14_product(
-        #   supplier,
-        #   item['id'],
-        #   item_hash['product_name'],
-        #   item_hash['part_number'],
-        #   item_hash['mfr_part_number'],
-        #   item_hash['brand_id']
-        # )
+        Turn14Product.add_t14_product(
+          supplier,
+          item['id'],
+          item_hash['product_name'],
+          item_hash['part_number'],
+          item_hash['mfr_part_number'],
+          item_hash['brand_id']
+        )
       end
     end
     exit if items['links']['next'].nil?
