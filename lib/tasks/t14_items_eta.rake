@@ -1,16 +1,25 @@
 desc 'To scrape eta and mfr count of turn14 products through inventory paging API'
 task t14_items_eta: :environment do
+  byebug
   token = Curb.t14_auth_token['access_token']
   puts "Deleting the items from the table to clear the redundant data."
-  Turn14AvailablePromise.destroy_all
+  # Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   itemsCount = 0
   loop do
     items = Curb.make_get_request items_url, token
     if items['data'].present?
+
+      # For Catalog check
+      mpn_numbers = []
+      sku_numbers = {}
+      get_Dopbox_Mpn_Sku(mpn_numbers, sku_numbers)
+      catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items["data"])
+
       # To scrape mfr count of turn14 products'
       manufacturer_and_purchase_order(items["data"])
+
       # To scrape eta of turn14 products'
       itemsCount += items["data"].count
       items['data'].each do |item|
@@ -69,4 +78,42 @@ end
 def add_purchase_order(product, eta)
   product.add_latest_purchase_order(product, eta)
   product.add_archived_purchase_order(product, eta)
+end
+
+def get_Dopbox_Mpn_Sku mpn_numbers, sku_numbers
+  file = Curb.open_uri(ENV['DROPBOX_URL'])
+  CSV.parse(file,
+            headers: true,
+            header_converters: :symbol) do |row|
+    mpn_numbers << row[:turn14id]
+    sku_numbers[row[:turn14id].to_s] = row[:sku]
+  end
+end
+
+def catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items)
+  byebug
+  batch = []
+  i = 0;
+  until mpn_numbers.empty?
+    if(Turn14Product.where(mfr_part_number: mpn_numbers[i]).or(Turn14Product.where(part_number: mpn_numbers[i])))
+      batch << sku_numbers[mpn_numbers[i]]
+      i += 1
+      itemIndex = find_item_for_catalog(sku_numbers[mpn_numbers[i]], items)
+      if(!itemIndex.eql?(-1))
+        byebug
+        it = items[itemIndex]
+        puts ""
+      end
+    end
+    puts batch.count.to_s
+  end
+end
+
+def find_item_for_catalog(id, items)
+  count = 0
+  items.each do |item|
+    count += 1
+    return count if item["id"].eql?(id)
+  end
+  return -1
 end
