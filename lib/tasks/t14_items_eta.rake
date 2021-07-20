@@ -3,7 +3,7 @@ task t14_items_eta: :environment do
   byebug
   token = Curb.t14_auth_token['access_token']
   puts "Deleting the items from the table to clear the redundant data."
-  # Turn14AvailablePromise.destroy_all
+  Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
   finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
