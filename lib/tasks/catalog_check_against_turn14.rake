@@ -1,5 +1,6 @@
 desc 'To check Catalog from dropbox to turn14'
 task catalog_check_against_turn14: :environment do
+  byebug
   file = Curb.open_uri(ENV['DROPBOX_URL'])
   mpn_numbers = []
   sku_numbers = {}
