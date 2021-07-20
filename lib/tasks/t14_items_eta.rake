@@ -1,10 +1,11 @@
-desc 'To scrape eta and mfr count of turn14 products through inventory paging API'
+desc 'To scrape eta and mfr count of turn14 products through inventory paging API and catalog check'
 task t14_items_eta: :environment do
   byebug
   token = Curb.t14_auth_token['access_token']
   puts "Deleting the items from the table to clear the redundant data."
   # Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
+  finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   itemsCount = 0
   loop do
@@ -15,7 +16,16 @@ task t14_items_eta: :environment do
       mpn_numbers = []
       sku_numbers = {}
       get_Dopbox_Mpn_Sku(mpn_numbers, sku_numbers)
-      catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items["data"])
+      catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items["data"], finalItems)
+      if finalItems.count == mpn_numbers.count || items['links']['next'].nil? 
+        # byebug
+        finalItems.each do |item|
+          product = Turn14Product.find_by(item_id: item['id'])
+          quantity = item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
+          next unless t14_item
+          Store.t14_itemss_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
+        end
+      end
 
       # To scrape mfr count of turn14 products'
       manufacturer_and_purchase_order(items["data"])
@@ -37,6 +47,7 @@ task t14_items_eta: :environment do
       end
     end
     puts "#{itemsCount} Items processed"
+    puts "Items found: #{finalItems.count}"
     exit if items['links']['next'].nil?
     items_url = ENV['TURN14_STORE'] + items['links']['next']
   rescue StandardError => e
@@ -90,19 +101,19 @@ def get_Dopbox_Mpn_Sku mpn_numbers, sku_numbers
   end
 end
 
-def catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items)
-  byebug
+def catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items, finalItems)
   batch = []
   i = 0;
-  until mpn_numbers.empty?
+  until batch.count == mpn_numbers.count
     if(Turn14Product.where(mfr_part_number: mpn_numbers[i]).or(Turn14Product.where(part_number: mpn_numbers[i])))
       batch << sku_numbers[mpn_numbers[i]]
       i += 1
       itemIndex = find_item_for_catalog(sku_numbers[mpn_numbers[i]], items)
       if(!itemIndex.eql?(-1))
-        byebug
+        # byebug
         it = items[itemIndex]
-        puts ""
+        finalItems << it
+        puts it
       end
     end
     puts batch.count.to_s
