@@ -71,11 +71,19 @@ end
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
   latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)
   # puts "Before Stock: #{latest.inventory_quantity} Before Date: #{latest.updated_at}"
-  latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
-    href: href, price: price, product_title: title)
+  if(store.name.eql?("Maxton Design USA"))
+    latest.update(brand: brand, mpn: sku, sku: mpn, inventory_quantity: stock, slug: slug,
+      href: href, price: price, product_title: title)
+    latest.archive_products.create(store_id: store.id, brand: brand, mpn: sku, sku: mpn,
+      inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
+      href: href, price: price, product_title: title)
+  else
+    latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
+      href: href, price: price, product_title: title)
+    latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,
+      inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
+      href: href, price: price, product_title: title)
+  end
   # latest = store.latest_products.find_by(variant_id: variant_id, product_id: product_id)
   # puts "After Stock: #{latest.inventory_quantity} After Date: #{latest.updated_at}"
-  latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,
-    inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
-    href: href, price: price, product_title: title)
 end
