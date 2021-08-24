@@ -27,3 +27,7 @@ Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: '
 Section.find_or_create_by(section_id: 'ECS-Audi').update(name: 'Audi', href: 'https://www.ecstuning.com/includes/vehicleMap.cgi?vehicleSelection=1&vstep_1=Audi')
 Section.find_or_create_by(section_id: 'ECS-BMW').update(name: 'BMW', href: 'https://www.ecstuning.com/includes/vehicleMap.cgi?vehicleSelection=1&vstep_1=BMW')
 Section.find_or_create_by(section_id: 'ECS-Volkswagen').update(name: 'Volkswagen', href: 'https://www.ecstuning.com/includes/vehicleMap.cgi?vehicleSelection=1&vstep_1=Volkswagen')
+
+
+# Wordpress websites
+Store.find_or_create_by(store_id: 'vargas_turbo').update(name: 'vargas_turbo', href: 'https://vargasturbo.com/product-search/')

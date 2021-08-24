@@ -1,6 +1,8 @@
 desc 'To scrape fcpeuro products from fcpeuro.com'
 task scrape_fcp_products: :environment do
-  sections = Section.find_by(section_id: ["Volkswagen-parts", "Audi-parts"])
+  sections = []
+  sections << Section.find_by(section_id: "Audi-parts")
+  sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
     puts "Section: #{section.section_id}"
     page = 1
@@ -17,10 +19,12 @@ task scrape_fcp_products: :environment do
         group.css('.grid-x.hit').each_with_index do |item,index2|
           item_url = "#{ENV['FCP_STORE']}/#{item['data-href']}"
           item_doc = Nokogiri::HTML(Curb.open_uri(item_url))
-          sku = item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content']
+          # sku = item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content']
+          sku = item_doc.xpath('/html/body/div[3]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/span[2]').text().strip
           async_url = "#{ENV['FCP_STORE']}#{item_doc.at('.extended')['data-load-async']}"
           async_doc = Nokogiri::HTML(Curb.open_uri(async_url))
-          desc = async_doc.at('#description').at('.extended__details').css('ul').css('li').text.strip 
+          # desc = async_doc.at('#description').at('.extended__details').css('h3').css('li').text.strip 
+          desc = async_doc.at('#description').at('.extended__details').css('dl').css('dd').text.strip
           if async_doc.css('.extended__kit').present?
             puts "Kit #{index2}"
             kit = category.kits.find_by(sku: sku)
@@ -70,11 +74,15 @@ def scrap_fcp_values item_doc, desc, async_doc, item_url
       brand: item_doc.at('.//meta[@property=$value]', nil, { value: 'product:brand' })['content'],
       price: item_doc.at('.listing__price .listing__amount span').text,
       available_at: item_doc.at('.listing__fulfillmentDesc span').text,
-      sku: item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content'],
-      fcp_euro_id: desc.split("FCP Euro ID:\n")[1].split("\n")[0],
-      quality: desc.split("Quality:\n")[1].split("\n")[0],
-      oe_numbers: async_doc.at('.extended__oeNumbers').text.strip.split("OE Numbers\n")[1],
-      mfg_numbers: async_doc.at('.extended__mfgNumbers').text.strip.split("MFG Numbers\n")[1],
+      # sku: item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content'],
+      sku: item_doc.xpath('/html/body/div[3]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/span[2]').text().strip,
+      # fcp_euro_id: desc.split("FCP Euro ID:\n")[1].split("\n")[0],
+      fcp_euro_id: desc.split("\n")[0],
+      # quality: desc.split("Quality:\n")[1].split("\n")[0],
+      quality: desc.split("\n")[3],
+      # oe_numbers: async_doc.at('.extended__oeNumbers').text.strip.split("OE Numbers\n")[1],
+      oe_numbers: async_doc.at('.extended__oeNumbers').text.strip.split("OE Numbers\n")[1].strip,
+      mfg_numbers: async_doc.at('.extended__mfgNumbers').text.strip.split("MFG Numbers\n")[1].strip,
       href: item_url
     }
 end
