@@ -6,6 +6,9 @@ task bc_racing_products: :environment do
   
   Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
   Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH'] 
+
+  # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+  # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
   
   # browser = Watir::Browser.new :chrome
   browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]

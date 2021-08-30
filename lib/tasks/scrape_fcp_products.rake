@@ -72,7 +72,8 @@ def add_fcp_fitments doc, product
 end
 
 def scrap_fcp_values item_doc, desc, async_doc, item_url
-  params = 
+  begin
+    params = 
     {
       title: item_doc.at('.listing__name').text.strip,
       brand: item_doc.at('.//meta[@property=$value]', nil, { value: 'product:brand' })['content'],
@@ -89,4 +90,7 @@ def scrap_fcp_values item_doc, desc, async_doc, item_url
       mfg_numbers: async_doc.at('.extended__mfgNumbers').text.strip.split("MFG Numbers\n")[1].strip,
       href: item_url
     }
+  rescue
+    continue
+  end
 end
