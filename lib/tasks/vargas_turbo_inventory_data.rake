@@ -6,11 +6,10 @@ task :vargas_turbo => :environment do
     store = Store.find_by(name: 'vargas_turbo')
     
 
-    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH']
-    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-
-    # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH']
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+    Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     
     browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
 
@@ -43,29 +42,58 @@ task :vargas_turbo => :environment do
         begin
             file = Curb.open_uri(item.second)
             doc = Nokogiri::HTML(file).at('body')
-            if(doc.xpath('//*[@id="product-259"]/div[2]/div/form/table/tbody/tr[1]/td[2]').present?)
-                # browser.goto store.href
-                # byebug
-                # doc = Nokogiri::HTML.parse(browser.page_source)
-                next
+            if( doc.at('.variations').present?)
+                browser.goto item[1]
+
+                name = doc.at("//h1[@itemprop='name']").text.strip
+                brand = doc.at('.posted_in').children[1].text.strip
+                selectorCount = browser.divs(class: "avada-select-parent").count
+
+                browser.divs(class: "avada-select-parent")[0].child.options.each_with_index do |option, index|
+
+                    if index == 0
+                        next
+                    else
+                        option.click
+
+                        if selectorCount == 2
+                            browser.divs(class: "avada-select-parent")[0].options.each_with_index do |innerOption, innerIndex|
+                                if innerIndex == 0
+                                    next
+                                else
+                                    price_temp = browser.divs(class: "woocommerce-variation-price")[0].text
+                                    price = price_temp.split(" ")[0] if price_temp.include?(" ")
+                                    qty = browser.divs(class: "woocommerce-variation-availability")[0].text.split(" ")[0]
+                                    sku = browser.divs(class: "product_meta")[0].child.text.split(":")[1].strip
+                                    variant_id = browser.elements(class: "variation_id")[0].attribute_value("value")
+
+                                    puts "Brand: #{brand}, Name: #{name}, SKU: #{sku}, Price: #{price}, QTY: #{qty}, Variant id: #{variant_id}"
+                                    add_vargas_turbo_products_to_store(store, name, brand, sku, qty, price, variant_id)
+                                end
+                            end
+                        else
+                            price_temp = browser.divs(class: "woocommerce-variation-price")[0].text
+                            price = price_temp.split(" ")[0] if price_temp.include?(" ")
+                            qty = browser.divs(class: "woocommerce-variation-availability")[0].text.split(" ")[0]
+                            sku = browser.divs(class: "product_meta")[0].child.text.split(":")[1].strip
+                            variant_id = browser.elements(class: "variation_id")[0].attribute_value("value")
+
+                            puts "Brand: #{brand}, Name: #{name}, SKU: #{sku}, Price: #{price}, QTY: #{qty}, Variant id: #{variant_id}"
+                            add_vargas_turbo_products_to_store(store, name, brand, sku, qty, price, variant_id)
+                        end
+                    end
+                end
             else
-                name = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/h1').text().strip
+                name = doc.at("//h1[@itemprop='name']").text.strip
+                sku = doc.at('.sku').text.strip
+                price_temp = doc.at('.price').text.strip
+                price = price_temp.split(" ")[0] if price_temp.include?(" ")
+                qty = doc.at('.stock').text.split(" ")[0]
+                brand = doc.at('.posted_in').children[1].text.strip
 
-                sku = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/div[4]/span[1]/span').text().strip
-                sku = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/div[3]/span[1]/span').text().strip if sku.eql?("")
-
-                price = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/p[1]/ins/span/bdi').text().strip
-                price = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/p[1]/span/bdi').text().strip if price.eql?("")
-
-                qty = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/div[1]').text().strip.split(" ")[0]
-                begin
-                    brand = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/div[4]/span[2]').children[1].text.strip
-                rescue
-                    brand = doc.xpath('//*[@id="product-'+item.first+'"]/div[2]/div/div[3]/span[2]').text().split(",")[0].split(" ")[1]
-                end    
+                puts "Brand: #{brand}, Name: #{name}, SKU: #{sku}, Price: #{price}, QTY: #{qty}"
+                add_vargas_turbo_products_to_store(store, name, brand, sku, qty, price, nil)
             end
-            puts "Brand: #{brand}, Name: #{name}, SKU: #{sku}, Price: #{price}, QTY: #{qty}"
-            add_vargas_turbo_products_to_store(store, name, brand, sku, qty, price)
         rescue
             next
         end
@@ -73,13 +101,8 @@ task :vargas_turbo => :environment do
     
 end
 
-def add_vargas_turbo_products_to_store(store, title, brand, sku, qty, price)
+def add_vargas_turbo_products_to_store(store, title, brand, sku, qty, price, variant_id)
     latest = store.latest_products.find_or_create_by(sku: sku)
-    latest.update(product_title: title, brand: brand, sku: sku, inventory_quantity: qty, price: price)
-    latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, sku: sku, inventory_quantity: qty, price: price)
+    latest.update(product_title: title, brand: brand, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
+    latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
 end
-
-
-
-
-
