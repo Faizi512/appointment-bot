@@ -7,7 +7,7 @@ task :vargas_turbo => :environment do
     
 
     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH']
-    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    Selenium::WebDriver::Chrome::Service.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
     # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     
