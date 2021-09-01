@@ -66,6 +66,7 @@ task :vargas_turbo => :environment do
                                     qty = browser.divs(class: "woocommerce-variation-availability")[0].text.split(" ")[0]
                                     sku = browser.divs(class: "product_meta")[0].child.text.split(":")[1].strip
                                     variant_id = browser.elements(class: "variation_id")[0].attribute_value("value")
+
                                     puts "Brand: #{brand}, Name: #{name}, SKU: #{sku}, Price: #{price}, QTY: #{qty}, Variant id: #{variant_id}"
                                     add_vargas_turbo_products_to_store(store, name, brand, sku, qty, price, variant_id)
                                 end
