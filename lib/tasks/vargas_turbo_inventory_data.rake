@@ -49,7 +49,6 @@ task :vargas_turbo => :environment do
                 selectorCount = browser.divs(class: "avada-select-parent").count
 
                 browser.divs(class: "avada-select-parent")[0].child.options.each_with_index do |option, index|
-
                     if index == 0
                         next
                     else
