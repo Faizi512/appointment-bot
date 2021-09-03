@@ -105,5 +105,5 @@ end
 def add_vargas_turbo_products_to_store(store, title, brand, sku, qty, price, variant_id)
     latest = store.latest_products.find_or_create_by(sku: sku)
     latest.update(product_title: title, brand: brand, mpn: sku, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
-    latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
+    latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, mpn: sku, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
 end
