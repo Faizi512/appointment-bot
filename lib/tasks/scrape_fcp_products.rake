@@ -19,7 +19,11 @@ task scrape_fcp_products: :environment do
           # puts "Category #{index1} Name: #{category.name}"
           group.css('.grid-x.hit').each_with_index do |item,index2|
             item_url = "#{ENV['FCP_STORE']}/#{item['data-href']}"
-            item_doc = Nokogiri::HTML(Curb.open_uri(item_url))
+            item_doc = Nokogiri::HTML(Curb.open_uri(item_url)) 
+            if item_doc.children.count <= 1
+              puts "Item skipped: Because item not found at :> #{item_url}"
+              next 
+            end
             # sku = item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content']
             sku = item_doc.xpath('/html/body/div[3]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/span[2]').text().strip
             async_url = "#{ENV['FCP_STORE']}#{item_doc.at('.extended')['data-load-async']}"
