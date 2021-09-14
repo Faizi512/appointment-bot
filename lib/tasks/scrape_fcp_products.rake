@@ -5,7 +5,7 @@ task scrape_fcp_products: :environment do
   sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
     puts "Section: #{section.section_id}"
-    page = 31
+    page = 1
     until page.blank?
       begin
         file = Curb.open_uri(section.href + "?page=#{page}")
