@@ -1,11 +1,11 @@
 desc 'To scrape fcpeuro products from fcpeuro.com'
 task scrape_fcp_products: :environment do
   sections = []
-  sections << Section.find_by(section_id: "Volkswagen-parts")
   sections << Section.find_by(section_id: "Audi-parts")
+  sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
     puts "Section: #{section.section_id}"
-    page = 1
+    page = 31
     until page.blank?
       begin
         file = Curb.open_uri(section.href + "?page=#{page}")
@@ -21,8 +21,9 @@ task scrape_fcp_products: :environment do
             item_url = "#{ENV['FCP_STORE']}/#{item['data-href']}"
             item_doc = Nokogiri::HTML(Curb.open_uri(item_url)) 
             if item_doc.children.count <= 1
-              puts "Item skipped: Because item not found at :> #{item_url}"
-              next 
+              item_doc_retry = Nokogiri::HTML(Curb.open_uri(item_url)) 
+              puts "Item skipped: Because item not found at :> #{item_url}" if item_doc_retry.children.count <= 1
+              next if item_doc_retry.children.count <= 1
             end
             # sku = item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content']
             sku = item_doc.xpath('/html/body/div[3]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/span[2]').text().strip
