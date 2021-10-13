@@ -11,18 +11,17 @@ task bc_racing_products: :environment do
   # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
   
   # browser = Watir::Browser.new :chrome
-  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
+  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
   
   # Navigate to Page
   browser.goto store.href
-
   # Authenticate and Navigate to the store
   browser.text_field(xpath: '//*[@id="email"]').set 'orders@moddedeuros.com'
   browser.text_field(xpath: '//*[@id="password"]').set 'u{U8$qz/S3&)TN9h'
   browser.button(xpath: '//*[@id="Submit"]').click
 
   browser.link(xpath: '//*[@id="form1"]/div[3]/div[3]/div[1]/div[2]/table/tbody/tr[2]/td[2]/a[1]').click
-  
+  browser.link(xpath: '//*[@id="ContentPlaceHolder1_formTable"]/tbody/tr[3]/td[4]/a').click
   page = 1
   until page.blank?
     rows = browser.table(id:'allItems').trs
@@ -48,7 +47,7 @@ task bc_racing_products: :environment do
     if browser.link(xpath: '//*[@id="ContentPlaceHolder1_ItemListPager_lnkNextPage"]').present?
       browser.link(xpath: '//*[@id="ContentPlaceHolder1_ItemListPager_lnkNextPage"]').click
     else
-      page = 0
+      page = nil
     end
   end
   browser.close
