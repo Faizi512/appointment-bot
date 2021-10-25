@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Issue detected..!</h1>
+    <br>
+    <h3>Description: </h3>
+    <p>Error: <%= params[:user]%>, error found in <%= params[:script]%></p>
+
+    <h4>Details: </h4>
+    <p><%= params[:user].backtrace%></p>
+  </body>
+</html>

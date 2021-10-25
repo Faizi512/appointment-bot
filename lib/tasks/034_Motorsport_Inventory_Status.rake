@@ -1,22 +1,28 @@
 require "google_drive"
 require "roo"
 desc 'To scrape products of 034 Motorsport from google spreadsheet file using google_drive gem'
-task motorsport_inventory: :environment do
-    store = Store.find_by(name: '034 motorsport')
-    count = 0
-    session = GoogleDrive::Session.from_config("#{Rails.root}/lib/tasks/config.json")
-    ws = session.spreadsheet_by_key("#{ENV['MOTORSPORT_SPREADSHEET_ID']}").worksheets[0]
-    ws.rows.each do |row|
-        if(count == 0)
-            count += 1
-        else
-            mpn = row[0]
-            product_title = row[1]
-            qty= row[2]
-            count = count + 1
-            add_034_motorsport_products_to_store(store, product_title, mpn, qty)
-            puts "#{count}:\t #{mpn},\t\t #{product_title},\t\t #{qty}"
+task motorsport_inventory: :environment do    
+    begin
+        store = Store.find_by(name: '034 motorsport')
+        count = 0
+        session = GoogleDrive::Session.from_config("#{Rails.root}/lib/tasks/config.json")
+        ws = session.spreadsheet_by_key("#{ENV['MOTORSPORT_SPREADSHEET_ID']}").worksheets[0]
+        raise Exception.new "Error: 'worksheet not found', error found in 'motorsport_inventory' script" if !ws.spreadsheet.id.present?
+        ws.rows.each do |row|
+            if(count == 0)
+                count += 1
+            else
+                mpn = row[0]
+                product_title = row[1]
+                qty= row[2]
+                count = count + 1
+                add_034_motorsport_products_to_store(store, product_title, mpn, qty)
+                puts "#{count}:\t #{mpn},\t\t #{product_title},\t\t #{qty}"
+            end
         end
+    rescue Exception => e
+        puts e.message
+        UserMailer.with(user: e, script: "motorsport_inventory").issue_in_script.deliver_now
     end
 end
 

@@ -12,7 +12,7 @@ task bc_racing_products: :environment do
   
   # browser = Watir::Browser.new :chrome
   browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
-  
+
   # Navigate to Page
   browser.goto store.href
   # Authenticate and Navigate to the store
