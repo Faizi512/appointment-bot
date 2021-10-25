@@ -2,7 +2,7 @@ desc 'To check turn14 open orders through api'
 task :t14_open_orders => :environment do
 	begin
 		t14_token = make_post_request("#{ENV['TURN14_STORE']}/v1/token","client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
-		raise Exception.new "Invalid token" if !token.present?
+		raise Exception.new "Invalid token" if !t14_token.present?
 		order_url = "#{ENV['TURN14_STORE']}/v1/orders"
 		supplier = Supplier.find_or_create_by(supplier_id: "turn14", name: "Turn 14")
 		t14_order_numbers = []
