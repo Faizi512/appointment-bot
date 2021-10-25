@@ -7,7 +7,6 @@ task motorsport_inventory: :environment do
         count = 0
         session = GoogleDrive::Session.from_config("#{Rails.root}/lib/tasks/config.json")
         ws = session.spreadsheet_by_key("#{ENV['MOTORSPORT_SPREADSHEET_ID']}").worksheets[0]
-        ws = nil
         raise Exception.new "Error: 'worksheet not found', error found in 'motorsport_inventory' script" if !ws.spreadsheet.id.present?
         ws.rows.each do |row|
             if(count == 0)
