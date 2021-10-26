@@ -14,7 +14,6 @@ task export_t14_items: :environment do
           next if item_hash.blank?
           
           puts 'Turn14 Product added'
-          
           Turn14Product.add_t14_product(
             supplier,
             item['id'],
@@ -44,6 +43,6 @@ task export_t14_items: :environment do
     end
   rescue Exception => e
     puts e.message
-    UserMailer.with(user: e, script: "motorsport_inventory").issue_in_script.deliver_now
+    UserMailer.with(user: e, script: "export_t14_items").issue_in_script.deliver_now
   end
 end
