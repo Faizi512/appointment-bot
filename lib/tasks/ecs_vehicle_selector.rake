@@ -87,7 +87,8 @@ def ecs_vehicle_selector(section_url, v_step)
   end
   v_hash
 rescue StandardError => e
-  [nil, nil]
+  puts e.message
+  UserMailer.with(user: e, script: "ecs_vehicle_selector").issue_in_script.deliver_now
 end
 
 def base_ecs_vehicle_selector(section_url)
@@ -102,5 +103,6 @@ def base_ecs_vehicle_selector(section_url)
   end
   v_hash
 rescue StandardError => e
-  [nil, nil]
+  puts e.message
+  UserMailer.with(user: e, script: "ecs_vehicle_selector").issue_in_script.deliver_now
 end

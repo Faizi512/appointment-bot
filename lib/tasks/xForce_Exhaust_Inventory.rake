@@ -24,6 +24,8 @@ task :xForce_Inventory => :environment do
             latest = store.latest_products.find_or_create_by(mpn: item[:mpn])
             latest.archive_products.create(store_id: store.id, product_title: item[:product_title], brand: item[:brand], mpn: item[:mpn], inventory_quantity: item[:inventory_quantity], product_id: item[:product_id])
         end
+    rescue SignalException => e
+        nil
     rescue Exception => e
         puts e.message
         puts e.backtrace

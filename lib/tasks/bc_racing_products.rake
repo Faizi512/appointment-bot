@@ -11,11 +11,17 @@ task bc_racing_products: :environment do
   # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
   
   # browser = Watir::Browser.new :chrome
-  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+  begin
+    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
 
   # Navigate to Page
-  browser.goto store.href
-  # Authenticate and Navigate to the store
+    browser.goto store.href
+    raise Exception.new "Browser error" if !browser.present?
+  rescue Exception=> e
+    puts e.message
+    UserMailer.with(user: e, script: "bc_racing_products").issue_in_script.deliver_now
+  end
+    # Authenticate and Navigate to the store
   browser.text_field(xpath: '//*[@id="email"]').set 'orders@moddedeuros.com'
   browser.text_field(xpath: '//*[@id="password"]').set 'u{U8$qz/S3&)TN9h'
   browser.button(xpath: '//*[@id="Submit"]').click

@@ -18,6 +18,7 @@ task manufacturer_and_purchase_order: :environment do
   rescue StandardError => e
     puts "exception #{e}"
     sleep 1
+    UserMailer.with(user: e, script: "manufacturer_and_purchase_order").issue_in_script.deliver_now
     token = Curb.t14_auth_token['access_token']
     retry
   end

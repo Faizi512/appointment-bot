@@ -1,7 +1,13 @@
 desc 'To scrape vehicle selector data of AUDI, Volkswagen from fcpeuro.com'
 task fcp_vehicle_selector: :environment do
-  file = Curb.open_uri(ENV['FCP_STORE'])
-  doc = Nokogiri::HTML(file)
+  begin
+    file = Curb.open_uri(ENV['FCP_STORE'])
+    doc = Nokogiri::HTML(file)
+    raise Exception.new "Doc not found" if !doc.present?
+  rescue Exception => e
+    puts e.message
+    UserMailer.with(user: e, script: "fcp_vehicle_selector").issue_in_script.deliver_now
+  end
   years = doc.css('#yearDropdown').children.text.split("\n")
   years.delete('Year')
   years.each do |year|

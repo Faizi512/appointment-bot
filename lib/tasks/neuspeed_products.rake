@@ -1,8 +1,10 @@
 require 'roo'
 desc 'To scrape products of neuspeed from dropbox xlsx file using roo gem'
 task neuspeed_products: :environment do
+  begin
     store = Store.find_by(name: 'neuspeed')
     data = Roo::Spreadsheet.open(ENV['NEUSPEED_DROPBOX_URL'], extension: :xlsx)
+    raise Exception.new "Data not found" if !data.present?
     data.each_with_index do |row, index|
       next if index.zero?
 
@@ -11,6 +13,10 @@ task neuspeed_products: :environment do
       qty = row[3]
       add_neuspeed_products_to_store(store, title, mpn, qty)
     end
+  rescue Exception => e
+    puts e.message 
+    UserMailer.with(user: e, script: "neuspeed_products").issue_in_script.deliver_now
+  end
 end
 
 def add_neuspeed_products_to_store(store, title, mpn, qty)

@@ -4,24 +4,32 @@ task scrape_ecs_products: :environment do
   sections = %w[/b-genuine-volkswagen-audi-parts/v-audi /b-genuine-volkswagen-audi-parts/v-volkswagen /b-genuine-bmw-parts/v-bmw]
   sections.each do |section|
     url = "#{store.href}#{section}"
-    home_doc = Curb.get_doc("#{store.href}#{section}")
-    taxons = home_doc.xpath("//div[@class='vselectFacet']").at('ul').css('a')
-    taxons.each do |taxon|
-      taxon_value = taxon.attributes['href'].value.split('/').last.split('c-').last
-      taxon_doc = Curb.get_doc("#{url}/c-#{taxon_value}/")
-      # puts "Taxon = #{taxon_value}"
-      sub_taxons = taxon_doc.xpath("//script[contains(text(), 'myHREF')]").children.first.text.split('myHREF')
-      sub_taxons.each_with_index do |sub_taxon, index|
-        if index.odd?
-          sub_taxon_value = sub_taxon.split('\;').first.split(" = '").last.split("/'").first.split("c-#{taxon_value}-").last
-          break if sub_taxon_value.include? ' = filterVehicleOption.url'
+    begin
+      home_doc = Curb.get_doc("#{store.href}#{section}")
+      raise Exception.new "Data not found" if !home_doc.present?
+      taxons = home_doc.xpath("//div[@class='vselectFacet']").at('ul').css('a')
+      taxons.each do |taxon|
+        taxon_value = taxon.attributes['href'].value.split('/').last.split('c-').last
+        taxon_doc = Curb.get_doc("#{url}/c-#{taxon_value}/")
+        # puts "Taxon = #{taxon_value}"
+        sub_taxons = taxon_doc.xpath("//script[contains(text(), 'myHREF')]").children.first.text.split('myHREF')
+        sub_taxons.each_with_index do |sub_taxon, index|
+          if index.odd?
+            sub_taxon_value = sub_taxon.split('\;').first.split(" = '").last.split("/'").first.split("c-#{taxon_value}-").last
+            break if sub_taxon_value.include? ' = filterVehicleOption.url'
 
-          scrape_ecs_pages(url, store, taxon_value, sub_taxon_value)
-          # puts "Value = #{sub_taxon_value}"
+            scrape_ecs_pages(url, store, taxon_value, sub_taxon_value)
+            # puts "Value = #{sub_taxon_value}"
+          end
         end
+        exit if taxon_value.include? 'wheels'
+        # puts '******************************************************************************************'
       end
-      exit if taxon_value.include? 'wheels'
-      # puts '******************************************************************************************'
+    rescue SignalException => e
+      nil
+    rescue Exception => e
+      puts e.message
+      UserMailer.with(user: e, script: "scrape_ecs_products").issue_in_script.deliver_now
     end
   end
 end

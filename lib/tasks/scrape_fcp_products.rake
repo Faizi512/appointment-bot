@@ -9,7 +9,13 @@ task scrape_fcp_products: :environment do
     until page.blank?
       begin
         file = Curb.open_uri(section.href + "?page=#{page}")
-        doc = Nokogiri::HTML(file)
+        begin
+          doc = Nokogiri::HTML(file)
+        raise Exceptio.new "Doc not found" if !doc.present?
+        rescue Exception => e
+          puts e.message
+          UserMailer.with(user: e, script: "scrape_fcp_products").issue_in_script.deliver_now
+        end
         doc.css('.browse .group').each_with_index do |group, index1|
           category_name = group.css('.group__heading .crumbs__item .crumbs__name').last.text rescue nil
           if category_name.blank?
@@ -56,8 +62,11 @@ task scrape_fcp_products: :environment do
         end
         next_page = begin
                       doc.css('.pages .pages__link').at('a[rel=next]')["href"]
-                    rescue StandardError
+                    rescue SignalException => e
                       nil
+                    rescue StandardError => e
+                      puts e.message
+                      UserMailer.with(user: e, script: "scrape_fcp_products").issue_in_script.deliver_now
                     end
         break if next_page.blank?
         puts "Next Page: #{next_page}"

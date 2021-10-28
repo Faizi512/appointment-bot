@@ -30,8 +30,11 @@ def scrape_usp_pages page_url, store
     end
     next_page = begin
       page_doc.xpath('//*[@class="right-arrow"]')[0].attributes['href'].value
-    rescue StandardError
+    rescue SignalException => e
       nil
+    rescue StandardError => e
+      puts e.message
+      UserMailer.with(user: e, script: "scrape_uspmotorsports_products").issue_in_script.deliver_now
     end
     break if next_page.blank?
 

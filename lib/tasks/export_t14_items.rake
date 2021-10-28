@@ -32,7 +32,10 @@ task export_t14_items: :environment do
           )
         end
       end
-      exit if items['links']['next'].nil?
+      if items['links']['next'].nil?
+        raise Exception.new "Exiting the script"
+        exit 
+      end
 
       items_url = ENV['TURN14_STORE'] + items['links']['next']
     rescue StandardError => e
@@ -42,7 +45,9 @@ task export_t14_items: :environment do
       retry
     end
   rescue Exception => e
-    puts e.message
-    UserMailer.with(user: e, script: "export_t14_items").issue_in_script.deliver_now
+    if !e.message.eql?("Exiting the script")
+      puts e.message
+      UserMailer.with(user: e, script: "export_t14_items").issue_in_script.deliver_now
+    end
   end
 end

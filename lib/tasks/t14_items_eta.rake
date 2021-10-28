@@ -1,6 +1,12 @@
 desc 'To scrape eta and mfr count of turn14 products through inventory paging API and catalog check'
 task t14_items_eta: :environment do
-  token = Curb.t14_auth_token['access_token']
+  begin
+    token = Curb.t14_auth_token['access_token']
+    raise Exception.new "Invalid access_token" if !token.present?
+  rescue Exception => e
+    puts e.message
+    UserMailer.with(user: e, script: "t14_items_eta").issue_in_script.deliver_no
+  end
   puts "Deleting the items from the table to clear the redundant data."
   Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
@@ -90,30 +96,43 @@ def add_purchase_order(product, eta)
 end
 
 def get_Dopbox_Mpn_Sku mpn_numbers, sku_numbers
-  file = Curb.open_uri(ENV['DROPBOX_URL'])
-  CSV.parse(file,
-            headers: true,
-            header_converters: :symbol) do |row|
-    mpn_numbers << row[:turn14id]
-    sku_numbers[row[:turn14id].to_s] = row[:sku]
+  begin
+    file = Curb.open_uri(ENV['DROPBOX_URL'])
+    raise Exception.new "Dropbox file not found"
+    CSV.parse(file,
+              headers: true,
+              header_converters: :symbol) do |row|
+      mpn_numbers << row[:turn14id]
+      sku_numbers[row[:turn14id].to_s] = row[:sku]
+    end
+  rescue Exception => e
+    puts e.message
+    UserMailer.with(user: e, script: "t14_items_eta").issue_in_script.deliver_now
   end
 end
 
 def catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items, finalItems)
-  batch = []
-  i = 0;
-  until batch.count == mpn_numbers.count
-    if(Turn14Product.where(mfr_part_number: mpn_numbers[i]).or(Turn14Product.where(part_number: mpn_numbers[i])))
-      batch << sku_numbers[mpn_numbers[i]]
-      i += 1
-      itemIndex = find_item_for_catalog(sku_numbers[mpn_numbers[i]], items)
-      if(!itemIndex.eql?(-1))
-        it = items[itemIndex]
-        finalItems << it
-        puts it
+  begin
+    batch = []
+    i = 0;
+    until batch.count == mpn_numbers.count
+      if(Turn14Product.where(mfr_part_number: mpn_numbers[i]).or(Turn14Product.where(part_number: mpn_numbers[i])))
+        batch << sku_numbers[mpn_numbers[i]]
+        i += 1
+        itemIndex = find_item_for_catalog(sku_numbers[mpn_numbers[i]], items)
+        if(!itemIndex.eql?(-1))
+          it = items[itemIndex]
+          finalItems << it
+          puts it
+        end
       end
+      puts batch.count.to_s
     end
-    puts batch.count.to_s
+  rescue SignalException => e
+    nil
+  rescue Exception => e
+    puts e.message
+    UserMailer.with(user: e, script: "t14_items_eta").issue_in_script.deliver_now
   end
 end
 

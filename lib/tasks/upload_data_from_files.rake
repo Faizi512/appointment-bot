@@ -23,9 +23,10 @@ task push_data: :environment do
             end
             puts "Read #{num_rows} rows" 
         end
+    rescue SignalException => e
+        nil
     rescue Exception => e
         puts e.message
-        puts e.backtrace
         UserMailer.with(user: e, script: "push_data").issue_in_script.deliver_now
     end
 end

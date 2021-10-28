@@ -33,6 +33,8 @@ task :t14_open_orders => :environment do
 			end
 		end
 		Turn14OpenOrder.where.not(sales_order: t14_order_numbers).delete_all
+	rescue SignalException => e
+		nil
 	rescue Exception => e
 		puts e.message
         UserMailer.with(user: e, script: "t14_open_orders").issue_in_script.deliver_now

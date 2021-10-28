@@ -2,17 +2,25 @@ require 'watir'
 require 'webdrivers/chromedriver'
 desc 'To scrape tunerprice products using automation watir gem'
 task tuner_price_products: :environment do
-  store = Store.find_by(name: 'tunerprice')
-  sections = %w[/index.php/audi.html /index.php/vw.html]
-  
-  Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-  Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH'] 
-  
-  # browser = Watir::Browser.new :chrome
-  browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
-  
-  # Navigate to Page
-  browser.goto store.href
+  begin
+    store = Store.find_by(name: 'tunerprice')
+    sections = %w[/index.php/audi.html /index.php/vw.html]
+    raise Exception.new "Section not found" if !sections.present?
+
+    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH'] 
+    
+    # browser = Watir::Browser.new :chrome
+    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
+    raise Exception.new "Browser not found" if !browser.present?
+    # Navigate to Page
+    browser.goto store.href
+  rescue SignalException => e
+    nil
+  rescue Exception => e
+    puts e.message
+    UserMailer.with(user: e, script: "tuner_price_products").issue_in_script.deliver_now
+  end
 
   # Authenticate and Navigate to the store
   browser.text_field(xpath: '//*[@id="email"]').set ENV['TUNER_PRICE_USERNAME']
