@@ -37,7 +37,7 @@ task export_t14_price: :environment do
 
       if all_price['links']['next'].nil?
         puts "next price page not found."
-        exit 
+        exit
       end
 
       price_url = ENV['TURN14_STORE'] + all_price['links']['next']
@@ -50,6 +50,8 @@ task export_t14_price: :environment do
     end
   rescue Exception => e
     puts e.message
-    UserMailer.with(user: e, script: "export_t14_price").issue_in_script.deliver_now
+    if e.message.eql?("Invalid token")
+      UserMailer.with(user: e, script: "export_t14_price").issue_in_script.deliver_now
+    end
   end
 end

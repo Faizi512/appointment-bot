@@ -98,7 +98,7 @@ end
 def get_Dopbox_Mpn_Sku mpn_numbers, sku_numbers
   begin
     file = Curb.open_uri(ENV['DROPBOX_URL'])
-    raise Exception.new "Dropbox file not found"
+    raise Exception.new "Dropbox file not found" if !file.present?
     CSV.parse(file,
               headers: true,
               header_converters: :symbol) do |row|

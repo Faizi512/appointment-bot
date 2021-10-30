@@ -9,8 +9,8 @@ task catalog_check_against_turn14: :environment do
       sku_numbers[row[:turn14id].to_s] = row[:sku]
     end
     auth_token = Curb.t14_auth_token
-    raise Exception.new "Error: 'Auth_token not found', error found in 'catalog_check_against_turn14' script" if !auth_token.present?
-    raise Exception.new "Error: 'Data not found', error found in 'catalog_check_against_turn14' script" if !mpn_numbers.present? || !sku_numbers.present?
+    raise Exception.new "Auth_token not found" if !auth_token.present?
+    raise Exception.new "Data not found" if !mpn_numbers.present? || !sku_numbers.present?
     until mpn_numbers.empty?
       batch = mpn_numbers.shift(250)
       items = Turn14Product.where(mfr_part_number: batch).or(Turn14Product.where(part_number: batch))
@@ -30,13 +30,12 @@ task catalog_check_against_turn14: :environment do
       items.each do |item|
         t14_item = t14_items['data'].select { |it| it['id'] == item['item_id'] }.first rescue nil
         next unless t14_item
-
         quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
         Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'])
       end
     end
   rescue Exception => e
-      puts e.message
-      UserMailer.with(user: e, script: "catalog_check_against_turn14").issue_in_script.deliver_now
+    puts e.message
+    UserMailer.with(user: e, script: "catalog_check_against_turn14").issue_in_script.deliver_now
   end
 end
