@@ -20,7 +20,7 @@ def scrape_usp_pages page_url, store
     products.each_with_index do |product, index|
       puts "product #{index}"
       product_url = product.css('.image').children[1].attributes['href'].value
-      product_doc = Curb.get_doc(product_url)
+      product_doc = Curb.get_doc(product_url)      
       slug = product_url.split('/').last.split('.html').first
       data = scrap_usp_product_values(product_doc)
       add_product_to_store(store, data[:brand], data[:mpn], data[:sku], data[:inventory], slug, product_url, data[:price], data[:title])
@@ -34,10 +34,10 @@ def scrape_usp_pages page_url, store
       nil
     rescue StandardError => e
       puts e.message
-      UserMailer.with(user: e, script: "scrape_uspmotorsports_products").issue_in_script.deliver_now
+      exit if e.message.eql?("undefined method `attributes' for nil:NilClass")
+      UserMailer.with(user: e, script: "scrape_uspmotorsports_products").issue_in_script.deliver_now if  !e.message.eql?("undefined method `attributes' for nil:NilClass")
     end
     break if next_page.blank?
-
     page = next_page.split('page=')[1]
   end
 end
