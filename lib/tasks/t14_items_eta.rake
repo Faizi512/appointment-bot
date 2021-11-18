@@ -1,5 +1,6 @@
 desc 'To scrape eta and mfr count of turn14 products through inventory paging API and catalog check'
 task t14_items_eta: :environment do
+
   begin
     token = Curb.t14_auth_token['access_token']
     raise Exception.new "Invalid access_token" if !token.present?
@@ -7,8 +8,8 @@ task t14_items_eta: :environment do
     puts e.message
     UserMailer.with(user: e, script: "t14_items_eta").issue_in_script.deliver_no
   end
-  # puts "Deleting the items from the table to clear the redundant data."
-  # Turn14AvailablePromise.destroy_all
+  puts "Deleting the items from the table to clear the redundant data."
+  Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
   finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
@@ -27,7 +28,7 @@ task t14_items_eta: :environment do
           product = Turn14Product.find_by(item_id: item['id'])
           quantity = item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
           next unless t14_item
-          Store.t14_itemss_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
+          Store.t14_items_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
         end
       end
 
