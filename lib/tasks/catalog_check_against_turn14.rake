@@ -11,6 +11,7 @@ task catalog_check_against_turn14: :environment do
     auth_token = Curb.t14_auth_token
     raise Exception.new "Auth_token not found" if !auth_token.present?
     raise Exception.new "Data not found" if !mpn_numbers.present? || !sku_numbers.present?
+    batch_count = 0
     until mpn_numbers.empty?
       batch = mpn_numbers.shift(250)
       items = Turn14Product.where(mfr_part_number: batch).or(Turn14Product.where(part_number: batch))
@@ -31,8 +32,10 @@ task catalog_check_against_turn14: :environment do
         t14_item = t14_items['data'].select { |it| it['id'] == item['item_id'] }.first rescue nil
         next unless t14_item
         quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
-        Store.t14_itemss_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'])
+        Store.t14_items_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'])
       end
+      batch_count += 1
+      puts "#{batch_count} batch done"
     end
   rescue Exception => e
     puts e.message
