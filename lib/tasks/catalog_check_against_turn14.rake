@@ -13,8 +13,10 @@ task catalog_check_against_turn14: :environment do
     raise Exception.new "Data not found" if !mpn_numbers.present? || !sku_numbers.present?
     batch_count = 0
     until mpn_numbers.empty?
+      batch = nil
       batch = mpn_numbers.shift(250)
-      items = Turn14Product.where(mfr_part_number: batch).or(Turn14Product.where(part_number: batch))
+      items = Turn14Product.select("DISTINCT ON(part_number) *").where(mfr_part_number: batch).or(Turn14Product.select("DISTINCT ON(part_number) *").where(part_number: batch))
+
       items_ids = items.map(&:item_id)
       next if items_ids.blank?
       retries = 0
