@@ -53,20 +53,22 @@ module Api
 
     def update_record
       if params.present?
-        data1 = {order_id: params["Key1"]["order_id"],
-            order_number: params["Key1"][:order_number],
-            shipment_number: params["Key1"][:shipment_number],
-            email: params["Key1"][:email],
-            product_name: params["Key1"][:product_name],
-            order_state: params["Key1"][:order_state],
-            shipment_state: params["Key1"][:shipment_state],
-            payment_state: params["Key1"][:payment_state],
-            completed_at: params["Key1"][:completed_at],
-            store_location_id: params["Key1"][:store_location_id],
-            stock_location_name: params["Key1"][:stock_location_name],
-            eta_date: params["Key1"][:estimated_eta],
-            contracted_date: params["Key1"][:contracted_date]}
-        RetoolOrder.find_or_create_by(item_id: params["Key1"][:item_id],shipment_number: params["Key1"][:shipment_number]).update(data1)
+        params[:Key1].each do |order|
+          data1 = {order_id: params["Key1"]["order_id"],
+              order_number: params["Key1"][:order_number],
+              shipment_number: params["Key1"][:shipment_number],
+              email: params["Key1"][:email],
+              product_name: params["Key1"][:product_name],
+              order_state: params["Key1"][:order_state],
+              shipment_state: params["Key1"][:shipment_state],
+              payment_state: params["Key1"][:payment_state],
+              completed_at: params["Key1"][:completed_at],
+              store_location_id: params["Key1"][:store_location_id],
+              stock_location_name: params["Key1"][:stock_location_name],
+              eta_date: params["Key1"][:estimated_eta],
+              contracted_date: params["Key1"][:contracted_date]}
+          RetoolOrder.find_or_create_by(item_id: params["Key1"][:item_id],shipment_number: params["Key1"][:shipment_number]).update(data1)
+        end
       end
       render json: "success".to_json, status: :ok
     end
