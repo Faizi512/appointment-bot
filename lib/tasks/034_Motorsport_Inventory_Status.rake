@@ -1,7 +1,7 @@
 require "google_drive"
 require "roo"
 desc 'To scrape products of 034 Motorsport from google spreadsheet file using google_drive gem'
-task motorsport_inventory: :environment do    
+task motorsport_inventory: :environment do 
     begin
         store = Store.find_by(name: '034 motorsport')
         count = 0
