@@ -38,7 +38,7 @@ module Api
           dborder.update(data1)
           process_oder_id << dborder.id
         end
-        # RetoolOrder.where.not(id: process_oder_id).delete_all
+        RetoolOrder.where.not(id: process_oder_id).delete_all
       end
       render json: "success".to_json, status: :ok
     end
