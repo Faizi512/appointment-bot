@@ -1,0 +1,2 @@
+class ThmotorsportsProduct < ApplicationRecord
+end
