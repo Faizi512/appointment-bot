@@ -27,7 +27,7 @@ task apr_holly_performance: :environment do
     end
   rescue Exception => e
     puts e.message
-    # UserMailer.with(user: e, script: "apr_holly_performance").issue_in_script.deliver_now
+    UserMailer.with(user: e, script: "apr_holly_performance").issue_in_script.deliver_now
   end
 end
 
