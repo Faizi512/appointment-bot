@@ -40,6 +40,7 @@ task sync_with_store: :environment do
         retries = 0
         begin
           retries ||= 0
+
           if(store.store_id=="NeuspeedRSWheels")
             hash_data = Parser.new(file, store.store_id, variant, product_brand).parse
             hash_data.each do |data|
@@ -76,8 +77,12 @@ def get_request(urll)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
-  latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)
-  # puts "Before Stock: #{latest.inventory_quantity} Before Date: #{latest.updated_at}"
+  if(store.store_id.eql?("NeuspeedRSWheels"))
+    latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id, mpn: mpn)
+  else
+    latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)
+  end
+    # puts "Before Stock: #{latest.inventory_quantity} Before Date: #{latest.updated_at}"
   if(store.name.eql?("Maxton Design USA"))
     latest.update(brand: brand, mpn: sku, sku: mpn, inventory_quantity: stock, slug: slug,
       href: href, price: price, product_title: title)
