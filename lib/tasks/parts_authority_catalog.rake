@@ -4,7 +4,7 @@ desc 'To scrape parts authority products catalog'
 task parts_authority_catalog: :environment do
   begin
     ftp = Net::FTP.new('ftp.panetny.com')
-    ftp.login('moddeurospf', 'DmZ7e44k')
+    ftp.login('moddeurospf','DmZ7e44k')
     raise Exception.new "Login failed" if !ftp.welcome.present?
     ftp.passive = true
     ftp.getbinaryfile('partsauthority.zip', 'zip_parts_authority', 1024) # 1024 is representing blocksize
@@ -16,7 +16,7 @@ task parts_authority_catalog: :environment do
         CSV.parse(content, headers: true, header_converters: :symbol) do |row|
           puts "Line #{row[:line]} Part #{row[:part]} Cost #{row[:cost]} Count #{row[:qtyonhand]} Packs #{row[:packs]}"
           product = PartAuthorityProduct.find_or_create_by(part_number: row[:part], product_line: row[:line])
-          product.update(product_line: row[:line], price: row[:cost], core_price: row[:coreprice], qty_on_hand: row[:qtyonhand], packs: row[:packs])
+          product.update(product_line: row[:line], price: row[:cost], core_price: row[:coreprice], qty_on_hand: row[:qtyonhand], packs: row[:packs])    
         end
       end
     end

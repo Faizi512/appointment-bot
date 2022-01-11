@@ -24,6 +24,8 @@ class Parser
       bmptuning_data_points(doc)
     when 'maxtondesignusa'
       maxtondesignusa_data_points(doc)
+    when 'NeuspeedRSWheels'
+      neuspeedRSWheels_data_points(doc)
     end
   end
 
@@ -56,6 +58,20 @@ class Parser
     @stock = txt.split("\"id\":#{@variant['id']}", 2).last.split('inventory_quantity', 2).last.split(',')[0].split(':')[1].to_i rescue nil
     @mpn = @variant['product_id']
     data_points_hash
+  end
+
+  def neuspeedRSWheels_data_points(doc)
+    hash_data=[]
+    @title=doc.xpath("//h1[@class='product-title']").children.text.strip
+    data=doc.xpath("//select/option[@data-variant-id]")
+      data.each do |products|
+        stock_data = products.attributes["data-variant-quantity"].value.to_i
+        @stock = stock_data > 0 ? stock_data : 0
+        @price = products.children[0].text.strip.split.last.to_f
+        @mpn=products.attributes["data-sku"].value
+        hash_data.push(data_points_hash)
+      end
+    hash_data
   end
 
   def maxtondesignusa_data_points doc
