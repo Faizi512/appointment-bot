@@ -1,0 +1,2 @@
+class HolleyPerformanceAvailablePromise < ApplicationRecord
+end

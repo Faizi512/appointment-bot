@@ -1,0 +1,2 @@
+class LastVisitedPage < ApplicationRecord
+end
