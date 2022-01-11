@@ -22,7 +22,6 @@ task sync_with_store: :environment do
     products['products'].each do |product|
       product_slug = product['handle']
       product_brand = product['vendor']
-
       product['variants'].each do |variant|
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
         # puts variant_href.to_s
@@ -41,9 +40,17 @@ task sync_with_store: :environment do
         retries = 0
         begin
           retries ||= 0
-          data = Parser.new(file, store.store_id, variant, product_brand).parse
-          add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
-          puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
+          if(store.store_id=="NeuspeedRSWheels")
+            hash_data = Parser.new(file, store.store_id, variant, product_brand).parse
+            hash_data.each do |data|
+              add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
+              puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
+            end
+          else
+            data = Parser.new(file, store.store_id, variant, product_brand).parse
+            add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
+            puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
+          end  
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
           sleep 1
