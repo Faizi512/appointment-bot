@@ -24,7 +24,9 @@ task sync_with_store: :environment do
       product_brand = product['vendor']
       product['variants'].each do |variant|
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
+        # variant_href ="https://www.mmrshop.co.uk/collections/all-bmw/products/mmr-performance-billet-aluminum-gear-shift-paddle-set?variant=31411673497703"
         # puts variant_href.to_s
+        # byebug
         retry_uri = 0
         file = begin
           retry_uri ||= 0

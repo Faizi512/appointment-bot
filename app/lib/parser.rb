@@ -14,7 +14,6 @@ class Parser
 
   def parse
     doc = Nokogiri::HTML(file)
-
     case store
     when 'urotuning'
       urotuning_data_points(doc)
@@ -26,6 +25,8 @@ class Parser
       maxtondesignusa_data_points(doc)
     when 'NeuspeedRSWheels'
       neuspeedRSWheels_data_points(doc)
+    when 'MMRPerformance'
+      mmrPerformance_data_points(doc)
     end
   end
 
@@ -74,6 +75,32 @@ class Parser
     hash_data
   end
 
+  def mmrPerformance_data_points(doc)
+    # byebug
+    #   data_val= doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[10]/form/div[1]/div/div/div/div[1]')
+    # path_exists=doc.xpath('//div[@class="product-page-main"]')
+
+    # if(!path_exists.empty?)
+
+      # byebug
+    #   path_exists.each_with_index do |list_element, index|
+    #     byebug
+    #  end
+    
+    # end
+    @title=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[2]/h1').children.text.strip
+    @price=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[5]/div/span/span').children.text.split("£")[1].to_f
+    # path_exists=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[10]/form/div[1]/div/div/div')
+    # if (!path_exists.empty?)
+    #   byebug
+    # end
+    @mpn=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p/span').children.text
+    @stock=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p/span').children.text.scan(/\d+/).first.to_i
+    
+    data_points_hash
+  
+  end
+
   def maxtondesignusa_data_points doc
     regex = "[0-9]"
     title = doc.xpath("//a/div[2]/div")[0].text
@@ -89,7 +116,6 @@ class Parser
     @mpn = @variant['product_id']
     data_points_hash
   end
-
 
   def data_points_hash
     {
