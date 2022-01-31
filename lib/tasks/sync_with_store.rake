@@ -8,8 +8,9 @@ task sync_with_store: :environment do
   page_number = 0
   loop do
     page_number += 1
-    products = begin
-    get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+    # temp = 0
+    begin
+      products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
     rescue StandardError => e
       puts 'Exception throws getting products'
       sleep 60
@@ -50,6 +51,8 @@ task sync_with_store: :environment do
           else
             data = Parser.new(file, store.store_id, variant, product_brand).parse
             add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
+            # temp = temp + 1
+            # puts "=============================== #{temp} ==============================="
             puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
           end  
         rescue StandardError => e
