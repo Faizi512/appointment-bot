@@ -25,13 +25,8 @@ class Parser
       maxtondesignusa_data_points(doc)
     when 'NeuspeedRSWheels'
       neuspeedRSWheels_data_points(doc)
-<<<<<<< HEAD
     when 'MMRPerformance'
-      mmrPerformance_data_points(doc)
-=======
-    when 'mmrperformance'
       mmrperformance_data_points(doc)
->>>>>>> master
     end
   end
 
@@ -81,29 +76,11 @@ class Parser
   end
 
   def mmrPerformance_data_points(doc)
-    # byebug
-    #   data_val= doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[10]/form/div[1]/div/div/div/div[1]')
-    # path_exists=doc.xpath('//div[@class="product-page-main"]')
-
-    # if(!path_exists.empty?)
-
-      # byebug
-    #   path_exists.each_with_index do |list_element, index|
-    #     byebug
-    #  end
-    
-    # end
     @title=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[2]/h1').children.text.strip
     @price=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[5]/div/span/span').children.text.split("£")[1].to_f
-    # path_exists=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[10]/form/div[1]/div/div/div')
-    # if (!path_exists.empty?)
-    #   byebug
-    # end
     @mpn=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p/span').children.text
     @stock=doc.xpath('/html/body/main/div[2]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p/span').children.text.scan(/\d+/).first.to_i
-    
     data_points_hash
-  
   end
 
   def maxtondesignusa_data_points doc
@@ -122,8 +99,6 @@ class Parser
     data_points_hash
   end
 
-<<<<<<< HEAD
-=======
   def mmrperformance_data_points(doc)
     @title = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[2]/h1').text
     @price = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[5]/div/span').text.present? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[5]/div/span').text.split("£")[1]: ""
@@ -133,7 +108,6 @@ class Parser
     data_points_hash
   end
 
->>>>>>> master
   def data_points_hash
     {
       stock: @stock, mpn: @mpn, brand: @brand,
