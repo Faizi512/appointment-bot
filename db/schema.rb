@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211025083025) do
+ActiveRecord::Schema.define(version: 20220303074434) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -149,6 +149,14 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.index ["fcp_product_id"], name: "index_fitments_on_fcp_product_id"
   end
 
+  create_table "holley_performance_available_promises", force: :cascade do |t|
+    t.string "mpn"
+    t.string "brand"
+    t.string "atp_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "inventories", force: :cascade do |t|
     t.string "solidus_sku"
     t.bigint "supplier_id"
@@ -158,6 +166,13 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_inventories_on_product_id"
     t.index ["supplier_id"], name: "index_inventories_on_supplier_id"
+  end
+
+  create_table "last_visited_pages", force: :cascade do |t|
+    t.string "section"
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "latest_products", force: :cascade do |t|
@@ -273,13 +288,6 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.text "notes"
   end
 
-  create_table "part_authority_brands", id: false, force: :cascade do |t|
-    t.integer "id", default: -> { "nextval('parts_authority_brands_id_seq'::regclass)" }, null: false
-    t.integer "brand_id"
-    t.string "brand_name", limit: 255
-    t.string "product_line", limit: 255
-  end
-
   create_table "part_authority_brands_mpns", force: :cascade do |t|
     t.string "brand"
     t.string "mpn"
@@ -376,6 +384,24 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.index ["supplier_id"], name: "index_suppliers_on_supplier_id"
   end
 
+  create_table "thmotorsports_products", force: :cascade do |t|
+    t.string "mpn"
+    t.string "current_price"
+    t.string "product_title"
+    t.string "manufacturer"
+    t.string "product_details"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "thmotorsports_products_fitments", force: :cascade do |t|
+    t.string "mpn"
+    t.string "fitment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "thmotorsports_product_id"
+  end
+
   create_table "turn14_available_promises", force: :cascade do |t|
     t.string "mpn"
     t.string "location"
@@ -422,6 +448,15 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.index ["supplier_id"], name: "index_turn14_products_on_supplier_id"
   end
 
+  create_table "uro_tuning_fitments", force: :cascade do |t|
+    t.string "mpn"
+    t.string "fitment"
+    t.bigint "latest_product_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["latest_product_id"], name: "index_uro_tuning_fitments_on_latest_product_id"
+  end
+
   create_table "vehicle_selectors", force: :cascade do |t|
     t.integer "year"
     t.string "make"
@@ -451,12 +486,5 @@ ActiveRecord::Schema.define(version: 20211025083025) do
     t.datetime "submitted_at"
   end
 
-  add_foreign_key "archived_purchase_orders", "turn14_products"
-  add_foreign_key "categories", "sections"
-  add_foreign_key "ecs_fitments", "ecs_products"
-  add_foreign_key "ecs_taxons", "ecs_products"
-  add_foreign_key "fcp_products", "categories"
-  add_foreign_key "fitments", "fcp_products"
-  add_foreign_key "latest_purchase_orders", "turn14_products"
-  add_foreign_key "manufacturers", "turn14_products"
+  add_foreign_key "uro_tuning_fitments", "latest_products"
 end

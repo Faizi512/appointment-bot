@@ -1,7 +1,8 @@
 Supplier.find_or_create_by(supplier_id: 'solidus').update(name: 'Solidus Store')
 
 #shopify stores
-Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: 'https://www.urotuning.com/collections/all/products') # store_id:1
+Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: 'https://www.urotuning.com/collections/all') # store_id:
+# Store.find_or_create_by(store_id: 'uroTuning').update(name: 'Uro_tuning', href: 'https://www.urotuning.com/collections/all/products')
 Store.find_or_create_by(store_id: 'performancebyie').update(name: 'performancebyie', href: 'https://www.performancebyie.com/collections/all/products')
 Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: 'https://www.bmptuning.com/collections/all/products')
 Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net/collections/all/products')

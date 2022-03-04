@@ -1,5 +1,7 @@
 {
   "name": "inventory_db",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "protractor": "^7.0.0"
+  }
 }
