@@ -2,11 +2,13 @@ require 'watir'
 require 'webdrivers/chromedriver'
 require 'timeout'
 require 'uri'
-desc 'To scrape inventory urotuningdat'
+desc 'To scrape inventory urotuning data'
 task new_urotuning_task: :environment do
     store = Store.find_by(store_id: 'urotuning')
-    Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
     raise Exception.new "Browser not found" if !browser.present?
     # --headless
