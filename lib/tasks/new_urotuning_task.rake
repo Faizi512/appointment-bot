@@ -12,8 +12,8 @@ task new_urotuning_task: :environment do
     # for live browser
     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-    browser = Watir::Browser.new :chrome, args: %w[ --no-sandbox --disable-dev-shm-usage --disable-gpu ]
-    # --headless
+    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+  
     raise Exception.new "Browser not found" if !browser.present?
     # browser = Watir::Browser.new :chrome
     browser.goto store.href
