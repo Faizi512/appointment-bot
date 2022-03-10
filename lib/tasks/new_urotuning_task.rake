@@ -12,7 +12,8 @@ task new_urotuning_task: :environment do
     # for live browser
     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    browser = Watir::Browser.new :chrome, args: %w[ --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    # --headless
     raise Exception.new "Browser not found" if !browser.present?
     # browser = Watir::Browser.new :chrome
     browser.goto store.href
@@ -51,7 +52,8 @@ def _scrape_products(products_urls,browser,store)
         product_data=_add_product_in_store(store, brand, mpn,stock,product_slug,variant,product_id,varient_href,price,title)
 
         if (browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[2]/div/div[2]/div[2]/table").exists? == true )
-            fitments=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[2]/div/div[2]/div[2]/table").children[0].children rescue nil
+            fitments=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[2]/div/div[2]/div[2]/table") rescue nil
+            fitments =fitments.children[0].children  rescue nil
             if !fitments.blank?
                 fitments.each do |fitment| 
                     if fitment.text.include?("Audi") || fitment.text.include?("BMW") || fitment.text.include?("Volkswagen")
