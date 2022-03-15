@@ -20,8 +20,15 @@ task new_urotuning_task: :environment do
         browser.goto store.href
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
-        offset = 0
-        while offset <= total_product do 
+        last_offset=UrotuningFtimentsPageLog.last['offset'].to_i
+        if(last_offset < total_product)
+          offset = last_offset
+        else
+           offset = 0
+        end
+
+        while offset <= total_product do  
+            add_offsets(offset)
             puts "=====================#{offset}================"
             url = "#{store.href}?offset=#{offset}"
             browser.goto url
@@ -86,6 +93,11 @@ end
 def add_in_fitments(product_id,mpn,fitment,store)  
     fitments_table =  UroTuningFitment
     fitments_table = fitments_table.find_or_create_by(latest_product_id: product_id, mpn: mpn, fitment: fitment)
+end
+
+def add_offsets(offset)  
+    offset_table =  UrotuningFtimentsPageLog
+    offset_table = offset_table.find_or_create_by(offset: offset)
 end
 
 def _add_product_in_store(store, brand, mpn, stock, slug, variant_id,product_id, href, price, title)

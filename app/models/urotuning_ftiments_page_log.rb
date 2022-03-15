@@ -1,0 +1,2 @@
+class UrotuningFtimentsPageLog < ApplicationRecord
+end
