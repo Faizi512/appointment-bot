@@ -26,7 +26,6 @@ task new_urotuning_task: :environment do
         elsif(last_offset < total_product)
            offset = last_offset
         elsif(last_offset == total_product)
-            byebug
             UrotuningFtimentsPageLog.destroy_all
             offset = 0
         else 
