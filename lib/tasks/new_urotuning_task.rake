@@ -10,7 +10,7 @@ task new_urotuning_task: :environment do
         # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
         # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
         # browser = Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
-        # for live browser
+        # # for live browser
         Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
         Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
         browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
@@ -21,12 +21,15 @@ task new_urotuning_task: :environment do
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
         last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        
         if(last_offset == 0)
           offset = last_offset
         elsif(last_offset < total_product)
            offset = last_offset
-        else
+        elsif(last_offset == total_product)
+            byebug
+            UrotuningFtimentsPageLog.destroy_all
+            offset = 0
+        else 
             offset = 0
         end
 
@@ -74,7 +77,6 @@ def _scrape_products(products_urls,browser,store)
     stock=JSON.parse(browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/form/script").text_content).first['inventory_quantity'] rescue nil
     product_id=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/form/div[5]").attributes[:data_product_id] rescue nil
     product_data=_add_product_in_store(store, brand, mpn,stock,product_slug,variant,product_id,varient_href,price,title)
-
     if (browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[2]/div/div[2]/div[2]/table").exists? == true )
         fitments=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[2]/div/div[2]/div[2]/table") rescue nil
         fitments =fitments.children[0].children  rescue nil
@@ -82,7 +84,7 @@ def _scrape_products(products_urls,browser,store)
             fitments.each do |fitment| 
                 if fitment.text.include?("Audi") || fitment.text.include?("BMW") || fitment.text.include?("Volkswagen") || fitment.text.include?("MINI")
                     fitment=fitment.text
-                    add_in_fitments(product_data.latest_product_id,mpn, fitment,store)
+                    add_in_fitments(product_data.latest_product_id,product_data.product_id,mpn, fitment,store)
                 end  
             end
         end
@@ -93,9 +95,9 @@ def _scrape_products(products_urls,browser,store)
  
 end
 
-def add_in_fitments(product_id,mpn,fitment,store)  
+def add_in_fitments(latest_product_id,product_id,mpn,fitment,store)  
     fitments_table =  UroTuningFitment
-    fitments_table = fitments_table.find_or_create_by(latest_product_id: product_id, mpn: mpn, fitment: fitment)
+    fitments_table = fitments_table.find_or_create_by(latest_product_id: latest_product_id, product_id: product_id, mpn: mpn, fitment: fitment)
 end
 
 def add_offsets(offset)  

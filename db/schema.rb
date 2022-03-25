@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220315133937) do
+ActiveRecord::Schema.define(version: 20220324133015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -454,6 +454,7 @@ ActiveRecord::Schema.define(version: 20220315133937) do
     t.bigint "latest_product_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "product_id"
     t.index ["latest_product_id"], name: "index_uro_tuning_fitments_on_latest_product_id"
   end
 
