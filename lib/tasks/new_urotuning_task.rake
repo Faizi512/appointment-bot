@@ -83,7 +83,7 @@ def _scrape_products(products_urls,browser,store)
             fitments =fitments.children[0].children  rescue nil
             if !fitments.blank?
                 fitments.each do |fitment| 
-                    if fitment.text.include?("Audi") || fitment.text.include?("BMW") || fitment.text.include?("Volkswagen") || fitment.text.include?("MINI") || fitment.text.include?("Mercedes Benz") ||  fitment.text.include?("Porsche")
+                    if fitment.text.include?("Audi") || fitment.text.include?("BMW") || fitment.text.include?("Volkswagen") || fitment.text.include?("MINI") || fitment.text.include?("Mercedes Benz") ||  fitment.text.include?("Porsche") ||  fitment.text.include?("Other Models")
                         fitment=fitment.text
                         add_in_fitments(product_data.latest_product_id,product_data.product_id,mpn, fitment,store)
                     end  
