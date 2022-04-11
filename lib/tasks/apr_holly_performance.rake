@@ -9,7 +9,8 @@ task apr_holly_performance: :environment do
       brand = row[:brand]
       mpn = row[:item]
       qty = row[:available_today]
-      price = row[:map_price].to_i
+      price_data = row[:map_price]
+      price = price_data.include?('$') ? '%.2f' % price_data.split('$')[1] : '%.2f' % price_data
       title = row[:description]
       if qty.eql?('0') && (brand == 'APR' || brand == "Dinan")
         atp_date = row[:atp_date]

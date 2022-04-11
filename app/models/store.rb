@@ -3,6 +3,7 @@ class Store < ApplicationRecord
   has_many :latest_products, dependent: :destroy
 
   def self.t14_items_insert_in_latest_and_archieve_table(item_id, brand, mpn, inventory_quantity, sku, price)
+    price = price.to_s.include?('$') ? '%.2f' % price.to_s.split('$')[1] : '%.2f' % price.to_s
     store = Store.find_by(store_id: 'turn14')
     latest = store.latest_products.find_or_create_by(store_id: store.id, mpn: mpn)
     latest.update(brand: brand, inventory_quantity: inventory_quantity, variant_id: item_id, sku: sku, price: price)

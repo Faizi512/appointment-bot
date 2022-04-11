@@ -16,7 +16,6 @@ task catalog_check_against_turn14: :environment do
       batch = nil
       batch = mpn_numbers.shift(250)
       items = Turn14Product.select("DISTINCT ON(part_number) *").where(mfr_part_number: batch).or(Turn14Product.select("DISTINCT ON(part_number) *").where(part_number: batch))
-
       items_ids = items.map(&:item_id)
       next if items_ids.blank?
       retries = 0

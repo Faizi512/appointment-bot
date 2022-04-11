@@ -47,11 +47,13 @@ task sync_with_store: :environment do
           if(store.store_id=="NeuspeedRSWheels")
             hash_data = Parser.new(file, store.store_id, variant, product_brand).parse
             hash_data.each do |data|
+              data[:price] = data[:price].to_s.include?('$') ? '%.2f' % data[:price].to_s.split('$')[1] : '%.2f' % data[:price].to_s
               add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
               puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
             end
           else
             data = Parser.new(file, store.store_id, variant, product_brand).parse
+            data[:price] = data[:price].include?('$') ? '%.2f' % data[:price].split('$')[1] : '%.2f' % data[:price]
             add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
             # temp = temp + 1
             # puts "=============================== #{temp} ==============================="

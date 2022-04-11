@@ -11,7 +11,8 @@ task tsw_wheels_products: :environment do
       title = row[:description]
       mpn = row[:item_number]
       qty = row[:quantity_all_us]
-      price = row[:map].to_i
+      price_data = row[:map]
+      price = price_data.include?('$') ? '%.2f' % price_data.split('$')[1] : '%.2f' % price_data
       add_tsw_wheels_products_to_store(store, title, brand, mpn, qty, price)
       puts "Title= #{title}"
       puts "Brand=#{brand} MPN=#{mpn} qty=#{qty} price=#{price}"
