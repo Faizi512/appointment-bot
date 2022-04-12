@@ -31,7 +31,7 @@ task new_urotuning_task: :environment do
         # else 
         #     offset = 0
         # end
-        offset=79344
+        offset=79368
         while offset <= total_product do  
             add_offsets(offset)
             puts "=====================#{offset}================"
