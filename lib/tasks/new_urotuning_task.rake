@@ -20,17 +20,18 @@ task new_urotuning_task: :environment do
         browser.goto store.href
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
-        last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        if(last_offset == 0)
-          offset = last_offset
-        elsif(last_offset < total_product)
-           offset = last_offset
-        elsif(last_offset == total_product)
-            UrotuningFtimentsPageLog.destroy_all
-            offset = 0
-        else 
-            offset = 0
-        end
+        # last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
+        # if(last_offset == 0)
+        #   offset = last_offset
+        # elsif(last_offset < total_product)
+        #    offset = last_offset
+        # elsif(last_offset == total_product)
+        #     UrotuningFtimentsPageLog.destroy_all
+        #     offset = 0
+        # else 
+        #     offset = 0
+        # end
+        offset=79344
         while offset <= total_product do  
             add_offsets(offset)
             puts "=====================#{offset}================"
