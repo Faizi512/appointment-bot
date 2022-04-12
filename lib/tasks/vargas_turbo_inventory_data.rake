@@ -5,13 +5,14 @@ desc 'To scrap inventory data from Vargas Turbo using watir'
 task :vargas_turbo => :environment do
     begin
         store = Store.find_by(name: 'vargas_turbo')
-
-        Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH']
-        Selenium::WebDriver::Chrome::Service.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-        # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-        # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
-
-        browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222]
+        # for local browser
+        Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+        Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+        browser = Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
+        # for live browser
+        # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+        # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+        # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
 
         file = Curb.open_uri(store.href)
         raise Exception.new "File not found" if !file.present?
@@ -109,7 +110,8 @@ task :vargas_turbo => :environment do
         end    
 end
 
-def add_vargas_turbo_products_to_store(store, title, brand, sku, qty, price, variant_id)
+def add_vargas_turbo_products_to_store(store, title, brand, sku, qty, price_data, variant_id)
+    price = price_data.include?('$') ? '%.2f' % price_data.tr('$ ,', '') : '%.2f' % price_data
     latest = store.latest_products.find_or_create_by(sku: sku)
     latest.update(product_title: title, brand: brand, mpn: sku, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
     latest.archive_products.create(store_id: store.id, product_title: title, brand: brand, mpn: sku, sku: sku, inventory_quantity: qty, price: price, variant_id: variant_id)
