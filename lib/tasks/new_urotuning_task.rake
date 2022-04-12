@@ -31,7 +31,6 @@ task new_urotuning_task: :environment do
         else 
             offset = 0
         end
-
         while offset <= total_product do  
             add_offsets(offset)
             puts "=====================#{offset}================"
@@ -91,8 +90,8 @@ def _scrape_products(products_urls,browser,store)
                 end
             end
         end 
-        # puts "===================  #{index}  ==================="
-        # puts "==== #{title},#{mpn},#{stock},#{product_slug},#{variant},#{product_id}, #{varient_href},#{price},#{title} ===="
+        puts "===================  #{index}  ==================="
+        puts "==== #{title},#{mpn},#{stock},#{product_slug},#{variant},#{product_id}, #{varient_href},#{price},#{title} ===="
     end
  
 end
