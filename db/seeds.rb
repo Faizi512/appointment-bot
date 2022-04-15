@@ -25,6 +25,7 @@ Store.find_or_create_by(store_id: 'xforce').update(name: 'xforce', href: 'https:
 Store.find_or_create_by(store_id: '034 motorsport').update(name: '034 motorsport', href: 'https://docs.google.com/spreadsheets/d/13O0EqWI5aTyMO_egXHFe1QSkCUWxjZ9iztgfyk1n7vo/edit#gid=1302382781')
 Store.find_or_create_by(store_id: 'parts_authority').update(name: 'Parts Authority', href: '')
 Store.find_or_create_by(store_id: 'thmotorsports').update(name: 'TH Motorsports', href: 'https://thmotorsports.com/')
+Store.find_or_create_by(store_id: 'cspracing').update(name: 'Cspracing', href: 'https://cspracing.com/')
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')
