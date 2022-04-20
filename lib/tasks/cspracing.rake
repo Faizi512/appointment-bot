@@ -7,6 +7,7 @@ desc 'To scrape inventory data from mmr_performance'
 task cspracing: :environment do
     begin
         store=Store.find_by(store_id: 'cspracing')
+        byebug
         # for local browser
         # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
         # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
