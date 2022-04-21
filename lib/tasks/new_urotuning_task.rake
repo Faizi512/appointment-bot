@@ -14,24 +14,22 @@ task new_urotuning_task: :environment do
         Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
         Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
         browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
-
-        # browser = Watir::Browser.new :chrome
         raise Exception.new "Browser not found" if !browser.present?
         browser.goto store.href
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
-        # last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        # if(last_offset == 0)
-        #   offset = last_offset
-        # elsif(last_offset < total_product)
-        #    offset = last_offset
-        # elsif(last_offset == total_product)
-        #     UrotuningFtimentsPageLog.destroy_all
-        #     offset = 0
-        # else 
-        #     offset = 0
-        # end
-        offset=79368
+        last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
+        if(last_offset == 0)
+          offset = last_offset
+        elsif(last_offset < total_product)
+           offset = last_offset
+        elsif(last_offset == total_product)
+            UrotuningFtimentsPageLog.destroy_all
+            offset = 0
+        else 
+            offset = 0
+        end
+        # offset=79368
         while offset <= total_product do  
             add_offsets(offset)
             puts "=====================#{offset}================"
@@ -50,7 +48,7 @@ task new_urotuning_task: :environment do
         end
     rescue Exception => e
         puts e.message
-      end
+    end
 end
 
 def _scrape_products(products_urls,browser,store)
