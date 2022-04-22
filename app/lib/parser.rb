@@ -27,6 +27,8 @@ class Parser
       neuspeedRSWheels_data_points(doc)
     when 'MMRPerformance'
       mmrperformance_data_points(doc)
+    when 'maperformance'
+      maperformance_data_points(doc)
     end
   end
 
@@ -105,6 +107,21 @@ class Parser
     txt = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text
     @stock = !txt.scan(/\d/).empty? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text.split("(")[1].split(" ")[0] : "0"
     @mpn = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.present? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.split(":")[1] : ""
+    data_points_hash
+  end
+
+  def maperformance_data_points(doc)
+    @brand=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/a').text
+    @title=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/h1').text
+    @mpn=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[1]/strong').text.split('#').last
+    @price=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[5]/p/span[1]').text
+    raw_data=doc.xpath("//script[@class='product-json']").text
+    if !raw_data.blank?
+      data=JSON[raw_data]
+      @stock=data['variants'].present? ? data['variants'][0]["inventory_quantity"] : 0
+    else
+      @stock=0
+    end
     data_points_hash
   end
 
