@@ -19,17 +19,19 @@ task new_urotuning_task: :environment do
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
         last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
+        # last_offset=144
         if(last_offset == 0)
           offset = last_offset
         elsif(last_offset < total_product)
            offset = last_offset
-        elsif(last_offset == total_product)
+        elsif( last_offset+24 >= total_product)
+            #we have to delete UrotuningFtimentsPageLog by when last_offset=80040
             UrotuningFtimentsPageLog.destroy_all
             offset = 0
         else 
             offset = 0
         end
-        # offset=79584
+       
         while offset <= total_product do  
             add_offsets(offset)
             puts "=====================#{offset}================"
@@ -81,7 +83,7 @@ def _scrape_products(products_urls,browser,store)
         title=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/header/h2").text rescue nil
         if (browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/form/div[1]/div[1]/div/span").exists? == true )
             price_data=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/div[2]/form/div[1]/div[1]/div/span").text 
-            price = price_data&.include?('$') ? '%.2f' % price_data.split('$')[1] : '%.2f' % price_data
+            price = price_data.include?(',') || price_data.include?('$') ? '%.2f' % price_data.tr('$ ,','') : '%.2f' % price_data
         else
             price = "0"
         end
