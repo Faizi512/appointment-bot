@@ -19,7 +19,7 @@ task new_urotuning_task: :environment do
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
         last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        # last_offset=144
+        last_offset=5400
         if(last_offset == 0)
           offset = last_offset
         elsif(last_offset < total_product)
@@ -72,10 +72,12 @@ def _scrape_products(products_urls,browser,store)
         rescue StandardError => e
             puts "Exception #{e}"
             sleep 10
-            retry if (retries += 1) < 3
+            next if (retries += 1) < 3
+            # retry if (retries += 1) < 3
         end
         # product="https://www.urotuning.com/products/apr-high-performance-ignition-coils?variant=40332676956353"
         # browser.goto product
+
         varient_href=product
         data_chunk = product.split("/")[4]
         product_slug=data_chunk.split("?").first
