@@ -19,7 +19,7 @@ task new_urotuning_task: :environment do
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
         last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        last_offset=5400
+        # last_offset=5400
         if(last_offset == 0)
           offset = last_offset
         elsif(last_offset < total_product)
