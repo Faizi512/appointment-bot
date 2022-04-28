@@ -6,11 +6,29 @@ require 'open-uri'
 task sync_with_store: :environment do
   store = Store.find_by(store_id: ENV['STORE_ID'])
   page_number = 0
+  temp=0
   loop do
-    page_number += 1
+    if store.store_id.eql?("maperformance")
+      last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
+        if(last_offset == 0)
+          temp += 1
+          add_offset_of_maperformance(temp) 
+        else
+          temp = last_offset 
+        end
+    else
+      page_number += 1
+    end
     # temp = 0
     begin
-      products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+      if store.store_id.eql?("maperformance")
+        puts "=============================== #{temp} ==============================="
+        # byebug
+          products = get_request("#{store.href}.json?limit=99999&page=#{temp}")
+          # add_offset_of_maperformance(temp) 
+      else
+          products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+      end
     rescue StandardError => e
       puts 'Exception throws getting products'
       sleep 60
@@ -70,9 +88,12 @@ task sync_with_store: :environment do
         next
       end
     end
+    if store.store_id.eql?("maperformance")
+        temp = temp + 1
+        add_offset_of_maperformance(temp) 
+    end
   end
 end
-
 def get_request(urll)
   url = URI(urll)
   https = Net::HTTP.new(url.host, url.port)
@@ -81,6 +102,10 @@ def get_request(urll)
   request = Net::HTTP::Get.new(url)
   response = https.request(request)
   JSON.parse response.read_body
+end
+
+def add_offset_of_maperformance(offset)
+  Maperformancelog.find_or_create_by(offset: offset)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)

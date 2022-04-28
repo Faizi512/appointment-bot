@@ -1,0 +1,2 @@
+class Maperformancelog < ApplicationRecord
+end
