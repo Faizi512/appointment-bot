@@ -17,7 +17,6 @@ task t14_items_eta: :environment do
   loop do
     items = Curb.make_get_request items_url, token
     if items['data'].present?
-
       # For Catalog check
       mpn_numbers = []
       sku_numbers = {}
@@ -83,7 +82,7 @@ def manufacturer_and_purchase_order items
       esd = item["attributes"].dig('manufacturer', 'esd')
       add_manufacturer(product, stock, esd) if stock.present? && esd.present?
       add_purchase_order(product, item["attributes"]["eta"]) if item["attributes"]["eta"].present?
-    end
+     end
   end
 end
 
@@ -98,9 +97,7 @@ end
 
 def get_Dopbox_Mpn_Sku mpn_numbers, sku_numbers
   file = Curb.open_uri(ENV['DROPBOX_URL'])
-  CSV.parse(file,
-            headers: true,
-            header_converters: :symbol) do |row|
+  CSV.foreach(file, encoding:'iso-8859-1:utf-8', headers: true, header_converters: :symbol) do |row|
     mpn_numbers << row[:turn14id]
     sku_numbers[row[:turn14id].to_s] = row[:sku]
   end
