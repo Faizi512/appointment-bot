@@ -12,7 +12,7 @@ task t14_items_eta: :environment do
   Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
   finalItems = []
-  items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
+  items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=447"
   itemsCount = 0
   loop do
     items = Curb.make_get_request items_url, token
@@ -30,10 +30,8 @@ task t14_items_eta: :environment do
           Store.t14_items_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
         end
       end
-
       # To scrape mfr count of turn14 products'
       manufacturer_and_purchase_order(items["data"])
-
       # To scrape eta of turn14 products'
       itemsCount += items["data"].count
       items['data'].each do |item|
