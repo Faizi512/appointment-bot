@@ -2,7 +2,7 @@ desc 'To scrape usp motor sports products from uspmotorsports.com'
 task scrape_uspmotorsports_products: :environment do
   store = Store.find_by(name: 'uspmotorsports')
   home_doc = Curb.get_doc(store.href)
-  categories = home_doc.at('.top-categories-dropdown').css('ul').css('li')
+  categories = home_doc.at('.top-categories-dropdown').css('ul').css('li') rescue nil
   puts 'categories fetched'
   categories.each do |category|
     category_url = category.children[1].attributes['href'].value
@@ -16,13 +16,16 @@ def scrape_usp_pages page_url, store
   until page.blank?
     puts "Page: #{page_url}?page=#{page}"
     page_doc = Curb.get_doc(page_url + "?page=#{page}")
-    products = page_doc.xpath("//div[@class='product-item-border']")
+    products = page_doc.xpath("//div[@class='product-item-border']") rescue nil
     products.each_with_index do |product, index|
       puts "product #{index}"
-      product_url = product.css('.image').children[1].attributes['href'].value
-      product_doc = Curb.get_doc(product_url)      
-      slug = product_url.split('/').last.split('.html').first
-      data = scrap_usp_product_values(product_doc)
+      product_url = product.css('.image').children[1].attributes['href'].value rescue nil
+      product_doc = Curb.get_doc(product_url)       rescue nil
+      slug = product_url.split('/').last.split('.html').first rescue nil
+      data = scrap_usp_product_values(product_doc) rescue nil
+      if !data[:price].blank?
+        data[:price] = data[:price].to_s.include?(',') || data[:price].to_s.include?('$') ? '%.2f' % data[:price].to_s.tr('$ ,', '') : '%.2f' % data[:price].to_s
+      end
       add_product_to_store(store, data[:brand], data[:mpn], data[:sku], data[:inventory], slug, product_url, data[:price], data[:title])
       # puts "URL = #{product_url}"
       # puts "brand = #{data[:brand]} mpn = #{data[:mpn]} inventory = #{data[:inventory]} sku = #{data[:sku]}"
@@ -49,9 +52,10 @@ def add_product_to_store(store, brand, mpn, sku, stock, slug, href, price, title
 end
 
 def scrap_usp_product_values doc
-  price_line = doc.xpath("//span[@class='currency']").children.last
-  price = price_line.text if price_line.present?
-  data = doc.xpath("//script[contains(text(), 'dataLayer')]").text
+  sale_price = doc.xpath("//span[@class='product-price-value property-value']").children.children.text rescue nil
+  original_price = doc.xpath("//span[@class='currency']").children.first.text rescue nil
+  price = sale_price.blank? ? original_price : sale_price 
+  data = doc.xpath("//script[contains(text(), 'dataLayer')]").text rescue nil
   {
     sku: data.split('productSKU')[1].split("': '")[1].split("'")[0],
     brand: data.split('productManufacturer')[1].split("': '")[1].split("',")[0],
