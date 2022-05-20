@@ -3,7 +3,7 @@ task export_t14_items: :environment do
   begin
     token = Curb.t14_auth_token['access_token']
     raise Exception.new "Invalid token" if !token.present?
-    items_url = "#{ENV['TURN14_STORE']}/v1/items?page=1"
+    items_url = "#{ENV['TURN14_STORE']}/v1/items?page=447"
     supplier = Supplier.find_or_create_by(supplier_id: 'turn14', name: 'Turn 14')
     loop do
       items = Curb.make_get_request(items_url, token)
