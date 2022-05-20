@@ -12,7 +12,7 @@ task t14_items_eta: :environment do
   Turn14AvailablePromise.destroy_all
   puts "Ready to load new data"
   finalItems = []
-  items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=447"
+  items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   itemsCount = 0
   loop do
     items = Curb.make_get_request items_url, token
