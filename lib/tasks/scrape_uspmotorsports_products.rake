@@ -32,7 +32,9 @@ def scrape_usp_pages page_url, store
       # puts "Price #{data[:price]} Title #{data[:title]}"
     end
     next_page = begin
-      page_doc.xpath('//*[@class="right-arrow"]')[0].attributes['href'].value
+      if page_doc.xpath('//*[@class="right-arrow"]').present? 
+         page_doc.xpath('//*[@class="right-arrow"]')[0].attributes['href'].value 
+      end
     rescue SignalException => e
       nil
     rescue StandardError => e
@@ -52,7 +54,7 @@ def add_product_to_store(store, brand, mpn, sku, stock, slug, href, price, title
 end
 
 def scrap_usp_product_values doc
-  sale_price = doc.xpath("//span[@class='product-price-value property-value']").children.children.text rescue nil
+  sale_price = doc.xpath("//span[@class='product-price-value property-value']").present? ? doc.xpath("//span[@class='product-price-value property-value']").children.children.text : nil
   original_price = doc.xpath("//span[@class='currency']").children.first.text rescue nil
   price = sale_price.blank? ? original_price : sale_price 
   data = doc.xpath("//script[contains(text(), 'dataLayer')]").text rescue nil
