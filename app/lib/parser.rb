@@ -29,7 +29,19 @@ class Parser
       mmrperformance_data_points(doc)
     when 'maperformance'
       maperformance_data_points(doc)
+    when 'spaturbousa'
+      spa_turbo_usa(doc)
     end
+  end
+
+  def spa_turbo_usa(doc)
+    title=doc.xpath("/html/head/meta[7]") rescue nil
+    @title=title[0].present? ? title[0].attributes["content"].value : nil
+    @price=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/div/div[1]/div/div/div/div[2]/div/div/div/div[1]/div[1]/form/div[2]/div[1]/div/span").children.text rescue nil
+    mpn=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/meta[3]") rescue nil
+    @mpn=mpn[0].present? ? mpn[0].attributes["content"].value : nil
+    @brand = doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/span[3]").children.text rescue ni
+    data_points_hash
   end
 
   def urotuning_data_points doc
