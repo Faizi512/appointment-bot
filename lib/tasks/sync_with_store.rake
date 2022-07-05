@@ -23,7 +23,6 @@ task sync_with_store: :environment do
     begin
       if store.store_id.eql?("maperformance")
         puts "=============================== #{temp} ==============================="
-        # byebug
           products = get_request("#{store.href}.json?limit=99999&page=#{temp}")
           # add_offset_of_maperformance(temp) 
       else
@@ -31,6 +30,8 @@ task sync_with_store: :environment do
       end
     rescue StandardError => e
       puts 'Exception throws getting products'
+      logger.error e.message
+      e.backtrace.each { |line| logger.error line }
       sleep 60
       retry
     end
