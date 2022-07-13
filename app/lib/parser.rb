@@ -27,9 +27,20 @@ class Parser
       neuspeedRSWheels_data_points(doc)
     when 'MMRPerformance'
       mmrperformance_data_points(doc)
+    when 'mm'
+      mm_data_points(doc)
     end
   end
 
+  def  mm_data_points doc
+    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1") rescue nil 
+    @price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue  nil
+    @mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text rescue nil
+    @brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a").children.last.text rescue nil
+    # @stock=
+    # @price = price.text.strip if price.present?
+    byebug
+  end
   def urotuning_data_points doc
     @title = doc.xpath("//h2[@itemprop='name']").children.text
     price = doc.xpath("//span[@class='bold_option_price_display price']").children.last
@@ -39,7 +50,7 @@ class Parser
     @stock = JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, { value: 'esc-out-of-stock' }).first.children.first).first['inventory_quantity'] rescue nil
     data_points_hash
 
-  end
+  end 
 
   def performancebyie_data_points doc
     @title = doc.xpath("//h1[@itemprop='name']").children.text
