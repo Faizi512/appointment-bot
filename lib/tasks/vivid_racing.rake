@@ -8,8 +8,8 @@ task vivid_racing_rake: :environment do
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
     # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     browser_1=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser not found" if !browser_1.present? 
 
@@ -82,7 +82,7 @@ def get_products_data(store,browser)
     end
     products_data.each do |product|
         title=product.children[0].text rescue nil
-        sku=product.children[1].text rescue nil
+        sku=product.children[1].text.split(' ')[1] rescue nil
         price=product.children[2].children[0].text rescue nil
         price=price.split(' ')[1].present? ? price.split(' ')[1] : price
         if !price.blank?
