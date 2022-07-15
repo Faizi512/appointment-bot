@@ -8,8 +8,8 @@ task vivid_racing_rake: :environment do
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
     # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     browser_1=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser not found" if !browser_1.present? 
 
@@ -81,6 +81,7 @@ def get_products_data(store,browser)
         browser.close
     end
     products_data.each do |product|
+        brand=nil  
         title=product.children[0].text rescue nil
         sku=product.children[1].text.split(' ')[1] rescue nil
         price=product.children[2].children[0].text rescue nil
@@ -88,19 +89,25 @@ def get_products_data(store,browser)
         if !price.blank?
             price = price.include?(',') || price.include?('$') ? '%.2f' % price.tr('$ ,', '') : '%.2f' % price
         end
-        # brand=JSON.parse(browser.element(xpath: "//script[@type='application/ld+json']"))
-        # brand=JSON.parse(browser.element(xpath: "/html/body/script[1]").text_content)
         href=product.parent.attributes[:href] rescue nil
+        if product.present?
+            browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
+            raise Exception.new "Browser not found" if !browser_4.present? 
+            browser_4.goto href
+            brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
+            browser_4.close
+        end
+        puts "===================#{brand}============="
         slug= href.split('/').last.split('.').first rescue nil
         product_id= href.split('/').last.split('.').first.split('-').last rescue nil
         puts "====title#{title}==sku#{sku}==price#{price}==href#{href}==slug#{slug}==productId#{product_id}"
-        add_product_data_in_store(store, sku, slug, product_id, href, price, title)
-    end
+        add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
+    end   
 end
  
-def add_product_data_in_store(store, sku, slug, product_id, href, price, title)
+def add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
     latest = store.latest_products.find_or_create_by(variant_id: product_id, product_id: product_id)
-    val=latest.update(mpn: sku, sku: sku, slug: slug,href: href, price: price, product_title: title)
-    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku, slug: slug, variant_id: product_id, product_id: product_id,
+    val=latest.update(mpn: sku, sku: sku,brand: brand slug: slug,href: href, price: price, product_title: title)
+    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku,  brand: brand slug: slug, variant_id: product_id, product_id: product_id,
     href: href, price: price, product_title: title)
 end
