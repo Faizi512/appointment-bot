@@ -107,7 +107,7 @@ end
  
 def add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
     latest = store.latest_products.find_or_create_by(variant_id: product_id, product_id: product_id)
-    val=latest.update(mpn: sku, sku: sku,brand: brand slug: slug,href: href, price: price, product_title: title)
-    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku,  brand: brand slug: slug, variant_id: product_id, product_id: product_id,
+    val=latest.update(mpn: sku, sku: sku,brand: brand,slug: slug,href: href, price: price, product_title: title)
+    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku,brand:brand,slug: slug, variant_id: product_id, product_id: product_id,
     href: href, price: price, product_title: title)
 end
