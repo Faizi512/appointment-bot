@@ -31,20 +31,21 @@ task vivid_racing_rake: :environment do
             else
                 browser_2=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                 raise Exception.new "Browser not found" if !browser_2.present?
-                
                 browser_2.goto url
+                if browser_2.elements(xpath: "//*[@class='category-tile']").present?
                     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
                         puts "<================other pages================>"
                         prod_url=item.children[0].attributes[:href]
                         get_products(store,prod_url)
                     end
+                end
                 browser_2.close
             end
         end
         browser_1.close
     rescue StandardError => e
         puts "#{e}"
-        sleep 10
+        sleep 60
         retry if (retry_index += 1) < 3
     end
 end
@@ -70,7 +71,7 @@ def get_products(store,url)
         browser_3.close
     rescue StandardError => e
         puts "#{e}"
-        sleep 1
+        sleep 60
         retry if (retries += 1) < 3
     end
 end
