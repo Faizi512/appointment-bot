@@ -40,6 +40,8 @@ class Parser
     @price=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/div/div[1]/div/div/div/div[2]/div/div/div/div[1]/div[1]/form/div[2]/div[1]/div/span").children.text rescue nil
     mpn=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/meta[3]") rescue nil
     @mpn=mpn[0].present? ? mpn[0].attributes["content"].value : nil
+    stock=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/div/div[1]/div/div/div/div[2]/div/div/div/div[1]/div[1]/form/div[2]/div[2]/span").text rescue nil
+    @stock= stock.present? ? 1 : 0
     @brand = doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/span[3]").children.text rescue ni
     data_points_hash
   end
