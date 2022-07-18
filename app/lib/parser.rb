@@ -33,9 +33,21 @@ class Parser
       maperformance_data_points(doc)
     when 'spaturbousa'
       spa_turbo_usa(doc)
+    when 'fastmods'
+      fastmods_data_points(doc)
     end
   end
 
+  def fastmods_data_points doc
+    @title = doc.xpath("/html/body/div[2]/main/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/h1").children[2].text.strip rescue nil
+    salePrice = doc.xpath("/html/body/div[2]/main/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]/span[2]").children.text.strip() rescue  nil
+    regularPrice=doc.xpath("/html/body/div[2]/main/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[2]/span[1]").children.text.strip() rescue  nil
+    @price=salePrice.present? ? salePrice : regularPrice
+    @brand=doc.xpath("/html/body/div[2]/main/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[3]/div[1]/div[1]/span/a").children.last.text rescue nil
+    stock=doc.xpath("/html/body/div[2]/main/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[3]/div[1]/div[6]/span/span[2]").text rescue nil
+    @stock=stock.eql?("Many in stock") ? 1 : 0
+    data_points_hash
+  end
   def  mm_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[2]/dd/span").children.text.strip() rescue  nil
