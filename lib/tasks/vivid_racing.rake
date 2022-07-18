@@ -92,7 +92,7 @@ def get_products_data(store,browser)
         if !price.blank?
             price = price.include?(',') || price.include?('$') ? '%.2f' % price.tr('$ ,', '') : '%.2f' % price
         end
-        # href=product.parent.attributes[:href] rescue nil
+        href=product.parent.attributes[:href] rescue nil
         # if product.present?
         #     browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
         #     raise Exception.new "Browser not found" if !browser_4.present? 
