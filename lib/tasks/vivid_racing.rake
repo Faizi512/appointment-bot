@@ -36,7 +36,8 @@ task vivid_racing_rake: :environment do
                     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
                         puts "<================other pages================>"
                         prod_url=item.children[0].attributes[:href]
-                        get_products(store,prod_url)
+                        puts prod_url
+                        # get_products(store,prod_url)
                     end
                 end
                 browser_2.close
