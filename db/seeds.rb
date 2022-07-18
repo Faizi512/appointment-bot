@@ -11,6 +11,7 @@ Store.find_or_create_by(store_id: 'mmrperformance').update(name: 'MMR Performanc
 Store.find_or_create_by(store_id: 'maperformance').update(name: 'MA Performance', href: 'https://www.maperformance.com/products')
 Store.find_or_create_by(store_id: 'spaturbousa').update(name: 'Spa Turbo Usa', href: 'https://spaturbousa.com/products')
 Store.find_or_create_by(store_id: 'throtl').update(name: 'Throtl', href: 'https://throtl.com/products')
+Store.find_or_create_by(store_id: 'fastmods').update(name: 'Fastmods', href: 'https://fastmodz.com/products')
 
 #end shopify stores
 
