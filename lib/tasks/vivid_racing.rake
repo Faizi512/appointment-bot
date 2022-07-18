@@ -11,7 +11,7 @@ task vivid_racing_rake: :environment do
     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     browser_1=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-    raise Exception.new "Browser not found" if !browser_1.present? 
+    raise Exception.new "Browser 1 not found" if !browser_1.present? 
 
     data=nil
     retry_index=0
@@ -27,17 +27,16 @@ task vivid_racing_rake: :environment do
             url=item.attributes[:href]
             if url.eql?("https://www.vividracing.com/index.php?new=true")
                 puts " <================index page================>"
-                # get_products(store,url)
+                get_products(store,url)
             else
                 browser_2=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-                raise Exception.new "Browser not found" if !browser_2.present?
+                raise Exception.new "Browser 2 not found" if !browser_2.present?
                 browser_2.goto url
                 if browser_2.elements(xpath: "//*[@class='category-tile']").present?
                     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
                         puts "<================other pages================>"
                         prod_url=item.children[0].attributes[:href]
-                        puts prod_url
-                        # get_products(store,prod_url)
+                        get_products(store,prod_url)
                     end
                 end
                 browser_2.close
@@ -53,20 +52,22 @@ end
 
 def get_products(store,url)
     browser_3=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-    raise Exception.new "Browser not found" if !browser_3.present?           
+    raise Exception.new "Browser 3 not found" if !browser_3.present?           
     begin
         retries ||=0
         browser_3.goto url
         page_number = 1
         until page_number.blank? do
-            
+
+            link=nil
             if url.split("?")[1].eql?("new=true") 
                 link = "#{url}&page=#{page_number}"
             else
                 link = "#{url}?page=#{page_number}"
             end
             browser_3.goto link
-            get_products_data(store,browser_3)
+            puts link
+            # get_products_data(store,browser_3)
             page_number += 1
         end
         browser_3.close
