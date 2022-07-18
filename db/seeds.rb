@@ -8,7 +8,9 @@ Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: '
 Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net/collections/all/products')
 Store.find_or_create_by(store_id: 'NeuspeedRSWheels').update(name: 'Neuspeed RSWheels', href: 'https://neuspeedrswheels.com/products')
 Store.find_or_create_by(store_id: 'mmrperformance').update(name: 'MMR Performance', href: 'https://www.mmrshop.co.uk/products')
-Store.find_or_create_by(store_id: 'mm').update(name: 'MMR Product', href: 'https://throtl.com/products')
+Store.find_or_create_by(store_id: 'maperformance').update(name: 'MA Performance', href: 'https://www.maperformance.com/products')
+Store.find_or_create_by(store_id: 'spaturbousa').update(name: 'Spa Turbo Usa', href: 'https://spaturbousa.com/products')
+Store.find_or_create_by(store_id: 'throtl').update(name: 'Throtl', href: 'https://throtl.com/products')
 
 #end shopify stores
 
@@ -28,6 +30,7 @@ Store.find_or_create_by(store_id: '034 motorsport').update(name: '034 motorsport
 Store.find_or_create_by(store_id: 'parts_authority').update(name: 'Parts Authority', href: '')
 Store.find_or_create_by(store_id: 'thmotorsports').update(name: 'TH Motorsports', href: 'https://thmotorsports.com/')
 Store.find_or_create_by(store_id: 'cspracing').update(name: 'Cspracing', href: 'https://cspracing.com/')
+Store.find_or_create_by(store_id: 'vividracing').update(name: 'Vivid Racing', href: 'https://www.vividracing.com/')
 
 Section.find_or_create_by(section_id: 'Volkswagen-parts').update(name: 'Volkswagen', href: 'https://www.fcpeuro.com/Volkswagen-parts/')
 Section.find_or_create_by(section_id: 'Audi-parts').update(name: 'Audi', href: 'https://www.fcpeuro.com/Audi-parts/')

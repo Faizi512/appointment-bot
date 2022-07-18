@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220420055113) do
+ActiveRecord::Schema.define(version: 20220427102529) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -215,6 +215,12 @@ ActiveRecord::Schema.define(version: 20220420055113) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["turn14_product_id"], name: "index_manufacturers_on_turn14_product_id"
+  end
+
+  create_table "maperformancelogs", force: :cascade do |t|
+    t.string "offset"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "me_categories", id: false, force: :cascade do |t|

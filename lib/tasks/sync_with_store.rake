@@ -6,13 +6,34 @@ require 'open-uri'
 task sync_with_store: :environment do
   store = Store.find_by(store_id: ENV['STORE_ID'])
   page_number = 0
+  temp=0
   loop do
     page_number += 1
     temp = 0
+    if store.store_id.eql?("maperformance")
+      last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
+        if(last_offset == 0)
+          temp += 1
+          add_offset_of_maperformance(temp) 
+        else
+          temp = last_offset 
+        end
+    else
+      page_number += 1
+    end
+    # temp = 0
     begin
-      products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+      if store.store_id.eql?("maperformance")
+        puts "=============================== #{temp} ==============================="
+          products = get_request("#{store.href}.json?limit=99999&page=#{temp}")
+          # add_offset_of_maperformance(temp) 
+      else
+          products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+      end
     rescue StandardError => e
       puts 'Exception throws getting products'
+      logger.error e.message
+      e.backtrace.each { |line| logger.error line }
       sleep 60
       retry
     end
@@ -27,7 +48,6 @@ task sync_with_store: :environment do
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
         # variant_href ="https://www.mmrshop.co.uk/collections/all-bmw/products/mmr-performance-billet-aluminum-gear-shift-paddle-set?variant=31411673497703"
         # puts variant_href.to_s
-        # byebug
         retry_uri = 0
         file = begin
           retry_uri ||= 0
@@ -43,17 +63,18 @@ task sync_with_store: :environment do
         retries = 0
         begin
           retries ||= 0
-
           if(store.store_id=="NeuspeedRSWheels")
             hash_data = Parser.new(file, store.store_id, variant, product_brand).parse
             hash_data.each do |data|
-              data[:price] = data[:price].to_s.include?('$') ? '%.2f' % data[:price].to_s.split('$')[1] : '%.2f' % data[:price].to_s
+              data[:price] = data[:price].to_s.include?('$') ? '%.2f' % data[:price].to_s.tr('$ ,', '') : '%.2f' % data[:price].to_s
               add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
               puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
             end
           else
             data = Parser.new(file, store.store_id, variant, product_brand).parse
-            data[:price] = data[:price].include?('$') ? '%.2f' % data[:price].split('$')[1] : '%.2f' % data[:price]
+            if !data[:price].blank?
+              data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]
+            end
             add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
             # temp = temp + 1
             # puts "=============================== #{temp} ==============================="
@@ -70,9 +91,12 @@ task sync_with_store: :environment do
         next
       end
     end
+    if store.store_id.eql?("maperformance")
+        temp = temp + 1
+        add_offset_of_maperformance(temp) 
+    end
   end
 end
-
 def get_request(urll)
   url = URI(urll)
   https = Net::HTTP.new(url.host, url.port)
@@ -81,6 +105,10 @@ def get_request(urll)
   request = Net::HTTP::Get.new(url)
   response = https.request(request)
   JSON.parse response.read_body
+end
+
+def add_offset_of_maperformance(offset)
+  Maperformancelog.find_or_create_by(offset: offset)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)

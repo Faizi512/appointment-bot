@@ -29,6 +29,10 @@ class Parser
       mmrperformance_data_points(doc)
     when 'throtl'
       mm_data_points(doc)
+    when 'maperformance'
+      maperformance_data_points(doc)
+    when 'spaturbousa'
+      spa_turbo_usa(doc)
     end
   end
 
@@ -42,6 +46,19 @@ class Parser
     @stock=stock.eql?("In Stock") ? 1 : 0
     data_points_hash
   end
+   
+  def spa_turbo_usa(doc)
+    title=doc.xpath("/html/head/meta[7]") rescue nil
+    @title=title[0].present? ? title[0].attributes["content"].value : nil
+    @price=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/div/div[1]/div/div/div/div[2]/div/div/div/div[1]/div[1]/form/div[2]/div[1]/div/span").children.text rescue nil
+    mpn=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/meta[3]") rescue nil
+    @mpn=mpn[0].present? ? mpn[0].attributes["content"].value : nil
+    stock=doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/div/div[1]/div/div/div/div[2]/div/div/div/div[1]/div[1]/form/div[2]/div[2]/span").text rescue nil
+    @stock= stock.present? ? 1 : 0
+    @brand = doc.xpath("/html/body/div[4]/div[2]/div[2]/div/div/div/div[2]/span[3]").children.text rescue ni
+    data_points_hash
+  end
+
   def urotuning_data_points doc
     @title = doc.xpath("//h2[@itemprop='name']").children.text
     price = doc.xpath("//span[@class='bold_option_price_display price']").children.last
@@ -115,6 +132,21 @@ class Parser
     txt = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text
     @stock = !txt.scan(/\d/).empty? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text.split("(")[1].split(" ")[0] : "0"
     @mpn = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.present? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.split(":")[1] : ""
+    data_points_hash
+  end
+
+  def maperformance_data_points(doc)
+    @brand=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/a').text
+    @title=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/h1').text
+    @mpn=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[1]/strong').text.split('#').last
+    @price=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[5]/p/span[1]').text
+    raw_data=doc.xpath("//script[@class='product-json']").text
+    if !raw_data.blank?
+      data=JSON[raw_data]
+      @stock=data['variants'].present? ? data['variants'][0]["inventory_quantity"] : 0
+    else
+      @stock=0
+    end
     data_points_hash
   end
 

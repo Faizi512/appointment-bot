@@ -14,7 +14,7 @@ task cspracing: :environment do
         # for live browser
         Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
         Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-        browser= Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
+        browser= Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
         raise Exception.new "Browser not found" if !browser.present?
        
         retries=0

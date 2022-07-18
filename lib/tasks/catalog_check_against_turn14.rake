@@ -4,7 +4,7 @@ task catalog_check_against_turn14: :environment do
     file = Curb.open_uri(ENV['DROPBOX_URL'])
     mpn_numbers = []
     sku_numbers = {}
-    CSV.parse(file, headers: true, header_converters: :symbol) do |row|
+    CSV.foreach(file, encoding:'iso-8859-1:utf-8', headers: true, header_converters: :symbol) do |row|
       mpn_numbers << row[:turn14id]
       sku_numbers[row[:turn14id].to_s] = row[:sku]
     end
@@ -32,8 +32,8 @@ task catalog_check_against_turn14: :environment do
       items.each do |item|
         t14_item = t14_items['data'].select { |it| it['id'] == item['item_id'] }.first rescue nil
         next unless t14_item
-        quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
-        Store.t14_items_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'])
+        quantity = t14_item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59'] rescue nil
+        Store.t14_items_insert_in_latest_and_archieve_table(item['id'], item['brand_id'], item['mfr_part_number'], quantity, sku_numbers[item.part_number], item['price'].to_s)
       end
       batch_count += 1
       puts "#{batch_count} batch done"
