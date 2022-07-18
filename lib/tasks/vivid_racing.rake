@@ -94,11 +94,16 @@ def get_products_data(store,browser)
         end
         href=product.parent.attributes[:href] rescue nil
         if product.present?
+            begin
             browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
             raise Exception.new "Browser not found" if !browser_4.present? 
             browser_4.goto href
             brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
             browser_4.close
+            rescue StandardError => e
+                puts "#{e}"
+                sleep 60
+            end
         end
         puts "===================#{brand}============="
         slug= href.split('/').last.split('.').first rescue nil
