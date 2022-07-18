@@ -66,7 +66,7 @@ def get_products(store,url)
                 link = "#{url}?page=#{page_number}"
             end
             browser_3.goto link
-            puts link
+            # puts link
             get_products_data(store,browser_3)
             page_number += 1
         end
@@ -93,18 +93,18 @@ def get_products_data(store,browser)
             price = price.include?(',') || price.include?('$') ? '%.2f' % price.tr('$ ,', '') : '%.2f' % price
         end
         href=product.parent.attributes[:href] rescue nil
-        # if product.present?
-        #     browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-        #     raise Exception.new "Browser not found" if !browser_4.present? 
-        #     browser_4.goto href
-        #     brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
-        #     browser_4.close
-        # end
-        # puts "===================#{brand}============="
+        if product.present?
+            browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
+            raise Exception.new "Browser not found" if !browser_4.present? 
+            browser_4.goto href
+            brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
+            browser_4.close
+        end
+        puts "===================#{brand}============="
         slug= href.split('/').last.split('.').first rescue nil
         product_id= href.split('/').last.split('.').first.split('-').last rescue nil
         puts "====title#{title}==sku#{sku}==price#{price}==href#{href}==slug#{slug}==productId#{product_id}"
-        # add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
+        add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
     end   
 end
  
