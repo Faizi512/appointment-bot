@@ -10,6 +10,8 @@ Store.find_or_create_by(store_id: 'NeuspeedRSWheels').update(name: 'Neuspeed RSW
 Store.find_or_create_by(store_id: 'mmrperformance').update(name: 'MMR Performance', href: 'https://www.mmrshop.co.uk/products')
 Store.find_or_create_by(store_id: 'maperformance').update(name: 'MA Performance', href: 'https://www.maperformance.com/products')
 Store.find_or_create_by(store_id: 'spaturbousa').update(name: 'Spa Turbo Usa', href: 'https://spaturbousa.com/products')
+Store.find_or_create_by(store_id: 'throtl').update(name: 'Throtl', href: 'https://throtl.com/products')
+
 #end shopify stores
 
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')
