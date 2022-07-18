@@ -27,7 +27,7 @@ task vivid_racing_rake: :environment do
             url=item.attributes[:href]
             if url.eql?("https://www.vividracing.com/index.php?new=true")
                 puts " <================index page================>"
-                get_products(store,url)
+                # get_products(store,url)
             else
                 browser_2=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                 raise Exception.new "Browser not found" if !browser_2.present?
