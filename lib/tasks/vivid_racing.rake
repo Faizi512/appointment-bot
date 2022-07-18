@@ -36,7 +36,7 @@ task vivid_racing_rake: :environment do
                     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
                         puts "<================other pages================>"
                         prod_url=item.children[0].attributes[:href]
-                        # get_products(store,prod_url)
+                        get_products(store,prod_url)
                     end
                 end
                 browser_2.close
@@ -58,7 +58,6 @@ def get_products(store,url)
         browser_3.goto url
         page_number = 1
         until page_number.blank? do
-
             link=nil
             if url.split("?")[1].eql?("new=true") 
                 link = "#{url}&page=#{page_number}"
@@ -66,7 +65,6 @@ def get_products(store,url)
                 link = "#{url}?page=#{page_number}"
             end
             browser_3.goto link
-            # puts link
             get_products_data(store,browser_3)
             page_number += 1
         end
