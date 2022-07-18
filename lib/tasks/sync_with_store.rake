@@ -8,7 +8,7 @@ task sync_with_store: :environment do
   page_number = 0
   loop do
     page_number += 1
-    # temp = 0
+    temp = 0
     begin
       products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
     rescue StandardError => e
@@ -84,7 +84,7 @@ def get_request(urll)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
-  if(store.store_id.eql?("NeuspeedRSWheels"))
+  if(store.store_id.eql?("Neuspeed RSWheels"))
     latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id, mpn: mpn)
   else
     latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id)

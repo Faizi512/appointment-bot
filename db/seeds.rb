@@ -8,6 +8,8 @@ Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: '
 Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net/collections/all/products')
 Store.find_or_create_by(store_id: 'NeuspeedRSWheels').update(name: 'Neuspeed RSWheels', href: 'https://neuspeedrswheels.com/products')
 Store.find_or_create_by(store_id: 'mmrperformance').update(name: 'MMR Performance', href: 'https://www.mmrshop.co.uk/products')
+Store.find_or_create_by(store_id: 'mm').update(name: 'MMR Product', href: 'https://throtl.com/products')
+
 #end shopify stores
 
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')

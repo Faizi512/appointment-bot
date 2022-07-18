@@ -27,19 +27,20 @@ class Parser
       neuspeedRSWheels_data_points(doc)
     when 'MMRPerformance'
       mmrperformance_data_points(doc)
-    when 'mm'
+    when 'throtl'
       mm_data_points(doc)
     end
   end
 
   def  mm_data_points doc
-    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1") rescue nil 
-    @price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue  nil
+    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
+    price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[2]/dd/span").children.text.strip() rescue  nil
+    @price=price.present? ? price : price
     @mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text rescue nil
     @brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a").children.last.text rescue nil
-    # @stock=
-    # @price = price.text.strip if price.present?
-    byebug
+    stock=doc.xpath("//div[@class='instock_green']").text rescue nil
+    @stock=stock.eql?("In Stock") ? 1 : 0
+    data_points_hash
   end
   def urotuning_data_points doc
     @title = doc.xpath("//h2[@itemprop='name']").children.text
@@ -49,9 +50,7 @@ class Parser
     @mpn = doc.xpath('.//meta[@itemprop=$value]', nil, { value: 'mpn' }).first.attributes['content'].value rescue nil
     @stock = JSON.parse(doc.xpath('.//script[@data-app=$value]', nil, { value: 'esc-out-of-stock' }).first.children.first).first['inventory_quantity'] rescue nil
     data_points_hash
-
   end 
-
   def performancebyie_data_points doc
     @title = doc.xpath("//h1[@itemprop='name']").children.text
     price = doc.xpath("//span[@class='product__price']").children.last
