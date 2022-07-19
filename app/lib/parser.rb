@@ -123,17 +123,12 @@ class Parser
   end
 
   def maxtondesignusa_data_points doc
-    regex = "[0-9]"
     title = doc.xpath("//a/div[2]/div")[0].text
     @title = "#{title} #{@variant["title"]}"
     price = doc.xpath("//span[@class='product__price']").text.strip
     @price = price if price.present?
-    if(doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match(regex)[0] != nil)
-      @stock = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match(regex)[0].to_i
-    else
-      regex << "+#{regex}"
-      @stock = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/form/div[2]").text.strip.match("regex")[0].to_i
-    end
+    stock=doc.xpath('//*[@id="ProductInventory-6088538521795"]').text.strip.to_i
+    @stock = stock <= 0 ? 0 : 1
     @mpn = @variant['product_id']
     data_points_hash
   end
