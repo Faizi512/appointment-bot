@@ -84,7 +84,7 @@ def get_products_data(store,browser)
     products_data.each do |product|
         brand=nil  
         title=product.children[0].text rescue nil
-        sku=product.children[1].text.split(' ')[1] rescue nil
+        sku=product.children[1].text.split('#')[1] rescue nil
         price=product.children[2].children[0].text rescue nil
         price=price.split(' ')[1].present? ? price.split(' ')[1] : price
         if !price.blank?
