@@ -48,7 +48,7 @@ class Parser
     @stock=stock.eql?("Many in stock") ? 1 : 0
     data_points_hash
   end
-  def  mm_data_points doc
+  def mm_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[2]/dd/span").children.text.strip() rescue  nil
     @price=price.present? ? price : price
@@ -128,7 +128,7 @@ class Parser
     price = doc.xpath("//span[@class='product__price']").text.strip
     @price = price if price.present?
     stock=doc.xpath('//*[@id="ProductInventory-6088538521795"]').text.strip.to_i
-    @stock = stock <= 0 ? 0 : 1
+    @stock = stock < 0 ? 0 : stock
     @mpn = @variant['product_id']
     data_points_hash
   end
