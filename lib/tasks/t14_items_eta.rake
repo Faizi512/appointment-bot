@@ -1,6 +1,5 @@
 desc 'To scrape eta and mfr count of turn14 products through inventory paging API and catalog check'
 task t14_items_eta: :environment do
-
   begin
     token = Curb.t14_auth_token['access_token']
     raise Exception.new "Invalid access_token" if !token.present?
@@ -10,6 +9,8 @@ task t14_items_eta: :environment do
   end
   puts "Deleting the items from the table to clear the redundant data."
   Turn14AvailablePromise.destroy_all
+  puts "Destroying the manufacturer data daily "
+  Manufacturer.destroy_all
   puts "Ready to load new data"
   finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
