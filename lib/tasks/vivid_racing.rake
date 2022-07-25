@@ -97,6 +97,9 @@ def get_products_data(store,browser)
             raise Exception.new "Browser not found" if !browser_4.present? 
             browser_4.goto href
             brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
+            in_stock=browser_4.element(xpath: "//p[@class='text-success']").text rescue nil
+            low_stock=browser_4.element(xpath: "//p[@class='text-danger']").text rescue nil
+            stock=in_stock.eql?("In Stock")  ? 1 : low_stock.eql?("Hurry Low Stock") ? 1 : 0
             browser_4.close
             rescue StandardError => e
                 puts "#{e}"
@@ -106,14 +109,14 @@ def get_products_data(store,browser)
         puts "===================#{brand}============="
         slug= href.split('/').last.split('.').first rescue nil
         product_id= href.split('/').last.split('.').first.split('-').last rescue nil
-        puts "====title#{title}==sku#{sku}==price#{price}==href#{href}==slug#{slug}==productId#{product_id}"
-        add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
+        puts "====title#{title}==sku#{sku}==price#{price}==href#{href}==slug#{slug}==productId#{product_id}===stock=>#{stock}"
+        add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title,stock)
     end   
 end
  
-def add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title)
+def add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title,stock)
     latest = store.latest_products.find_or_create_by(variant_id: product_id, product_id: product_id)
-    val=latest.update(mpn: sku, sku: sku,brand: brand,slug: slug,href: href, price: price, product_title: title)
+    val=latest.update(mpn: sku, sku: sku,brand: brand,slug: slug,href: href, price: price, product_title: title,inventory_quantity:stock)
     latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku,brand:brand,slug: slug, variant_id: product_id, product_id: product_id,
-    href: href, price: price, product_title: title)
+    href: href, price: price, product_title: title,inventory_quantity:stock)
 end
