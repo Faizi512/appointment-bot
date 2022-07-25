@@ -45,7 +45,7 @@ task vivid_racing_rake: :environment do
         browser_1.close
     rescue StandardError => e
         puts "#{e}"
-        sleep 60
+        sleep 10
         retry if (retry_index += 1) < 3
     end
 end
@@ -71,7 +71,7 @@ def get_products(store,url)
         browser_3.close
     rescue StandardError => e
         puts "#{e}"
-        sleep 60
+        sleep 10
         retry if (retries += 1) < 3
     end
 end
@@ -103,7 +103,7 @@ def get_products_data(store,browser)
             browser_4.close
             rescue StandardError => e
                 puts "#{e}"
-                sleep 60
+                sleep 10
             end
         end
         puts "===================#{brand}============="
