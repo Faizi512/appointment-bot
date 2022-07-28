@@ -29,7 +29,7 @@ task vivid_racing_rake: :environment do
                 puts " <================index page================>"
                 get_products(store,url)
             else
-                browser_2=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
+                browser_2=Watir::Browser.new :chrome, args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                 raise Exception.new "Browser 2 not found" if !browser_2.present?
                 browser_2.goto url
                 if browser_2.elements(xpath: "//*[@class='category-tile']").present?
@@ -51,7 +51,7 @@ task vivid_racing_rake: :environment do
 end
 
 def get_products(store,url)
-    browser_3=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
+    browser_3=Watir::Browser.new :chrome, args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 3 not found" if !browser_3.present?           
     begin
         retries ||=0
@@ -93,13 +93,15 @@ def get_products_data(store,browser)
         href=product.parent.attributes[:href] rescue nil
         if product.present?
             begin
-            browser_4=Watir::Browser.new :chrome, args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
+            browser_4=Watir::Browser.new :chrome, args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
             raise Exception.new "Browser not found" if !browser_4.present? 
             browser_4.goto href
             brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
-            in_stock=browser_4.element(xpath: "//p[@class='text-success']").text rescue nil
-            low_stock=browser_4.element(xpath: "//p[@class='text-danger']").text rescue nil
-            stock=in_stock.eql?("In Stock")  ? 1 : low_stock.eql?("Hurry Low Stock") ? 1 : 0
+           if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
+              stock=1
+           else
+              stock=0
+           end
             browser_4.close
             rescue StandardError => e
                 puts "#{e}"
@@ -109,7 +111,7 @@ def get_products_data(store,browser)
         puts "===================#{brand}============="
         slug= href.split('/').last.split('.').first rescue nil
         product_id= href.split('/').last.split('.').first.split('-').last rescue nil
-        puts "====title#{title}==sku#{sku}==price#{price}==href#{href}==slug#{slug}==productId#{product_id}===stock=>#{stock}"
+        puts "==title>#{title}==sku>#{sku}==price>#{price}==href>#{href}==slug>#{slug}==>productId#{product_id}==stock>#{stock}"
         add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title,stock)
     end   
 end

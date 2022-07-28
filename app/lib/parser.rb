@@ -127,7 +127,7 @@ class Parser
     @title = "#{title} #{@variant["title"]}"
     price = doc.xpath("//span[@class='product__price']").text.strip
     @price = price if price.present?
-    stock=doc.xpath('//*[@id="ProductInventory-6088538521795"]').text.strip.to_i
+    stock=doc.xpath("//div[@class='product__inventory hide']").text.strip.split(' ')[1].to_i rescue nil
     @stock = stock < 0 ? 0 : stock
     @mpn = @variant['product_id']
     data_points_hash
