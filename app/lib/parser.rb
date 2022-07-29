@@ -28,7 +28,7 @@ class Parser
     when 'MMRPerformance'
       mmrperformance_data_points(doc)
     when 'throtl'
-      mm_data_points(doc)
+      throtl_data_points(doc)
     when 'maperformance'
       maperformance_data_points(doc)
     when 'spaturbousa'
@@ -48,14 +48,14 @@ class Parser
     @stock=stock.eql?("Many in stock") ? 1 : 0
     data_points_hash
   end
-  def mm_data_points doc
+  def throtl_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
-    price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[2]/dd/span").children.text.strip() rescue  nil
+    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip()
     @price=price.present? ? price : price
+    stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text
+    @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
     @mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text rescue nil
     @brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a").children.last.text rescue nil
-    stock=doc.xpath("//div[@class='instock_green']").text rescue nil
-    @stock=stock.eql?("In Stock") ? 1 : 0
     data_points_hash
   end
    
