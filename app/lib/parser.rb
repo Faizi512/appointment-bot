@@ -51,7 +51,7 @@ class Parser
   def throtl_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip()
-    @price=price.present? ? price : price
+    @price=price.present? ?  price.split(' ')[0] : price
     stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text
     @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
     @mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text rescue nil
