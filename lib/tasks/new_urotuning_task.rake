@@ -13,27 +13,15 @@ task new_urotuning_task: :environment do
         # for live browser
         Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
         Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-        browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+        browser = Watir::Browser.new :chrome, args: %w[ --headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
         raise Exception.new "Browser not found" if !browser.present?
         browser.goto store.href
         total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
         raise Exception.new "Data not found" if !total_product.present? 
-        last_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        # last_offset=5400
-        if(last_offset == 0)
-          offset = last_offset
-        elsif(last_offset < total_product)
-           offset = last_offset
-        elsif( last_offset+24 >= total_product)
-            #we have to delete UrotuningFtimentsPageLog by when last_offset=80040
-            UrotuningFtimentsPageLog.destroy_all
-            offset = 0
-        else 
-            offset = 0
-        end
-       
+        offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
+        # offset=81216
         while offset <= total_product do  
-            add_offsets(offset)
+            add_offsets(offset,total_product)
             puts "=====================#{offset}================"
             url = "#{store.href}?offset=#{offset}"
             retries =0
@@ -77,7 +65,6 @@ def _scrape_products(products_urls,browser,store)
         end
         # product="https://www.urotuning.com/products/apr-high-performance-ignition-coils?variant=40332676956353"
         # browser.goto product
-
         varient_href=product
         data_chunk = product.split("/")[4]
         product_slug=data_chunk.split("?").first
@@ -109,7 +96,6 @@ def _scrape_products(products_urls,browser,store)
         puts "===================  #{index}  ==================="
         puts "==== #{title},#{mpn},#{stock},#{product_slug},#{variant},#{product_id}, #{varient_href},#{price},#{title} ===="
     end
- 
 end
 
 def add_in_fitments(latest_product_id,product_id,mpn,fitment,store)  
@@ -117,9 +103,16 @@ def add_in_fitments(latest_product_id,product_id,mpn,fitment,store)
     fitments_table = fitments_table.find_or_create_by(latest_product_id: latest_product_id, product_id: product_id, mpn: mpn, fitment: fitment)
 end
 
-def add_offsets(offset)  
+def add_offsets(offset,total_product) 
+    new_offset=0
     offset_table =  UrotuningFtimentsPageLog
-    offset_table = offset_table.find_or_create_by(offset: offset)
+    if(offset+24 >= total_product)
+            UrotuningFtimentsPageLog.destroy_all
+            new_offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
+            offset_table = offset_table.find_or_create_by(offset: new_offset)
+    else
+        offset_table = offset_table.find_or_create_by(offset: offset)
+    end 
 end
 
 def _add_product_in_store(store, brand, mpn, stock, slug, variant_id,product_id, href, price, title)
