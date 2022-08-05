@@ -1,0 +1,2 @@
+class Throtlurllog < ApplicationRecord
+end

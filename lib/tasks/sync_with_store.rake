@@ -18,12 +18,21 @@ task sync_with_store: :environment do
         else
           temp = last_offset 
         end
+    elsif store.store_id.eql?("throtl")
+     
+      last_offset=Throtlurllog.last.present? ? Throtlurllog.last['offset'].to_i : 0
+      if(last_offset == 0)
+        temp += 1
+        add_offset_of_throtl(temp) 
+      else
+        temp = last_offset 
+      end
     else
       page_number += 1
     end
     # temp = 0
     begin
-      if store.store_id.eql?("maperformance")
+      if store.store_id.eql?("maperformance") || store.store_id.eql?("throtl")
         puts "=============================== #{temp} ==============================="
           products = get_request("#{store.href}.json?limit=99999&page=#{temp}")
           # add_offset_of_maperformance(temp) 
@@ -46,8 +55,6 @@ task sync_with_store: :environment do
       product_brand = product['vendor']
       product['variants'].each do |variant|
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
-        # variant_href ="https://www.mmrshop.co.uk/collections/all-bmw/products/mmr-performance-billet-aluminum-gear-shift-paddle-set?variant=31411673497703"
-        # puts variant_href.to_s
         retry_uri = 0
         file = begin
           retry_uri ||= 0
@@ -109,6 +116,10 @@ end
 
 def add_offset_of_maperformance(offset)
   Maperformancelog.find_or_create_by(offset: offset)
+end
+
+def add_offset_of_throtl(offset)
+  Throtlurllog.find_or_create_by(offset: offset)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
