@@ -123,9 +123,10 @@ class Parser
   end
 
   def maxtondesignusa_data_points doc
-    title = doc.xpath("//a/div[2]/div")[0].text
-    @title = "#{title} #{@variant["title"]}"
-    price = doc.xpath("//span[@class='product__price']").text.strip
+    title = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/h1").text.strip() rescue nil 
+    variant_title= @variant["title"].present? ? @variant["title"] : nil 
+    @title = "#{title} #{variant_title}" rescue nil
+    price = doc.xpath("/html/body/div[1]/div/main/div[1]/div/div/div/div[1]/div[1]/div/span[2]").price.strip() rescue nil
     @price = price if price.present?
     stock=doc.xpath("//div[@class='product__inventory hide']").text.strip.split(' ')[1].to_i rescue nil
     @stock = stock < 0 ? 0 : stock
