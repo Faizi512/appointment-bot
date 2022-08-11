@@ -5,10 +5,12 @@ require 'open-uri'
 
 task sync_with_store: :environment do
   store = Store.find_by(store_id: ENV['STORE_ID'])
+  product_collection="collections/all/products"
   page_number = 0
   temp=0
+  page_count=0
   loop do
-    page_number += 1
+    page_number +=1 
     temp = 0
     if store.store_id.eql?("maperformance")
       last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
@@ -19,7 +21,6 @@ task sync_with_store: :environment do
           temp = last_offset 
         end
     elsif store.store_id.eql?("throtl")
-     
       last_offset=Throtlurllog.last.present? ? Throtlurllog.last['offset'].to_i : 0
       if(last_offset == 0)
         temp += 1
@@ -27,8 +28,8 @@ task sync_with_store: :environment do
       else
         temp = last_offset 
       end
-    else
-      page_number += 1
+    # else
+    #   page_number += 1
     end
     # temp = 0
     begin
@@ -36,6 +37,8 @@ task sync_with_store: :environment do
         puts "=============================== #{temp} ==============================="
           products = get_request("#{store.href}.json?limit=99999&page=#{temp}")
           # add_offset_of_maperformance(temp) 
+      elsif store.store_id.eql?("maxtondesignusa")
+         products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_number}")
       else
           products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
       end
@@ -46,15 +49,26 @@ task sync_with_store: :environment do
       sleep 60
       retry
     end
-    if products['products'].empty?
-      puts 'no record found'
-      break
+    if products['products'].empty? 
+      if store.store_id.eql?("maxtondesignusa")
+        product_collection="products"
+        page_count +=1
+        products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_count}")
+      else
+        puts 'no record found'
+        break
+      end
     end
     products['products'].each do |product|
       product_slug = product['handle']
       product_brand = product['vendor']
       product['variants'].each do |variant|
+       if store.store_id.eql?("maxtondesignusa") 
+        variant_href = "#{store.href}/#{product_collection}/#{product_slug}?variant=#{variant['id']}"
+       else
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
+       end
+        # variant_href="https://maxtondesignusa.net/collections/all/products/front-splitter-flaps-volkswagen-golf-7-r-r-line-facelift?variant=42427985527007"
         retry_uri = 0
         file = begin
           retry_uri ||= 0

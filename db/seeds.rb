@@ -5,7 +5,7 @@ Store.find_or_create_by(store_id: 'urotuning').update(name: 'Urotuning', href: '
 # Store.find_or_create_by(store_id: 'uroTuning').update(name: 'Uro_tuning', href: 'https://www.urotuning.com/collections/all/products')
 Store.find_or_create_by(store_id: 'performancebyie').update(name: 'performancebyie', href: 'https://www.performancebyie.com/collections/all/products')
 Store.find_or_create_by(store_id: 'bmptuning').update(name: 'bmptuning', href: 'https://www.bmptuning.com/collections/all/products')
-Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net/collections/all/products')
+Store.find_or_create_by(store_id: 'maxtondesignusa').update(name: 'Maxton Design USA', href: 'https://maxtondesignusa.net')
 Store.find_or_create_by(store_id: 'NeuspeedRSWheels').update(name: 'Neuspeed RSWheels', href: 'https://neuspeedrswheels.com/products')
 Store.find_or_create_by(store_id: 'mmrperformance').update(name: 'MMR Performance', href: 'https://www.mmrshop.co.uk/products')
 Store.find_or_create_by(store_id: 'maperformance').update(name: 'MA Performance', href: 'https://www.maperformance.com/products')

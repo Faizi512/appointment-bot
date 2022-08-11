@@ -10,16 +10,16 @@ task new_urotuning_task: :environment do
         # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
         # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
         # browser = Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
-        # for live browser
+        # # for live browser
         Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
         Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
         browser = Watir::Browser.new :chrome, args: %w[ --headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
         raise Exception.new "Browser not found" if !browser.present?
         browser.goto store.href
-        total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i 
+        total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i  
         raise Exception.new "Data not found" if !total_product.present? 
         offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
-        # offset=81216
+        # offset=51840
         while offset <= total_product do  
             add_offsets(offset,total_product)
             puts "=====================#{offset}================"
@@ -61,10 +61,7 @@ def _scrape_products(products_urls,browser,store)
             puts "Exception #{e}"
             sleep 10
             next if (retries += 1) < 3
-            # retry if (retries += 1) < 3
         end
-        # product="https://www.urotuning.com/products/apr-high-performance-ignition-coils?variant=40332676956353"
-        # browser.goto product
         varient_href=product
         data_chunk = product.split("/")[4]
         product_slug=data_chunk.split("?").first
