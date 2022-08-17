@@ -50,12 +50,18 @@ class Parser
   end
   def throtl_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
-    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip()
-    @price=price.present? ?  price.split(' ')[0] : price
-    stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text
+    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
+    if price.present?  
+    @price= price.split(' ').count >1 ? price.split(' ')[0] : price
+    else
+    @price=price
+    end 
+    stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text rescue nil
     @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
-    @mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text rescue nil
-    @brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a").children.last.text rescue nil
+    mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
+    @mpn=mpn.children.present? ? mpn.children.last.text : nil
+    brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
+    @brand=brand.children.present? ? brand.last.text : nil
     data_points_hash
   end
    

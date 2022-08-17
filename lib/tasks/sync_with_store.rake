@@ -44,8 +44,7 @@ task sync_with_store: :environment do
       end
     rescue StandardError => e
       puts 'Exception throws getting products'
-      logger.error e.message
-      e.backtrace.each { |line| logger.error line }
+      puts e.backtrace
       sleep 60
       retry
     end
@@ -74,6 +73,8 @@ task sync_with_store: :environment do
           retry_uri ||= 0
           URI.open(variant_href)
         rescue OpenURI::HTTPError => e
+          logger.error e.message
+          e.backtrace.each { |line| logger.error line }
           puts "Exception in method OpenURI #{e} for #{store.name} URL:#{variant_href}" if retry_uri.positive?
           removed_product = store.latest_products.find_by(variant_id: variant['id'], product_id: variant['product_id']) if retry_uri.positive?
           removed_product.delete if removed_product.present?
@@ -102,11 +103,14 @@ task sync_with_store: :environment do
             puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
           end  
         rescue StandardError => e
+          logger.error e.message
+          e.backtrace.each { |line| logger.error line }
           puts "Exception in Parsing Nokogiri::HTML #{e}"
           sleep 1
           retry if (retries += 1) < 3
         end
       rescue StandardError => e
+        puts e.backtrace
         puts "Exception in finding product variant #{e}"
         puts "URI = #{variant_href}"
         next
