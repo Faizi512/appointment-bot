@@ -60,7 +60,7 @@ task sync_with_store: :environment do
         break
       end
     end
-    products['products'].last do |product|
+    products['products'].each do |product|
       product_slug = product['handle']
       product_brand = product['vendor']
       product['variants'].each do |variant|
