@@ -4,29 +4,29 @@ require 'nokogiri'
 require 'open-uri'
 
 task sync_with_store: :environment do
+
   store = Store.find_by(store_id: ENV['STORE_ID'])
   product_collection="collections/all/products"
   page_number = 0
   temp=0
   page_count=0
+  
   loop do
     page_number +=1 
-    temp = 0
     if store.store_id.eql?("maperformance")
       last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
         if(last_offset == 0)
           temp += 1
           add_offset_of_maperformance(temp) 
         else
-          temp = last_offset 
+          temp = last_offset
         end
     elsif store.store_id.eql?("throtl")
-      last_offset=Throtlurllog.last.present? ? Throtlurllog.last['offset'].to_i : 0
+      last_offset=LoggingTable.last.present? ? (LoggingTable.last.last_page.eql?(false) ? LoggingTable.last['page_number'].to_i : LoggingTable.where(store_id: store.id).destroy_all && 0) : 0
       if(last_offset == 0)
         temp += 1
-        add_offset_of_throtl(temp) 
       else
-        temp = last_offset 
+        temp = last_offset + 1
       end
     # else
     #   page_number += 1
@@ -44,7 +44,8 @@ task sync_with_store: :environment do
       end
     rescue StandardError => e
       puts 'Exception throws getting products'
-      puts e.backtrace
+      logger.error e.message
+      e.backtrace.each { |line| logger.error line }
       sleep 60
       retry
     end
@@ -55,10 +56,11 @@ task sync_with_store: :environment do
         products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_count}")
       else
         puts 'no record found'
+        LoggingTable.create!(store_id: store.id, url: "#{store.href}.json?limit=99999&page=#{temp}", page_number: temp, last_page: true)
         break
       end
     end
-    products['products'].each do |product|
+    products['products'].last do |product|
       product_slug = product['handle']
       product_brand = product['vendor']
       product['variants'].each do |variant|
@@ -106,7 +108,6 @@ task sync_with_store: :environment do
           retry if (retries += 1) < 3
         end
       rescue StandardError => e
-        puts e.backtrace
         puts "Exception in finding product variant #{e}"
         puts "URI = #{variant_href}"
         next
@@ -116,6 +117,9 @@ task sync_with_store: :environment do
         temp = temp + 1
         add_offset_of_maperformance(temp) 
     end
+    puts "#{store.href}/#{product_collection}.json?limit=99999&page=#{temp}"
+    LoggingTable.create!(store_id: store.id, url: "#{store.href}.json?limit=99999&page=#{temp}", page_number: temp, last_page: false)
+    puts "====================== Page end =================================="
   end
 end
 def get_request(urll)
@@ -128,12 +132,8 @@ def get_request(urll)
   JSON.parse response.read_body
 end
 
-def add_offset_of_maperformance(offset)
-  Maperformancelog.find_or_create_by(offset: offset)
-end
-
-def add_offset_of_throtl(offset)
-  Throtlurllog.find_or_create_by(offset: offset)
+def add_offset_of_maperformance(temp)
+  Maperformancelog.find_or_create_by(offset: temp)
 end
 
 def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
