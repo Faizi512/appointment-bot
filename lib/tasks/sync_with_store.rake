@@ -22,7 +22,7 @@ task sync_with_store: :environment do
           temp = last_offset
         end
     elsif store.store_id.eql?("throtl")
-      last_offset=LoggingTable.last.present? ? (LoggingTable.last.last_page.eql?(false) ? LoggingTable.last['page_number'].to_i : LoggingTable.where(store_id: store.id).destroy_all && 0) : 0
+      last_offset=LoggingTable.where(store_id: store.id).last.present? ? (LoggingTable.where(store_id: store.id).last.last_page.eql?(false) ? LoggingTable.where(store_id: store.id).last['page_number'].to_i : LoggingTable.where(store_id: store.id).destroy_all && 0) : 0
       if(last_offset == 0)
         temp += 1
       else
