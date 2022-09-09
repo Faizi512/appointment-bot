@@ -107,7 +107,6 @@ def get_products(store,url,temp,urls)
                         #link =  urls.present? ? urls[2] : "#{url}&page=#{page_number}"    
                     else
                         link = "#{url}&page=#{page_number}"
-                        byebug
                     end
                 else
                     if urls.present?
