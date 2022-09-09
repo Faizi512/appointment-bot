@@ -102,11 +102,15 @@ def get_products(store,url,temp,urls)
                 if url.split("?")[1].eql?("new=true")
                     if urls.present?
                         link = urls[2]
+                        puts link
                         page_number = link.split("page=")[1].to_i
+                        puts link
                         urls = nil
                         #link =  urls.present? ? urls[2] : "#{url}&page=#{page_number}"    
                     else
+                        puts link
                         link = "#{url}&page=#{page_number}"
+                        puts link
                     end
                 else
                     if urls.present?
@@ -114,8 +118,10 @@ def get_products(store,url,temp,urls)
                     else
                         link = "#{url}?page=#{page_number}"
                     end
+                    puts link
                 end
                 #browser_3.goto urls[2].present? ? urls[2] : link
+                puts link
                 browser_3.goto link
                 temp[2] = "#{browser_3.url}"
                 #temp += " | " + "#{browser_3.url}"
