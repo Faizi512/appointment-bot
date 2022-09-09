@@ -97,7 +97,7 @@ def get_products(store,url,temp,urls)
 
            until page_number.blank? do
                 puts "----------------------------------------------------------"
-                puts "========= page_number >> #{page_number} start ============"
+                puts "========= page start ============"
                 link=nil
                 if url.split("?")[1].eql?("new=true")
                     if urls.present?
@@ -152,6 +152,7 @@ def get_products_data(store,browser)
         sku=product.children[1].text.split('#')[1] rescue nil
         price = product.children[2].children[0].text rescue nil
         price = price.split(' ')[1].present? ? price.split(' ')[1] : price
+      
         if !price.blank?
             price = price.include?(',') || price.include?('$') ? '%.2f' % price.tr('$ ,', '') : '%.2f' % price
         end
@@ -164,12 +165,13 @@ def get_products_data(store,browser)
             
                 raise Exception.new "Browser not found" if !browser_4.present? 
                 browser_4.goto href
-                brand=browser_4.element(xpath: "/html/body/div[3]/div[2]/div[2]/p[3]/a").text rescue nil 
-            if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
-               stock=1
-            else
-               stock=0
-            end
+                
+                brand=browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text rescue nil 
+                if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
+                  stock=1
+                else
+                    stock=0
+                end
             browser_4.close
             rescue StandardError => e
                 puts "#{e}"
@@ -177,7 +179,7 @@ def get_products_data(store,browser)
             end
         end
 
-        puts "===================#{brand}====================="
+        puts "================= Brand: #{brand} ====================="
         slug= href.split('/').last.split('.').first rescue nil
         product_id= href.split('/').last.split('.').first.split('-').last rescue nil
         puts "==title>#{title}==sku>#{sku}==price>#{price}==href>#{href}==slug>#{slug}==>productId#{product_id}==stock>#{stock}"
@@ -188,7 +190,7 @@ end
 def add_product_data_in_store(store,brand, sku, slug, product_id, href, price, title,stock)
 
     latest = store.latest_products.find_or_create_by(variant_id: product_id, product_id: product_id)
-    val=latest.update(mpn: sku, sku: sku,brand: brand,slug: slug,href: href, price: price, product_title: title,inventory_quantity:stock)
-    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku,brand:brand,slug: slug, variant_id: product_id, product_id: product_id,
+    val=latest.update(mpn: sku, sku: sku, brand: brand,slug: slug,href: href, price: price, product_title: title,inventory_quantity:stock)
+    latest.archive_products.create(store_id: store.id, mpn: sku, sku: sku, brand:brand, slug: slug, variant_id: product_id, product_id: product_id,
     href: href, price: price, product_title: title,inventory_quantity:stock)
 end
