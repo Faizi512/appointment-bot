@@ -9,10 +9,10 @@ task vivid_racing_rake: :environment do
 
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+     Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    #Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    #Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     
     browser_1=Watir::Browser.new :chrome  , args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 1 not found" if !browser_1.present? 
@@ -93,7 +93,7 @@ def get_products(store,url,temp,urls)
 
         browser_3.goto url
         puts "--------------------------------------------------------------"
-        puts "=========== Browser-2(3) start == #{browser_3.url}============"        
+        puts "=========== Browser-2 start == #{browser_3.url}============"        
 
            until page_number.blank? do
                 puts "----------------------------------------------------------"
@@ -102,11 +102,12 @@ def get_products(store,url,temp,urls)
                 if url.split("?")[1].eql?("new=true")
                     if urls.present?
                         link = urls[2]
-                        page_number = eval(link.split("page=")[1])
+                        page_number = link.split("page=")[1].to_i
                         urls = nil
                         #link =  urls.present? ? urls[2] : "#{url}&page=#{page_number}"    
                     else
                         link = "#{url}&page=#{page_number}"
+                        byebug
                     end
                 else
                     if urls.present?
