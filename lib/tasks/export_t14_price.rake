@@ -25,7 +25,7 @@ task export_t14_price: :environment do
           @price = item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }['price']
         end
         # next if product.price.present?
-        product.update(price: @price)
+        product.update(price: @price, price_list: item['attributes']['pricelists'])
         # puts "Count: #{index}"
       end
       if all_price['links']['next'].nil?
