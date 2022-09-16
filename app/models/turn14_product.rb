@@ -4,9 +4,9 @@ class Turn14Product < ApplicationRecord
   has_many :latest_purchase_orders, dependent: :destroy
   has_many :archived_purchase_orders, dependent: :destroy
 
-  def self.add_t14_product(supplier, item_id, product_name, part_number, mfr_part_number, brand_id, brand, active, regular_stock, not_carb_approved, alternate_part_number, barcode, prop_65, epa)
+  def self.add_t14_product(supplier, item_id, product_name, part_number, mfr_part_number, brand_id, brand, active, regular_stock, not_carb_approved, alternate_part_number, barcode, prop_65, epa, part_description, category, subcategory, dimensions, carb_eo_number, clearance_item, thumbnail, units_per_sku)
     product = supplier.turn14_products.find_or_create_by(supplier_id: supplier.id, item_id: item_id)
-    product.update(part_number: part_number, name: product_name, mfr_part_number: mfr_part_number, brand_id: brand_id, brand: brand, active: active, regular_stock: regular_stock, not_carb_approved: not_carb_approved, alternate_part_number: alternate_part_number, barcode: barcode, prop_65: prop_65, epa: epa)
+    product.update(part_number: part_number, name: product_name, mfr_part_number: mfr_part_number, brand_id: brand_id, brand: brand, active: active, regular_stock: regular_stock, not_carb_approved: not_carb_approved, alternate_part_number: alternate_part_number, barcode: barcode, prop_65: prop_65, epa: epa, part_description: part_description, category: category, subcategory: subcategory, dimensions: dimensions, carb_eo_number: carb_eo_number, clearence_item: clearance_item, thumbnail: thumbnail, units_per_sku: units_per_sku)
     product
   end
 
