@@ -19,13 +19,29 @@ task export_t14_price: :environment do
         next if item['attributes']['pricelists'].blank?
         product = Turn14Product.find_by(item_id: item['id'])
         next if product.blank?
-        if item['attributes']['pricelists'].find { |x| x['name'] == 'MAP' }.present?
-          @price = item['attributes']['pricelists'].find { |x| x['name'] == 'MAP' }['price']
-        elsif item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }.present?
-          @price = item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }['price']
+        if !item['attributes']['pricelists'].select {|x| x['name'].eql?("MAP")}.blank?
+          @map_price = item['attributes']['pricelists'].find { |x| x['name'] == 'MAP' }['price']
+        else
+          @map_price = nil
+        end
+        if !item['attributes']['pricelists'].select {|x| x['name'].eql?("Retail")}.blank?
+          @retail_price = item['attributes']['pricelists'].find { |x| x['name'] == 'Retail' }['price']
+        else
+          @retail_price = nil
+        end
+        if !item['attributes']['pricelists'].select {|x| x['name'].eql?("Jobber")}.blank?
+          @jobber_price = item['attributes']['pricelists'].find { |x| x['name'] == 'Jobber' }['price']
+        else
+          @jobber_price = nil
+        end
+        if item['attributes']["purchase_cost"].present?
+          @purchase_cost = item['attributes']["purchase_cost"]
+        else
+          @purchase_cost = nil
         end
         # next if product.price.present?
-        product.update(price: @price, price_list: item['attributes']['pricelists'])
+        puts "============== MAP price: #{@map_price}, Retail price: #{@retail_price}, Jobber Price #{@jobber_price}, Purchase cost #{@purchase_cost} =============="
+        product.update(map_price: @map_price, retail_price: @retail_price, jobber_price: @jobber_price, purchase_cost: @purchase_cost)
         # puts "Count: #{index}"
       end
       if all_price['links']['next'].nil?
