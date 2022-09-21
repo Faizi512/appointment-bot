@@ -1,6 +1,8 @@
 desc 'To scrape turn14 items detailed data through api call'
 task export_t14_items_data: :environment do
   begin
+    Turn14ProductDataDescription.destroy_all
+    Turn14ProductDataFile.destroy_all
     token = Curb.t14_auth_token['access_token']
     raise Exception.new "Invalid token" if !token.present?
     item_data_url = "#{ENV['TURN14_STORE']}/v1/items/data?page=1"
@@ -14,10 +16,13 @@ task export_t14_items_data: :environment do
           next if data.blank?
           puts 'Turn14 Product added'
           id = data["id"]
-          description = data["descriptions"].collect{|x| x["description"]}
-          links = data["files"]&.collect{|x| x["links"]}
-          links&.each do |link|
-            Turn14ProductData.create!(supplier_id: supplier.id, item_id: id, description: description, image: link.first["url"])
+          descriptions = data["descriptions"]
+          descriptions&.each do |description|
+            Turn14ProductDataDescription.create!(supplier_id: supplier.id, product_id: id, desc_type: description["type"], description: description["description"])
+          end
+          files = data["files"]
+          files&.each do |file|
+            Turn14ProductDataFile.create!(supplier_id: supplier.id, product_id: id, file_extension: file["file_extension"], file_type: file["type"], media_content: file["media_content"], generic: file["generic"], url: file["links"].collect{|x| x["url"]}[0])
           end
         end
       end
@@ -36,7 +41,7 @@ task export_t14_items_data: :environment do
   rescue Exception => e
     if !e.message.eql?("Exiting the script")
       puts e.message
-      UserMailer.with(user: e, script: "export_t14_items").issue_in_script.deliver_now
+      UserMailer.with(user: e, script: "export_t14_items_data").issue_in_script.deliver_now
     end
   end
 end
