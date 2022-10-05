@@ -42,3 +42,6 @@ Section.find_or_create_by(section_id: 'ECS-Volkswagen').update(name: 'Volkswagen
 
 # Wordpress websites
 Store.find_or_create_by(store_id: 'vargas_turbo').update(name: 'vargas_turbo', href: 'https://vargasturbo.com/product-search/')
+
+
+Store.find_or_create_by(store_id: 'milltekcorp').update(name: 'milltekcorp', href: 'http://dealer.milltekcorp.com/index.cfm')
