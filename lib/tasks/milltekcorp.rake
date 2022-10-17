@@ -38,9 +38,24 @@ task milltekcorp: :environment do
     else
         browser.url = "http://dealer.milltekcorp.com/products.cfm"
     end 
-
+    sections = ""
     if browser.element(xpath: '//*[@id="content-main"]').present?
-        sections = ['//*[@id="content-main"]/div[6]', '//*[@id="content-main"]/div[12]', '//*[@id="content-main"]/div[84]']
+        count = browser.element(xpath: '//*[@id="content-main"]').children.count
+        for index in 1..count do
+            if browser.element(xpath: '//*[@id="content-main"]/div['+index.to_s+']').present?
+                if browser.element(xpath: '//*[@id="content-main"]/div['+index.to_s+']').preceding_siblings.present?
+                    if browser.element(xpath: '//*[@id="content-main"]/div['+index.to_s+']').preceding_siblings.last.preceding_siblings.last.text.eql?("Audi") ||
+                        browser.element(xpath: '//*[@id="content-main"]/div['+index.to_s+']').preceding_siblings.last.preceding_siblings.last.text.eql?("BMW") ||
+                        browser.element(xpath: '//*[@id="content-main"]/div['+index.to_s+']').preceding_siblings.last.preceding_siblings.last.text.eql?("Volkswagen")
+                        sections << "//*[@id='content-main']/div[#{index}]||"
+                        puts "Starting..............."
+                    else
+                        next
+                    end
+                end
+            end
+        end
+        sections = sections.split("||")
     end
 
     puts "=================== Browser-1 start== #{browser.url} ======================"
@@ -124,7 +139,7 @@ def extract_data url, browser, model
             data = item.children.last.table.tbody.children.last.td.table.tbody.children
             data.each do |row|
                 if row.text.split(": ")[0].eql?("System number")
-                    kit_part_number = row.text.split(" ")[2]       
+                    kit_part_number = row.text.split(" ")[2] 
                 end
                 if row.text.split(": ")[0].eql?("Pipe diameter")
                     price_MAP = row.text.split(" ").last      
