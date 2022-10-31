@@ -24,4 +24,5 @@ end
 def add_product sku, title, price, stock, store
     latest = store.latest_products.find_or_create_by(mpn: sku)
     latest.update(product_title: title, mpn: sku, inventory_quantity: stock, price: price)
+    latest.archive_products.create(store_id: store.id, product_title: title, mpn: sku, inventory_quantity: stock, price: price)
 end
