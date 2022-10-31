@@ -40,8 +40,13 @@ Section.find_or_create_by(section_id: 'ECS-BMW').update(name: 'BMW', href: 'http
 Section.find_or_create_by(section_id: 'ECS-Volkswagen').update(name: 'Volkswagen', href: 'https://www.ecstuning.com/includes/vehicleMap.cgi?vehicleSelection=1&vstep_1=Volkswagen')
 
 
+
+Store.find_or_create_by(store_id: 'milltekcorp').update(name: 'milltekcorp', href: 'http://dealer.milltekcorp.com/index.cfm')
+
+
+Store.find_or_create_by(store_id: 'cts_xml').update(name: 'cts_xml', href: 'https://www.ctsturbo.com/wp-content/uploads/wpallexport/exports/784e26b6001fac67473b4fe955f99fe8/current-CTS-Products-2022.xml')
+
+
 # Wordpress websites
 Store.find_or_create_by(store_id: 'vargas_turbo').update(name: 'vargas_turbo', href: 'https://vargasturbo.com/product-search/')
 
-
-Store.find_or_create_by(store_id: 'milltekcorp').update(name: 'milltekcorp', href: 'http://dealer.milltekcorp.com/index.cfm')
