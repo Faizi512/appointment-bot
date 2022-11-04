@@ -2,14 +2,22 @@ require 'watir'
 require 'webdrivers/chromedriver'
 desc 'To scrape data from vivid racing automation watir gem'
 
+    $urls = {}
+    $temp = {}
+
+    $tile = {}
+    $tile_temp = {}
+
 task vivid_racing_rake: :environment do
     store = Store.find_by(store_id: 'vividracing')
     urls_str = LoggingTable.where(store_id: store.id).last.url if LoggingTable.where(store_id: store.id).last.present?
-    urls = eval(urls_str) if urls_str.present?
+    $urls = eval(urls_str) if urls_str.present?
 
+    tile_str = LoggingTable.where(store_id: store.id).last.temp if LoggingTable.where(store_id: store.id).last.present?
+    $tile = eval(tile_str) if tile_str.present?
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-     #Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
@@ -21,60 +29,108 @@ task vivid_racing_rake: :environment do
     retry_index=0
     begin 
         retry_index ||=0
-        #browser_1.goto urls.present? ? urls[0] : store.href
+        #browser_1.goto $urls.present? ? $urls[0] : store.href
         browser_1.goto store.href
         puts "--------------------------------------------------------------"
         puts "=========== Browser-1 start== #{browser_1.url} ============"
-        #temp = "#{browser_1.url}"
-        temp = {}
-        temp[0] = "#{browser_1.url}"
+        #$temp = "#{browser_1.url}"
+        
+        $temp[0] = "#{browser_1.url}"
 
         if browser_1.element(xpath: "/html/body/div[2]/div/div[1]/div[3]/div/div[2]/div").present?
-            data=browser_1.element(xpath: "/html/body/div[2]/div/div[1]/div[3]/div/div[2]/div")
+            data = browser_1.element(xpath: "/html/body/div[2]/div/div[1]/div[3]/div/div[2]/div")
         else
-            data=browser_1.element(xpath: "//div[@class='list-group no-scroll']")
+            data = browser_1.element(xpath: "//div[@class='list-group no-scroll']")
         end
         count = data.children.count
-        current_tile = 1
+        #current_tile = 0
+        index = 0
+        while index <= count 
+            if index == count
 
-        data.children.each do |item|
-            current_tile += 1
-            if current_tile == count
                 LoggingTable.where(store_id: store.id).destroy_all
             else
-                if urls.present?
-                    url = urls[1]
+                index = $tile[0] if $tile.present?
+                $tile_temp[0] = index
+                if $urls.present?
+
+                    url = $urls[1]
                 else
-                    url=item.attributes[:href] 
+
+                    url = data.children[index].attributes[:href]
                 end
 
+
+        
                 if url.eql?("https://www.vividracing.com/index.php?new=true")
-                    puts "---------------------------------------------------------------------"
+
                     puts " <======================  index page  ==============================>"
                     puts " <==============  page numbers exist in this browser  ==============>"
-                    temp[1] = "https://www.vividracing.com/index.php?new=true"
-                    get_products(store,url,temp,urls)
-
+                    $temp[1] = "https://www.vividracing.com/index.php?new=true"
+                    $tile_temp[1] = 0
+                    $tile_temp[2] = 0
+                    #get_products(store,url,$temp,$urls)
+                    get_products(store,url)
                 else
                     browser_2=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-
                     raise Exception.new "Browser 2 not found" if !browser_2.present?
 
                     browser_2.goto url
-                    temp[1] = "#{browser_2.url}"
+                    $temp[1] = "#{browser_2.url}"
 
-                    if browser_2.elements(xpath: "//*[@class='category-tile']").present?
-                        browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
-                            puts "---------------------------------------------"
-                            puts "<================other pages================>"
-                            prod_url=item.children[0].attributes[:href]
-                            get_products(store,prod_url,temp,urls)
+
+                    row = browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children.count-1
+                    i = 3
+                    while i < row do 
+
+                        i = $tile[1] if $tile.present?
+                        $tile_temp[1] = i
+                        
+                        puts browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].text
+
+                        tiles_count_in_row = browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children.count
+                        
+                        j = 0
+                        while j < tiles_count_in_row do
+                            if $tile.present?
+
+                                j = $tile[2]
+                                $tile = nil 
+                            end
+
+                            $tile_temp[2] = j
+
+                            if browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].text.present?
+                                puts browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].text
+                                
+                                if browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].present?
+                                    prod_url = browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].attributes[:href]
+                                    get_products(store, prod_url)
+                                end
+                            end
+                            j+=1
                         end
+                        i+=1
                     end
+
+
+                    # if browser_2.elements(xpath: "//*[@class='category-tile']").present?
+                    #     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
+                    #         puts "---------------------------------------------"
+                    #         puts "<================other pages================>"
+                    
+                    #         prod_url = item.children[0].attributes[:href]
+                    
+                    #         #get_products(store,prod_url,$temp,$urls)
+                    #         #get_products(store,prod_url)
+                    #     end
+                    # end
                     browser_2.close
                 end
             end
+            index+=1
         end
+
         browser_1.close
     rescue StandardError => e
         puts "#{e}"
@@ -83,13 +139,14 @@ task vivid_racing_rake: :environment do
     end
 end
 
-def get_products(store,url,temp,urls)
+def get_products(store,url)
+#def get_products(store,url,$temp,$urls)
     browser_3=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 3 not found" if !browser_3.present?           
     begin
         retries ||=0
         page_number = 1
-        #browser_3.goto urls[1].present? ? urls[1] : url
+        #browser_3.goto $urls[1].present? ? $urls[1] : url
 
         browser_3.goto url
         puts "--------------------------------------------------------------"
@@ -100,36 +157,44 @@ def get_products(store,url,temp,urls)
                 puts "========= page start ============"
                 link=nil
                 if url.split("?")[1].eql?("new=true")
-                    if urls.present?
-                        link = urls[2]
+                    if $urls.present?
+                        link = $urls[2]
                         puts link
                         page_number = link.split("page=")[1].to_i
                         puts link
-                        urls = nil
-                        #link =  urls.present? ? urls[2] : "#{url}&page=#{page_number}"    
+                        $urls = nil
+                        #link =  $urls.present? ? $urls[2] : "#{url}&page=#{page_number}"    
                     else
                         puts link
                         link = "#{url}&page=#{page_number}"
                         puts link
                     end
                 else
-                    if urls.present?
-                        link = urls[2]
+                    if $urls.present?
+                        link = $urls[2]
+                        page_number = link.split("page=")[1].to_i
+                        $urls = nil
                     else
                         link = "#{url}?page=#{page_number}"
                     end
                     puts link
                 end
-                #browser_3.goto urls[2].present? ? urls[2] : link
+                #browser_3.goto $urls[2].present? ? $urls[2] : link
                 puts link
                 browser_3.goto link
-                temp[2] = "#{browser_3.url}"
-                #temp += " | " + "#{browser_3.url}"
+                if browser_3.element(xpath: "/html/body/div[3]/div/div[2]/h1[2]").present?
+                    if browser_3.element(xpath: "/html/body/div[3]/div/div[2]/h1[2]").text.eql?("No products found")
+                        break
+                    end
+                end
+                $temp[2] = "#{browser_3.url}"
+                #$temp += " | " + "#{browser_3.url}"
 
                 puts "----------------------------------------------------------"
                 puts "===========Browser-3 start== #{browser_3.url}============"
                 get_products_data(store,browser_3)
-                LoggingTable.create!(url: temp, store_id: store.id, page_number: page_number)
+
+                LoggingTable.create!(url: $temp, store_id: store.id, page_number: page_number, temp: $tile_temp)
                 
                 puts "=================== #{link} ==========================="
                 puts "========= page_number >> #{page_number} end ============"
@@ -147,15 +212,14 @@ end
 
 def get_products_data(store,browser) 
 
-    products_data=browser.elements(xpath: "//*[@class='product-info']") 
+    products_data = browser.elements(xpath: "//*[@class='product-info']") 
     if !products_data.present?
         browser.close
     end
-
     products_data.each do |product|
-        brand=nil  
-        title=product.children[0].text rescue nil
-        sku=product.children[1].text.split('#')[1] rescue nil
+        brand = nil  
+        title = product.children[0].text rescue nil
+        sku = product.children[1].text.split('#')[1] rescue nil
         price = product.children[2].children[0].text rescue nil
         price = price.split(' ')[1].present? ? price.split(' ')[1] : price
       
