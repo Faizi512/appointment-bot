@@ -63,9 +63,6 @@ task vivid_racing_rake: :environment do
 
         
                 if url.eql?("https://www.vividracing.com/index.php?new=true")
-
-                    puts " <======================  index page  ==============================>"
-                    puts " <==============  page numbers exist in this browser  ==============>"
                     $temp[1] = "https://www.vividracing.com/index.php?new=true"
                     $tile_temp[1] = 0
                     $tile_temp[2] = 0
@@ -75,7 +72,10 @@ task vivid_racing_rake: :environment do
                     browser_2=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                     raise Exception.new "Browser 2 not found" if !browser_2.present?
 
+                    puts "&&&&&&&&&&&&& #{url} &&&&&&&&&&&&&&&"
+                    puts "============ Browser-2 Opening ============="
                     browser_2.goto url
+                    puts "&&&&&&&&&&&&& #{browser_2.url} &&&&&&&&&&&&&"
                     $temp[1] = "#{browser_2.url}"
 
 
@@ -83,7 +83,7 @@ task vivid_racing_rake: :environment do
                     i = 3
                     while i < row do 
 
-                        i = $tile[1] if $tile.present?
+                        i = $tile[1]+1 if $tile.present?
                         $tile_temp[1] = i
                         
                         puts browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].text
@@ -94,7 +94,7 @@ task vivid_racing_rake: :environment do
                         while j < tiles_count_in_row do
                             if $tile.present?
 
-                                j = $tile[2]
+                                j = $tile[2]+1
                                 $tile = nil 
                             end
 
@@ -147,8 +147,11 @@ def get_products(store,url)
         retries ||=0
         page_number = 1
         #browser_3.goto $urls[1].present? ? $urls[1] : url
-
+        puts "&&&&&&&&&&&&& #{url} &&&&&&&&&&&&&&&"
+        puts "============ Browser-3 Opening ============="
         browser_3.goto url
+        puts "&&&&&&&&&&&&& #{browser_3.url} &&&&&&&&&&&&&&&"
+
         puts "--------------------------------------------------------------"
         puts "=========== Browser-2 start == #{browser_3.url}============"        
 
@@ -159,7 +162,6 @@ def get_products(store,url)
                 if url.split("?")[1].eql?("new=true")
                     if $urls.present?
                         link = $urls[2]
-                        puts link
                         page_number = link.split("page=")[1].to_i
                         puts link
                         $urls = nil
@@ -181,7 +183,12 @@ def get_products(store,url)
                 end
                 #browser_3.goto $urls[2].present? ? $urls[2] : link
                 puts link
+
+                puts "&&&&&&&&&&&&& #{link} &&&&&&&&&&&&&&&"
+                puts "============ Browser-3 Opening ============="
                 browser_3.goto link
+                puts "&&&&&&&&&&&&& #{browser_3.url} &&&&&&&&&&&&&&&"
+
                 if browser_3.element(xpath: "/html/body/div[3]/div/div[2]/h1[2]").present?
                     if browser_3.element(xpath: "/html/body/div[3]/div/div[2]/h1[2]").text.eql?("No products found")
                         break
