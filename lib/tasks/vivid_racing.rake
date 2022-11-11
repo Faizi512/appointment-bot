@@ -17,10 +17,10 @@ task vivid_racing_rake: :environment do
     $tile = eval(tile_str) if tile_str.present?
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+     Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     
     browser_1=Watir::Browser.new :chrome  , args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 1 not found" if !browser_1.present? 
@@ -251,8 +251,8 @@ def get_products_data(store,browser)
             
                 raise Exception.new "Browser not found" if !browser_4.present? 
                 browser_4.goto href
-                
-                brand=browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text rescue nil 
+                #brand = browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text rescue nil 
+                brand = browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].text rescue nil
                 if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
                   stock=1
                 else
