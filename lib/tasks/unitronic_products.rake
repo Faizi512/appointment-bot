@@ -9,8 +9,9 @@ task unitronic_products: :environment do
       products.each do |product|
         mpn = product["partNumber"]
         title = product["description"]
-        price_data = product["retailPrice"]
-        price = price_data.include?('$') ? '%.2f' % price_data.split('$')[1] : '%.2f' % price_data
+        price = product["retailPrice"]
+        #price_data = product["retailPrice"]
+        #price = price_data.include?('$') ? '%.2f' % price_data.split('$')[1] : '%.2f' % price_data
         qty = product["qtyCA"].to_i + product["qtyUS"].to_i
         add_unitronic_products_to_store(store, title, mpn, qty, price)
         puts "Product= #{product}"
