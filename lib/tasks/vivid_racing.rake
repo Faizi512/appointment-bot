@@ -69,7 +69,7 @@ task vivid_racing_rake: :environment do
                     $tile = nil
                     puts "&&&&&&&&&&&&&&&  #{url}  &&&&&&&&&&&&"
                     #get_products(store,url,$temp,$urls)
-                    #get_products(store,url)
+                    get_products(store,url)
                 else
                     browser_2=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                     raise Exception.new "Browser 2 not found" if !browser_2.present?
@@ -107,7 +107,7 @@ task vivid_racing_rake: :environment do
                                 
                                 if browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].present?
                                     prod_url = browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].attributes[:href]
-                                    #get_products(store, prod_url)
+                                    get_products(store, prod_url)
                                 end
                             end
                             j+=1
