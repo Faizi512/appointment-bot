@@ -17,10 +17,10 @@ task vivid_racing_rake: :environment do
     $tile = eval(tile_str) if tile_str.present?
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-     Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     
     browser_1=Watir::Browser.new :chrome  , args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 1 not found" if !browser_1.present? 
@@ -66,8 +66,10 @@ task vivid_racing_rake: :environment do
                     $temp[1] = "https://www.vividracing.com/index.php?new=true"
                     $tile_temp[1] = 0
                     $tile_temp[2] = 0
+                    $tile = nil
+                    puts "&&&&&&&&&&&&&&&  #{url}  &&&&&&&&&&&&"
                     #get_products(store,url,$temp,$urls)
-                    get_products(store,url)
+                    #get_products(store,url)
                 else
                     browser_2=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                     raise Exception.new "Browser 2 not found" if !browser_2.present?
@@ -105,7 +107,7 @@ task vivid_racing_rake: :environment do
                                 
                                 if browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].present?
                                     prod_url = browser_2.element(xpath: "/html/body/div[3]/div/div[2]").children[i].children[j].children[0].children[0].attributes[:href]
-                                    get_products(store, prod_url)
+                                    #get_products(store, prod_url)
                                 end
                             end
                             j+=1
@@ -253,6 +255,7 @@ def get_products_data(store,browser)
                 browser_4.goto href
                 #brand = browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text rescue nil 
                 brand = browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].text rescue nil
+                #byebug if brand == nil
                 if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
                   stock=1
                 else
