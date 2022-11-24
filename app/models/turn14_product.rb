@@ -22,11 +22,19 @@ class Turn14Product < ApplicationRecord
   def add_latest_purchase_order(product, eta)
     if eta['qty_on_order'].present?
       eta['qty_on_order'].each do |location|
-        product.latest_purchase_orders.find_or_create_by(
-          location: location[0],
-          qty_on_order: location[1],
-          estimated_availability: eta['estimated_availability'][location[0].to_s]
-        )
+        if eta['estimated_availability'].present?
+          product.latest_purchase_orders.find_or_create_by(
+            location: location[0],
+            qty_on_order: location[1],
+            estimated_availability: eta['estimated_availability'][location[0].to_s]
+          )
+        else
+          product.latest_purchase_orders.find_or_create_by(
+            location: location[0],
+            qty_on_order: location[1],
+            estimated_availability: "N/A"
+          )
+        end
         puts 'Latest purchase order added.'
       end
     end
@@ -35,11 +43,19 @@ class Turn14Product < ApplicationRecord
   def add_archived_purchase_order(product, eta)
     if eta['qty_on_order'].present?
       eta['qty_on_order'].each do |location|
-        product.archived_purchase_orders.create!(
-          location: location[0],
-          qty_on_order: location[1],
-          estimated_availability: eta['estimated_availability'][location[0].to_s]
-        )
+        if eta['estimated_availability'].present?
+          product.archived_purchase_orders.create!(
+            location: location[0],
+            qty_on_order: location[1],
+            estimated_availability: eta['estimated_availability'][location[0].to_s]
+          )
+        else
+          product.archived_purchase_orders.create!(
+            location: location[0],
+            qty_on_order: location[1],
+            estimated_availability: "N/A"
+          )
+        end
         puts 'Archived purchase order added.'
       end
     end

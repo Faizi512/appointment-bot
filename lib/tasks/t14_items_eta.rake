@@ -67,21 +67,23 @@ end
 
 def get_est_date(location, item)
   est_availability = ""
-  item["attributes"]["eta"]["estimated_availability"].each do |key, array|
-    est_availability = item["attributes"]["eta"]["estimated_availability"][location]
+  if item["attributes"]["eta"]["estimated_availability"].present?
+    item["attributes"]["eta"]["estimated_availability"].each do |key, array|
+      est_availability = item["attributes"]["eta"]["estimated_availability"][location]
+    end
   end
-  est_availability
+    est_availability
 end
 
 def manufacturer_and_purchase_order items
   items.each do |item|
     if(Turn14Product.find_by(item_id: item["id"]).present?)
       product = Turn14Product.find_by(item_id: item['id'])
-      stock = item["attributes"].dig('manufacturer', 'stock')
-      esd = item["attributes"].dig('manufacturer', 'esd')
+      stock = item["attributes"].dig('manufacturer', 'stock') if item["attributes"].dig('manufacturer').present?
+      esd = item["attributes"].dig('manufacturer', 'esd') if item["attributes"].dig('manufacturer').present?
       add_manufacturer(product, stock, esd) if stock.present? && esd.present?
       add_purchase_order(product, item["attributes"]["eta"]) if item["attributes"]["eta"].present?
-     end
+    end
   end
 end
 
