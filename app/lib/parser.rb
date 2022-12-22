@@ -65,7 +65,8 @@ class Parser
     mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
     @mpn=mpn.children.present? ? mpn.children.last.text : nil
     brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
-    @brand=brand.children.present? ? brand.last.text : nil
+    # @brand=brand.children.present? ? brand.last.text : nil
+    @brand = brand[0].attributes["data-val"].value
 
       # byebug
     if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].name.eql?("ul")
@@ -84,7 +85,6 @@ class Parser
       @description = nil
     end
 
-    # byebug
     data_points_hash
   end
    
