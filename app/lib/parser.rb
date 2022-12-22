@@ -84,7 +84,6 @@ class Parser
     else
       @description = nil
     end
-
     data_points_hash
   end
    
