@@ -67,6 +67,7 @@ task sync_with_store: :environment do
        if store.store_id.eql?("maxtondesignusa") 
         variant_href = "#{store.href}/#{product_collection}/#{product_slug}?variant=#{variant['id']}"
        else
+        # byebug
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
        end
         # variant_href="https://maxtondesignusa.net/collections/all/products/front-splitter-flaps-volkswagen-golf-7-r-r-line-facelift?variant=42427985527007"
@@ -93,14 +94,16 @@ task sync_with_store: :environment do
               puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
             end
           else
+            # byebug
             data = Parser.new(file, store.store_id, variant, product_brand).parse
             if !data[:price].blank?
               data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]
             end
+            # byebug
             add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title], data[:description])
             # temp = temp + 1
-            # puts "=============================== #{temp} ==============================="
-            puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}, #{data[:description]}"
+            puts "====================================================================================================="
+            puts "Store: #{store}, Brand: #{data[:brand]}, mpn: #{data[:mpn]}, sku: #{data[:sku]}, stock: #{data[:stock]}, product_slug: #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, price: #{data[:price]}, title: #{data[:title]}, description: #{data[:description]}"
           end  
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
@@ -150,6 +153,7 @@ def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, produc
       inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
       href: href, price: price, product_title: title)
   else
+    #byebug
     latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
       href: href, price: price, product_title: title, description: description)
     latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,

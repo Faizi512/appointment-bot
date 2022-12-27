@@ -11,6 +11,9 @@ class Parser
     @price = ''
     @title = ''
     @description = ""
+    @features = ""
+    @benefits = ""
+    @included = ""
   end
 
   def parse
@@ -64,23 +67,24 @@ class Parser
     brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
     @brand=brand.children.present? ? brand.last.text : nil
 
-    if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].text.strip.eql?("About Product\nAdditional Details\nAbout the Brand")
+      # byebug
+    if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].name.eql?("ul")
       i = 4
       while true
-        doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip.eql?("Additional Details") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip
-        i = i+2
+        doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].name.eql?("div") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip
+        i = i+1
       end
-    elsif doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].present? && doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].text.strip.eql?("About Product\nAdditional Details\nAbout the Brand")
+    elsif doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].present? && doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].name.eql?("ul")
        i = 10
       while true
-        doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip.eql?("Additional Details") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip
-        i = i+2
+        doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].name.eql?("div") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip
+        i = i+1
       end
     else
       @description = nil
     end
 
-
+    # byebug
     data_points_hash
   end
    
@@ -169,6 +173,7 @@ class Parser
   end
 
   def maperformance_data_points(doc)
+    # byebug
     @brand=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/a').text
     @title=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/h1').text
     @mpn=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[1]/strong').text.split('#').last
@@ -180,6 +185,8 @@ class Parser
     else
       @stock=0
     end
+
+    # byebug
     data_points_hash
   end
 
