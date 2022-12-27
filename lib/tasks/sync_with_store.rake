@@ -97,10 +97,10 @@ task sync_with_store: :environment do
             if !data[:price].blank?
               data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]
             end
-            add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title])
+            add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title], data[:description])
             # temp = temp + 1
             # puts "=============================== #{temp} ==============================="
-            puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
+            puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}, #{data[:description]}"
           end  
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
@@ -136,7 +136,7 @@ def add_offset_of_maperformance(temp)
   Maperformancelog.find_or_create_by(offset: temp)
 end
 
-def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title)
+def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, product_id, href, price, title, description)
   if(store.store_id.eql?("Neuspeed RSWheels"))
     latest = store.latest_products.find_or_create_by(variant_id: variant_id, product_id: product_id, mpn: mpn)
   else
@@ -151,10 +151,10 @@ def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, produc
       href: href, price: price, product_title: title)
   else
     latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
-      href: href, price: price, product_title: title)
+      href: href, price: price, product_title: title, description: description)
     latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,
       inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
-      href: href, price: price, product_title: title)
+      href: href, price: price, product_title: title, description: description)
   end
   # latest = store.latest_products.find_by(variant_id: variant_id, product_id: product_id)
   # puts "After Stock: #{latest.inventory_quantity} After Date: #{latest.updated_at}"

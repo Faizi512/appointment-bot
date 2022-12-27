@@ -10,6 +10,7 @@ class Parser
     @sku = variant['sku']
     @price = ''
     @title = ''
+    @description = ""
   end
 
   def parse
@@ -52,16 +53,34 @@ class Parser
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
     if price.present?  
-    @price= price.split(' ').count >1 ? price.split(' ')[0] : price
+      @price= price.split(' ').count >1 ? price.split(' ')[0] : price
     else
-    @price=price
-    end 
+      @price=price
+    end
     stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text rescue nil
     @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
     mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
     @mpn=mpn.children.present? ? mpn.children.last.text : nil
     brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
     @brand=brand.children.present? ? brand.last.text : nil
+
+    if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].text.strip.eql?("About Product\nAdditional Details\nAbout the Brand")
+      i = 4
+      while true
+        doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip.eql?("Additional Details") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip
+        i = i+2
+      end
+    elsif doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].present? && doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].text.strip.eql?("About Product\nAdditional Details\nAbout the Brand")
+       i = 10
+      while true
+        doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip.eql?("Additional Details") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip
+        i = i+2
+      end
+    else
+      @description = nil
+    end
+
+
     data_points_hash
   end
    
@@ -167,7 +186,8 @@ class Parser
   def data_points_hash
     {
       stock: @stock, mpn: @mpn, brand: @brand,
-      sku: @sku, price: @price, title: @title
+      sku: @sku, price: @price, title: @title,
+      description: @description
     }
   end
 end

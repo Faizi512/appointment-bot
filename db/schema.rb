@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220427102529) do
+ActiveRecord::Schema.define(version: 20221226133304) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "pg_stat_statements"
 
   create_table "archive_products", force: :cascade do |t|
     t.string "brand"
@@ -31,6 +30,7 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.datetime "updated_at", null: false
     t.string "price"
     t.string "product_title"
+    t.text "description"
     t.index ["latest_product_id"], name: "index_archive_products_on_latest_product_id"
     t.index ["store_id"], name: "index_archive_products_on_store_id"
   end
@@ -195,6 +195,7 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.datetime "updated_at", null: false
     t.string "price"
     t.string "product_title"
+    t.text "description"
     t.index ["store_id"], name: "index_latest_products_on_store_id"
   end
 
@@ -206,6 +207,18 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["turn14_product_id"], name: "index_latest_purchase_orders_on_turn14_product_id"
+  end
+
+  create_table "logging_tables", force: :cascade do |t|
+    t.bigint "store_id"
+    t.string "url"
+    t.integer "page_number"
+    t.integer "offset"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "last_page"
+    t.string "temp"
+    t.index ["store_id"], name: "index_logging_tables_on_store_id"
   end
 
   create_table "manufacturers", force: :cascade do |t|
@@ -223,81 +236,31 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "me_categories", id: false, force: :cascade do |t|
-    t.integer "modded_catid"
-    t.string "modded_catname", limit: 255
-    t.integer "fcp_catid"
-    t.string "fcp_catname", limit: 255
+  create_table "milltekcorp_kits", force: :cascade do |t|
+    t.string "kit_name"
+    t.integer "primary_stock"
+    t.integer "secondary_stock"
+    t.string "kit_part_number"
+    t.string "price_MAP"
+    t.string "dealer_cost"
+    t.string "href"
+    t.string "brand"
+    t.string "model"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-  create_table "me_fcp_brands", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "fcp_brand_name", limit: 255
-    t.string "modded_brand_name", limit: 255
-    t.integer "modded_brand_id"
-  end
-
-  create_table "me_inventory_db", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "brand", limit: 255
-    t.string "product_name", limit: 255
-    t.string "mpn", limit: 255
-    t.string "sku", limit: 255
-    t.decimal "cost", precision: 10, scale: 2
-    t.integer "qty"
-    t.string "loc", limit: 255
-    t.string "stock_state", limit: 255
-  end
-
-  create_table "me_new_products", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "brand", limit: 255
-    t.integer "brand_id"
-    t.text "product_name"
-    t.text "slug"
-    t.string "sku", limit: 255
-    t.string "price", limit: 255
-    t.integer "cost"
-    t.string "retail", limit: 255
-    t.string "mpn", limit: 255
-    t.text "taxon_ids"
-    t.text "taxon_name"
-    t.string "fcpeuro_id", limit: 255
-    t.string "fcpeuro_productsid", limit: 255
-    t.string "fcpeuro_quality", limit: 255
-    t.text "fcpeuro_oenumbers"
-    t.text "fcpeuro_mfgnumbers"
-    t.string "status"
-  end
-
-  create_table "me_purchase_orders", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "modded_po", limit: 255
-    t.string "vendor", limit: 255
-    t.string "brand", limit: 255
-    t.string "mpn", limit: 255
-    t.integer "qty"
-    t.string "sku", limit: 255
-    t.string "stock_state", limit: 255
-    t.string "tracking", limit: 255
-    t.string "product_name", limit: 255
-  end
-
-  create_table "new_product_db", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "product_name", limit: 255
-    t.integer "sku"
-    t.string "brand", limit: 255
-    t.integer "price"
-    t.integer "cost_price"
-    t.integer "retail_price"
-    t.string "mpn", limit: 255
-    t.text "description"
-    t.text "image"
-    t.text "features"
-    t.text "warranty"
-    t.text "installation"
-    t.text "notes"
+  create_table "milltekcorp_products", force: :cascade do |t|
+    t.bigint "milltekcorp_kit_id"
+    t.integer "us_local_stock"
+    t.integer "uk_remote_stock"
+    t.string "product_part_number"
+    t.string "product_description"
+    t.string "product_price_MAP"
+    t.string "product_dealer_cost"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["milltekcorp_kit_id"], name: "index_milltekcorp_products_on_milltekcorp_kit_id"
   end
 
   create_table "part_authority_brands_mpns", force: :cascade do |t|
@@ -321,6 +284,7 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.integer "packs"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "brand"
     t.index ["part_number"], name: "index_part_authority_products_on_part_number"
     t.index ["product_line"], name: "index_part_authority_products_on_product_line"
   end
@@ -414,6 +378,12 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.string "thmotorsports_product_id"
   end
 
+  create_table "throtlurllogs", force: :cascade do |t|
+    t.string "offset"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "turn14_available_promises", force: :cascade do |t|
     t.string "mpn"
     t.string "location"
@@ -438,6 +408,35 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.index ["supplier_id"], name: "index_turn14_open_orders_on_supplier_id"
   end
 
+  create_table "turn14_product_data", force: :cascade do |t|
+    t.bigint "supplier_id"
+    t.string "item_id"
+    t.index ["supplier_id"], name: "index_turn14_product_data_on_supplier_id"
+  end
+
+  create_table "turn14_product_data_descriptions", force: :cascade do |t|
+    t.string "product_id"
+    t.string "desc_type"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "supplier_id"
+    t.index ["supplier_id"], name: "index_turn14_product_data_descriptions_on_supplier_id"
+  end
+
+  create_table "turn14_product_data_files", force: :cascade do |t|
+    t.string "product_id"
+    t.string "file_type"
+    t.string "file_extension"
+    t.string "media_content"
+    t.boolean "generic"
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "supplier_id"
+    t.index ["supplier_id"], name: "index_turn14_product_data_files_on_supplier_id"
+  end
+
   create_table "turn14_products", force: :cascade do |t|
     t.bigint "supplier_id"
     t.string "item_id"
@@ -456,6 +455,25 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.string "alternate_part_number"
     t.string "prop_65"
     t.string "epa"
+    t.string "part_description"
+    t.string "category"
+    t.string "subcategory"
+    t.string "dimensions"
+    t.string "carb_eo_number"
+    t.boolean "clearence_item"
+    t.integer "units_per_sku"
+    t.string "price_list"
+    t.string "thumbnail"
+    t.float "map_price"
+    t.float "price_price"
+    t.float "retail_price"
+    t.float "jobber_price"
+    t.float "purchase_cost"
+    t.integer "dim_box_number"
+    t.float "dim_length"
+    t.float "dim_width"
+    t.float "dim_height"
+    t.float "dim_weight"
     t.index ["item_id"], name: "index_turn14_products_on_item_id"
     t.index ["supplier_id"], name: "index_turn14_products_on_supplier_id"
   end
@@ -488,22 +506,17 @@ ActiveRecord::Schema.define(version: 20220427102529) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "wufoo_rma", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "order_id", limit: 255
-    t.string "first_name", limit: 255
-    t.string "last_name", limit: 255
-    t.string "email", limit: 255
-    t.string "reason_contact", limit: 255
-    t.string "reason_return", limit: 255
-    t.string "have_installed", limit: 255
-    t.string "year", limit: 255
-    t.string "make", limit: 255
-    t.string "model", limit: 255
-    t.text "cancel_exp"
-    t.text "return_exp"
-    t.datetime "submitted_at"
-  end
-
+  add_foreign_key "archived_purchase_orders", "turn14_products"
+  add_foreign_key "categories", "sections"
+  add_foreign_key "ecs_fitments", "ecs_products"
+  add_foreign_key "ecs_taxons", "ecs_products"
+  add_foreign_key "fcp_products", "categories"
+  add_foreign_key "fitments", "fcp_products"
+  add_foreign_key "latest_purchase_orders", "turn14_products"
+  add_foreign_key "logging_tables", "stores"
+  add_foreign_key "manufacturers", "turn14_products"
+  add_foreign_key "milltekcorp_products", "milltekcorp_kits"
+  add_foreign_key "turn14_product_data_descriptions", "suppliers"
+  add_foreign_key "turn14_product_data_files", "suppliers"
   add_foreign_key "uro_tuning_fitments", "latest_products"
 end
