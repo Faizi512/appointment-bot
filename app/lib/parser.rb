@@ -52,7 +52,9 @@ class Parser
     @stock=stock.eql?("Many in stock") ? 1 : 0
     data_points_hash
   end
+
   def throtl_data_points doc
+    byebug
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
     if price.present?  

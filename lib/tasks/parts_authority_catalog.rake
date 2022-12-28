@@ -3,7 +3,7 @@ require 'zip'
 desc 'To scrape parts authority products catalog'
 task parts_authority_catalog: :environment do
   begin
-    ftp = Net::FTP.new('ftp.panetny.com')
+    ftp = Net::FTP.new('pareps.panetny.com')
     ftp.login('moddeurospf','DmZ7e44k')
     raise Exception.new "Login failed" if !ftp.welcome.present?
     ftp.passive = true

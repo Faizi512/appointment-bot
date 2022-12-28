@@ -66,4 +66,6 @@ Rails.application.configure do
     authentication: :plain,
     enable_starttls_auto: true
   }
+
+  config.hosts = "https://093d-2400-adc5-46a-eb00-e1e6-e937-4160-1796.ap.ngrok.io"
 end
