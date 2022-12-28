@@ -7,7 +7,6 @@ module Api
   class RetoolTestApiController < ApplicationController
     protect_from_forgery except: :test
     def test
-      byebug
       pdf = open(params["html"]["url"])
       session = GoogleDrive::Session.from_config('config/drive_config.json')
       response = session.upload_from_file(pdf, params["html"]["name"], convert: false, parents: ["1ZgzHBHzK2CZR54TFgly0ozM8aZdcpuXY"])
