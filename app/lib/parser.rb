@@ -54,7 +54,6 @@ class Parser
   end
 
   def throtl_data_points doc
-    byebug
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
     price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
     if price.present?  
@@ -70,7 +69,6 @@ class Parser
     # @brand=brand.children.present? ? brand.last.text : nil
     @brand = brand[0].attributes["data-val"].value
 
-      # byebug
     if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].name.eql?("ul")
       i = 4
       while true
