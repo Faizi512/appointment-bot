@@ -52,40 +52,6 @@ class Parser
     @stock=stock.eql?("Many in stock") ? 1 : 0
     data_points_hash
   end
-
-  def throtl_data_points doc
-    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil 
-    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
-    if price.present?  
-      @price= price.split(' ').count >1 ? price.split(' ')[0] : price
-    else
-      @price=price
-    end
-    stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text rescue nil
-    @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
-    mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
-    @mpn=mpn.children.present? ? mpn.children.last.text : nil
-    brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
-    # @brand=brand.children.present? ? brand.last.text : nil
-    @brand = brand[0].attributes["data-val"].value
-
-    if doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].present? && doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[1].name.eql?("ul")
-      i = 4
-      while true
-        doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].name.eql?("div") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[2]/div/div").children[i].text.strip
-        i = i+1
-      end
-    elsif doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].present? && doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[7].name.eql?("ul")
-       i = 10
-      while true
-        doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].name.eql?("div") ? break : @description = @description + "\n" + doc.xpath("/html/body/main/section[1]/section/div/div[4]/div/div").children[i].text.strip
-        i = i+1
-      end
-    else
-      @description = nil
-    end
-    data_points_hash
-  end
    
   def spa_turbo_usa(doc)
     title=doc.xpath("/html/head/meta[7]") rescue nil
@@ -171,21 +137,118 @@ class Parser
     data_points_hash
   end
 
+  def throtl_data_points doc
+    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil
+    if (@title.eql?("") && doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').present?)
+      @title = doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').text.strip rescue nil
+    end
+    
+    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
+    if (price.eql?("") && doc.xpath('//*[@id="price-template--14958388772912__front"]/p').present?)
+      price=doc.xpath('//*[@id="price-template--14958388772912__front"]/p').text.strip rescue nil
+    end
+
+    if price.present?  
+      @price= price.split(' ').count >1 ? price.split(' ')[0] : price
+    else
+      @price=price
+    end
+
+    stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text rescue nil
+    @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
+ 
+    mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
+    @mpn=mpn.children.present? ? mpn.children.last.text : nil
+
+    brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
+    @brand=brand.children.present? ? brand.last.text : brand.text 
+    if (@brand.eql?("") && doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').present?)
+      @brand=doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').text.strip rescue nil
+    end
+
+    
+    if doc.xpath('//*[@id="product-description"]/div/div').children[1].present? && doc.xpath('//*[@id="product-description"]/div/div').children[1].name.eql?("ul")
+      x=4
+      while true
+        doc.xpath('//*[@id="product-description"]/div/div').children[x].text.eql?("Front Fitment Wheel Specifications table") ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[x].text.strip
+        x = x+1
+      end
+      if @description.eql?("") || @description.eql?(nil)
+        i = 4
+        while true
+          (doc.xpath('//*[@id="product-description"]/div/div').children[i].name.eql?("div") || doc.xpath('//*[@id="product-description"]/div/div').children[i].text.eql?("Additional Details")) ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[i].text.strip
+          i = i+1
+        end
+      end    
+    elsif doc.xpath('//*[@id="product-description"]/div/div').children[7].present? && doc.xpath('//*[@id="product-description"]/div/div').children[7].name.eql?("ul")
+       i = 10
+      while true
+        (doc.xpath('//*[@id="product-description"]/div/div').children[i].name.eql?("div") || doc.xpath('//*[@id="product-description"]/div/div').children[i].text.eql?("Additional Details")) ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[i].text.strip
+        i = i+1
+      end
+    else
+      @description = nil
+    end
+    data_points_hash
+  end
+
   def maperformance_data_points(doc)
-    # byebug
     @brand=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/a').text
     @title=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/h1').text
     @mpn=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[1]/strong').text.split('#').last
     @price=doc.xpath('/html/body/main/div/div[3]/div[1]/div/div/div/div[1]/div[2]/div/span[5]/p/span[1]').text
     raw_data=doc.xpath("//script[@class='product-json']").text
     if !raw_data.blank?
-      data=JSON[raw_data]
-      @stock=data['variants'].present? ? data['variants'][0]["inventory_quantity"] : 0
+      data = JSON[raw_data]
+      @stock = data['variants'].present? ? data['variants'][0]["inventory_quantity"] : 0
     else
-      @stock=0
+      @stock = 0
     end
 
-    # byebug
+      if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").present?
+        if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").children[0].attributes["id"].present?
+          if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").children[0].attributes["id"].value.eql?("newdescr") 
+            if doc.xpath("//div[@id='newdescr']")[0].text.present?
+              if doc.xpath("//div[@id='newdescr']")[0].text.split("Features").present?
+                @description = doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[0].strip : nil
+              elsif doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits").present?
+                @description = doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[0].strip : nil
+              elsif doc.xpath("//div[@id='newdescr']")[0].children.present?
+                @description = doc.xpath("//div[@id='newdescr']")[0].children[1].text.present? ? doc.xpath("//div[@id='newdescr']")[0].children[1].text.strip : nil
+              end
+
+              if doc.xpath("//div[@id='newdescr']")[0].text.split("Features").present?
+                if doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[1].split("Benefits").present?
+                  @features = doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[1].split("Benefits")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Feature")[1].split("Benefits")[0].strip : nil
+                elsif doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[1].split("Applications").present?
+                  @features = doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[1].split("Applications")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Features")[1].split("Applications")[0].strip : nil
+                elsif doc.xpath("//div[@id='newdescr']")[0].children.present?
+                  @features = doc.xpath("//div[@id='newdescr']")[0].children[1].text.present? ? doc.xpath("//div[@id='newdescr']")[0].children[1].text.strip : nil 
+                end
+              end
+
+              if doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits").present?
+                if doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].split("Applications").present?
+                  @benefits = doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].split("Applications")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].split("Applications")[0].strip : nil
+                elsif doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].present?
+                  @benefits = doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("Benefits")[1].strip : nil
+                elsif doc.xpath("//div[@id='newdescr']")[0].children.present?
+                  @benefits = doc.xpath("//div[@id='newdescr']")[0].children[1].text.present? ? doc.xpath("//div[@id='newdescr']")[0].children[1].text.strip : nil 
+                end
+              end
+
+              if doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?").present?
+                if doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?").split("Warranty").present?
+                  @included = doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?")[1].split("Warranty")[0].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?")[1].split("Warranty")[0].strip : nil
+                elsif doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?").present?
+                  @included = doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?")[1].present? ? doc.xpath("//div[@id='newdescr']")[0].text.split("What's In The Box?")[1].strip : nil
+                end
+              end
+            puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+            end
+          end
+        end
+      end
     data_points_hash
   end
 
@@ -193,7 +256,8 @@ class Parser
     {
       stock: @stock, mpn: @mpn, brand: @brand,
       sku: @sku, price: @price, title: @title,
-      description: @description
+      description: @description, features: @features,
+      benefits: @benefits, included: @included
     }
   end
 end

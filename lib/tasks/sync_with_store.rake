@@ -14,6 +14,7 @@ task sync_with_store: :environment do
   loop do
     page_number +=1 
     if store.store_id.eql?("maperformance")
+
       last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
         if(last_offset == 0)
           temp += 1
@@ -67,7 +68,6 @@ task sync_with_store: :environment do
        if store.store_id.eql?("maxtondesignusa") 
         variant_href = "#{store.href}/#{product_collection}/#{product_slug}?variant=#{variant['id']}"
        else
-        # byebug
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
        end
         # variant_href="https://maxtondesignusa.net/collections/all/products/front-splitter-flaps-volkswagen-golf-7-r-r-line-facelift?variant=42427985527007"
@@ -94,16 +94,18 @@ task sync_with_store: :environment do
               puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
             end
           else
-            # byebug
+            puts variant_href
             data = Parser.new(file, store.store_id, variant, product_brand).parse
             if !data[:price].blank?
               data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]
             end
-            # byebug
-            add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug,variant['id'], variant['product_id'], variant_href, data[:price], data[:title], data[:description])
+            add_product_in_store(store, data[:brand], data[:mpn], data[:sku], data[:stock], product_slug, variant['id'], variant['product_id'], variant_href, data[:price], data[:title], data[:description])
+            if(store.store_id=="maperformance")
+              add_product_in_product_details(store, variant['id'], data[:description], data[:features], data[:benefits], data[:included], variant_href)
+            end
             # temp = temp + 1
+            puts "-> Store: #{store}, -> Brand: #{data[:brand]}, -> mpn: #{data[:mpn]}, -> sku: #{data[:sku]}, -> stock: #{data[:stock]}, -> product_slug: #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, -> price: #{data[:price]}, -> title: #{data[:title]}, -> description: #{data[:description]}"
             puts "====================================================================================================="
-            puts "Store: #{store}, Brand: #{data[:brand]}, mpn: #{data[:mpn]}, sku: #{data[:sku]}, stock: #{data[:stock]}, product_slug: #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, price: #{data[:price]}, title: #{data[:title]}, description: #{data[:description]}"
           end  
         rescue StandardError => e
           puts "Exception in Parsing Nokogiri::HTML #{e}"
@@ -153,7 +155,6 @@ def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, produc
       inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
       href: href, price: price, product_title: title)
   else
-    #byebug
     latest.update(brand: brand, mpn: mpn, sku: sku, inventory_quantity: stock, slug: slug,
       href: href, price: price, product_title: title, description: description)
     latest.archive_products.create(store_id: store.id, brand: brand, mpn: mpn, sku: sku,
@@ -163,3 +164,18 @@ def add_product_in_store(store, brand, mpn, sku, stock, slug, variant_id, produc
   # latest = store.latest_products.find_by(variant_id: variant_id, product_id: product_id)
   # puts "After Stock: #{latest.inventory_quantity} After Date: #{latest.updated_at}"
 end
+
+def add_product_in_product_details(store, variant_id, description, features, benefits, included, variant_href)
+  puts "-> variant_id: #{variant_id}"
+  puts "-> description: #{description}"
+  puts "-> features: #{features}"
+  puts "-> benefits: #{benefits}"
+  puts "-> included: #{included}"
+  puts "-> variant_href: #{variant_href}"
+  #            
+  
+  detail = MaPerformanceDetail.find_or_create_by(variant_id: variant_id)
+  detail.update(description: description, features: features, benefits: benefits, included: included, variant_href: variant_href)
+  
+  puts "      ..............................................................        "
+end                                                                                                                                                                               
