@@ -14,7 +14,6 @@ task sync_with_store: :environment do
   loop do
     page_number +=1 
     if store.store_id.eql?("maperformance")
-
       last_offset=Maperformancelog.last.present? ? Maperformancelog.last['offset'].to_i : 0
         if(last_offset == 0)
           temp += 1
@@ -55,8 +54,20 @@ task sync_with_store: :environment do
         product_collection="products"
         page_count +=1
         products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_count}")
-      else
+      elsif store.store_id.eql?("maperformance")
+        puts '{(=============================================================================================)}'
         puts 'no record found'
+        puts '{(=============================================================================================)}'
+        e = "No record found, store ended."
+        UserMailer.with(user: e, script: "#{store.name}").completion_alert.deliver_now
+        temp=0
+        add_offset_of_maperformance(temp)
+      else
+        puts '{(=============================================================================================)}'
+        puts 'no record found'
+        puts '{(=============================================================================================)}'
+        e = "No record found, store ended."
+        UserMailer.with(user: e, script: "#{store.name}").completion_alert.deliver_now
         LoggingTable.create!(store_id: store.id, url: "#{store.href}.json?limit=99999&page=#{temp}", page_number: temp, last_page: true)
         break
       end
@@ -172,8 +183,7 @@ def add_product_in_product_details(store, variant_id, description, features, ben
   puts "-> benefits: #{benefits}"
   puts "-> included: #{included}"
   puts "-> variant_href: #{variant_href}"
-  #            
-  
+
   detail = MaPerformanceDetail.find_or_create_by(variant_id: variant_id)
   detail.update(description: description, features: features, benefits: benefits, included: included, variant_href: variant_href)
   

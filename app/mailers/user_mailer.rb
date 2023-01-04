@@ -11,4 +11,8 @@ class UserMailer < ApplicationMailer
         # mail(to: "noman.saleem@aldaimsolutions.com", subject: "Issue detected in script")
         # mail(to: "faizan.haider@aldaimsolutions.com", subject: "Issue detected in script")
     end
+
+    def completion_alert
+        mail(to: ENV["MAILER_ADDRESS"], subject: "Script completed!")
+    end
 end
