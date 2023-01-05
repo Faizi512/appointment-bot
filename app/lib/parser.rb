@@ -138,16 +138,15 @@ class Parser
   end
 
   def throtl_data_points doc
-    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip rescue nil
-    if (@title.eql?("") && doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').present?)
-      @title = doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').text.strip rescue nil
+    @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").present? ? doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip : nil
+    if (@title.eql?("") || @title.eql?(nil))
+      @title = doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').present? ? doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[1]/h1').text.strip : nil
     end
     
-    price=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip() rescue nil
-    if (price.eql?("") && doc.xpath('//*[@id="price-template--14958388772912__front"]/p').present?)
-      price=doc.xpath('//*[@id="price-template--14958388772912__front"]/p').text.strip rescue nil
+    price = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.present? ? doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[3]/div/dl/div[1]/dd/span").children.text.strip : nil
+    if (price.eql?("") || price.eql?(nil))
+      price = doc.xpath('//*[@id="price-template--14958388772912__front"]/p').present? ? doc.xpath('//*[@id="price-template--14958388772912__front"]/p').text.strip : nil
     end
-
     if price.present?  
       @price= price.split(' ').count >1 ? price.split(' ')[0] : price
     else
@@ -157,38 +156,52 @@ class Parser
     stock=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div").children[1].children.text rescue nil
     @stock=stock.present? ?  stock.gsub(/[^0-9]/, '').to_i : 0
  
-    mpn=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p") rescue nil
-    @mpn=mpn.children.present? ? mpn.children.last.text : nil
-
-    brand=doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") rescue nil
-    @brand=brand.children.present? ? brand.last.text : brand.text 
-    if (@brand.eql?("") && doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').present?)
-      @brand=doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').text.strip rescue nil
+    if doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").present?
+      @mpn = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.present? ? doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/p").children.last.text : nil
     end
 
+    brand = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a").present? ? doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/a") : nil
+    @brand = brand.children.present? ? brand.last.text : brand.text 
+    if (@brand.eql?("") || @brand.eql?(nil))
+      @brand = doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').present? ? doc.xpath('//*[@id="shopify-section-template--14958388772912__front"]/section/div[2]/div/div[2]/div[1]/div[1]/div/div[1]/a').text.strip : nil
+    end
     
+
     if doc.xpath('//*[@id="product-description"]/div/div').children[1].present? && doc.xpath('//*[@id="product-description"]/div/div').children[1].name.eql?("ul")
       x=4
+      count = doc.xpath('//*[@id="product-description"]/div/div').children.count
       while true
+        if x.eql?(count)
+          break
+        end
         doc.xpath('//*[@id="product-description"]/div/div').children[x].text.eql?("Front Fitment Wheel Specifications table") ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[x].text.strip
-        x = x+1
+        x = x+1   
       end
       if @description.eql?("") || @description.eql?(nil)
         i = 4
+        count = doc.xpath('//*[@id="product-description"]/div/div').children.count
         while true
+          if i.eql?(count)
+            break
+          end
           (doc.xpath('//*[@id="product-description"]/div/div').children[i].name.eql?("div") || doc.xpath('//*[@id="product-description"]/div/div').children[i].text.eql?("Additional Details")) ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[i].text.strip
           i = i+1
         end
       end    
     elsif doc.xpath('//*[@id="product-description"]/div/div').children[7].present? && doc.xpath('//*[@id="product-description"]/div/div').children[7].name.eql?("ul")
        i = 10
+       count = doc.xpath('//*[@id="product-description"]/div/div').children.count
       while true
+        if i.eql?(count)
+          break
+        end
         (doc.xpath('//*[@id="product-description"]/div/div').children[i].name.eql?("div") || doc.xpath('//*[@id="product-description"]/div/div').children[i].text.eql?("Additional Details")) ? break : @description = @description + "\n" + doc.xpath('//*[@id="product-description"]/div/div').children[i].text.strip
         i = i+1
       end
     else
       @description = nil
     end
+
     data_points_hash
   end
 
@@ -204,7 +217,6 @@ class Parser
     else
       @stock = 0
     end
-
       if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").present?
         if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").children[0].attributes["id"].present?
           if doc.xpath("//div[@class='rte desktop-full tablet-no-show zxc']").children[0].attributes["id"].value.eql?("newdescr") 
@@ -249,6 +261,7 @@ class Parser
           end
         end
       end
+
     data_points_hash
   end
 
