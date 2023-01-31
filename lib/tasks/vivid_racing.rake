@@ -17,10 +17,10 @@ task vivid_racing_rake: :environment do
     $tile = eval(tile_str) if tile_str.present?
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-     Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     
     browser_1=Watir::Browser.new :chrome  , args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 1 not found" if !browser_1.present? 
@@ -29,11 +29,9 @@ task vivid_racing_rake: :environment do
     retry_index=0
     begin 
         retry_index ||=0
-        #browser_1.goto $urls.present? ? $urls[0] : store.href
         browser_1.goto store.href
         puts "--------------------------------------------------------------"
         puts "=========== Browser-1 start== #{browser_1.url} ============"
-        #$temp = "#{browser_1.url}"
         
         $temp[0] = "#{browser_1.url}"
 
@@ -43,7 +41,6 @@ task vivid_racing_rake: :environment do
             data = browser_1.element(xpath: "//div[@class='list-group no-scroll']")
         end
         count = data.children.count
-        #current_tile = 0
         index = 0
         while index <= count 
             if index == count
@@ -68,7 +65,6 @@ task vivid_racing_rake: :environment do
                     $tile_temp[2] = 0
                     $tile = nil
                     puts "&&&&&&&&&&&&&&&  #{url}  &&&&&&&&&&&&"
-                    #get_products(store,url,$temp,$urls)
                     get_products(store,url)
                 else
                     browser_2=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
@@ -129,12 +125,10 @@ task vivid_racing_rake: :environment do
 end
 
 def get_products(store,url)
-#def get_products(store,url,$temp,$urls)
     browser_3=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 3 not found" if !browser_3.present?           
     begin
         retries ||=0
-        #page_number = 1
         last_page = LoggingTable.where(store_id: store.id).last.page_number if LoggingTable.where(store_id: store.id).last.present?
         
         if last_page.present?
@@ -144,7 +138,6 @@ def get_products(store,url)
             page_number = 1
         end
 
-        #browser_3.goto $urls[1].present? ? $urls[1] : url
         puts "&&&&&&&&&&&&& #{url} &&&&&&&&&&&&&&&"
         puts "============ Browser-3 Opening ============="
         browser_3.goto url
@@ -160,10 +153,8 @@ def get_products(store,url)
                 if url.split("?")[1].eql?("new=true")
                     if $urls.present?
                         link = $urls[2]
-                        #page_number = link.split("page=")[1].to_i
                         puts link
                         $urls = nil
-                        #link =  $urls.present? ? $urls[2] : "#{url}&page=#{page_number}"    
                     else
                         puts link
                         link = "#{url}&page=#{page_number}"
@@ -172,14 +163,12 @@ def get_products(store,url)
                 else
                     if $urls.present?
                         link = $urls[2]
-                        #page_number = link.split("page=")[1].to_i
                         $urls = nil
                     else
                         link = "#{url}?page=#{page_number}"
                     end
                     puts link
                 end
-                #browser_3.goto $urls[2].present? ? $urls[2] : link
                 puts link
 
                 puts "&&&&&&&&&&&&& #{link} &&&&&&&&&&&&&&&"
@@ -193,7 +182,6 @@ def get_products(store,url)
                     end
                 end
                 $temp[2] = "#{browser_3.url}"
-                #$temp += " | " + "#{browser_3.url}"
 
                 puts "----------------------------------------------------------"
                 puts "===========Browser-3 start== #{browser_3.url}============"
@@ -206,7 +194,6 @@ def get_products(store,url)
                 puts "---------------------------------------------------------"
                 page_number += 1
             end
-        #LoggingTable.where(store_id: store.id).last.present
         browser_3.close
     rescue StandardError => e
         puts "#{e}"
@@ -239,13 +226,12 @@ def get_products_data(store,browser)
                 browser_4=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
                 raise Exception.new "Browser not found" if !browser_4.present? 
                 browser_4.goto href
-                
+
                 brand = browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").present? ? browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text : nil 
                 if brand.eql?(nil)
                     brand = browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].present? ? browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].text : nil
                 end
-                #puts "===************************==Brand: = #{brand} ===************************=== "
-                    #byebug if brand == nil
+
                 if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
                   stock=1
                 else
