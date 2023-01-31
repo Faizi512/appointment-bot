@@ -58,16 +58,16 @@ task sync_with_store: :environment do
         puts '{(=============================================================================================)}'
         puts 'no record found'
         puts '{(=============================================================================================)}'
-        e = "No record found, store ended."
-        UserMailer.with(user: e, script: "#{store.name}").completion_alert.deliver_now
+        msg = "Script successfully completed"
+        UserMailer.with(user: msg, script: "#{store.name}").completion_alert.deliver_now
         temp=0
         add_offset_of_maperformance(temp)
       else
         puts '{(=============================================================================================)}'
         puts 'no record found'
         puts '{(=============================================================================================)}'
-        e = "No record found, store ended."
-        UserMailer.with(user: e, script: "#{store.name}").completion_alert.deliver_now
+        msg = "Script successfully completed"
+        UserMailer.with(user: msg, script: "#{store.name}").completion_alert.deliver_now
         LoggingTable.create!(store_id: store.id, url: "#{store.href}.json?limit=99999&page=#{temp}", page_number: temp, last_page: true)
         break
       end

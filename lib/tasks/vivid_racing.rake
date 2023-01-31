@@ -17,10 +17,10 @@ task vivid_racing_rake: :environment do
     $tile = eval(tile_str) if tile_str.present?
     # --headless
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+     Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
     #for live 
-     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
     
     browser_1=Watir::Browser.new :chrome  , args: %w[--headless --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
     raise Exception.new "Browser 1 not found" if !browser_1.present? 
@@ -114,19 +114,6 @@ task vivid_racing_rake: :environment do
                         end
                         i+=1
                     end
-
-
-                    # if browser_2.elements(xpath: "//*[@class='category-tile']").present?
-                    #     browser_2.elements(xpath: "//*[@class='category-tile']").each do |item|
-                    #         puts "---------------------------------------------"
-                    #         puts "<================other pages================>"
-                    
-                    #         prod_url = item.children[0].attributes[:href]
-                    
-                    #         #get_products(store,prod_url,$temp,$urls)
-                    #         #get_products(store,prod_url)
-                    #     end
-                    # end
                     browser_2.close
                 end
             end
@@ -250,12 +237,15 @@ def get_products_data(store,browser)
         if product.present?
             begin
                 browser_4=Watir::Browser.new :chrome , args: %w[--headless  --ignore-certificate-errors --disable-popup-blocking --disable-translate --disable-notifications --start-maximized --disable-gpu]
-            
                 raise Exception.new "Browser not found" if !browser_4.present? 
                 browser_4.goto href
-                #brand = browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text rescue nil 
-                brand = browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].text rescue nil
-                #byebug if brand == nil
+                
+                brand = browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").present? ? browser_4.element(xpath: "/html/body/div[3]/div[4]/div[2]/p[3]/a").text : nil 
+                if brand.eql?(nil)
+                    brand = browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].present? ? browser_4.element(xpath: "/html/body/div[3]/div[4]").children[1].children[6].text : nil
+                end
+                #puts "===************************==Brand: = #{brand} ===************************=== "
+                    #byebug if brand == nil
                 if browser_4.element(xpath: "//p[@class='text-success']").present? || browser_4.element(xpath: "//p[@class='text-danger']").present?
                   stock=1
                 else
