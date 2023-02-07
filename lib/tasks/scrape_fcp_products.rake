@@ -4,10 +4,15 @@ task scrape_fcp_products: :environment do
   sections << Section.find_by(section_id: "Audi-parts")
   sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
+    puts "====================================================="
     puts "Section: #{section.section_id}"
+    puts "====================================================="
     page = 1
     until page.blank?
       begin
+        puts "====================================================="
+        puts "page # #{page}"
+        puts "====================================================="
         file = Curb.open_uri(section.href + "?page=#{page}")
         begin
           doc = Nokogiri::HTML(file)
