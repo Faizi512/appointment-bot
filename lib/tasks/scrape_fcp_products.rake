@@ -7,7 +7,7 @@ task scrape_fcp_products: :environment do
     puts "====================================================="
     puts "Section: #{section.section_id}"
     puts "====================================================="
-    page = 1
+    page = 32
     until page.blank?
       begin
         puts "====================================================="
