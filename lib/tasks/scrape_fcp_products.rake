@@ -1,13 +1,13 @@
 desc 'To scrape fcpeuro products from fcpeuro.com'
 task scrape_fcp_products: :environment do
   sections = []
-  sections << Section.find_by(section_id: "Audi-parts")
   sections << Section.find_by(section_id: "Volkswagen-parts")
+  sections << Section.find_by(section_id: "Audi-parts")
   sections.each do |section|
     puts "====================================================="
     puts "Section: #{section.section_id}"
     puts "====================================================="
-    page = 42
+    page = 1
     until page.blank?
       begin
         puts "====================================================="
