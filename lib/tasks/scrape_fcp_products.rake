@@ -29,7 +29,7 @@ task scrape_fcp_products: :environment do
           category = section.categories.find_or_create_by(name: category_name)
           # puts "Category #{index1} Name: #{category.name}"
           group.css('.grid-x.hit').each_with_index do |item,index2|
-            item_url = "#{ENV['FCP_STORE']}/#{item['data-href']}"
+            item_url = "#{ENV['FCP_STORE']}#{item['data-href']}"
             item_doc = Nokogiri::HTML(Curb.open_uri(item_url)) 
             if item_doc.children.count <= 1
               item_doc_retry = Nokogiri::HTML(Curb.open_uri(item_url)) 
@@ -96,7 +96,7 @@ def scrap_fcp_values item_doc, desc, async_doc, item_url
     {
       title: item_doc.at('.listing__name').text.strip,
       brand: item_doc.at('.//meta[@property=$value]', nil, { value: 'product:brand' })['content'],
-      price: item_doc.at('.listing__price .listing__amount span').text,
+      price: item_doc.at('.listing__price .listing__amount span').text.gsub('$', ""),
       available_at: item_doc.at('.listing__fulfillmentDesc span').text,
       # sku: item_doc.at('.//meta[@itemprop=$value]', nil, { value: 'sku' })['content'],
       sku: item_doc.xpath('/html/body/div[3]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div[2]/span[2]').text().strip,
@@ -109,6 +109,8 @@ def scrap_fcp_values item_doc, desc, async_doc, item_url
       mfg_numbers: async_doc.at('.extended__mfgNumbers').text.strip.split("MFG Numbers\n")[1].strip,
       href: item_url
     }
+    puts params
+    params
   rescue
     continue
   end
