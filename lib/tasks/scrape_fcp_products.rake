@@ -1,8 +1,8 @@
 desc 'To scrape fcpeuro products from fcpeuro.com'
 task scrape_fcp_products: :environment do
   sections = []
-  sections << Section.find_by(section_id: "Volkswagen-parts")
   sections << Section.find_by(section_id: "Audi-parts")
+  sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
     puts "====================================================="
     puts "Section: #{section.section_id}"
@@ -48,10 +48,11 @@ task scrape_fcp_products: :environment do
               if kit.blank?
                 kit = category.kits.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
                 sku_list = async_doc.css('.extended__kit table tbody tr .extended__tableSku').text.strip.split("\n").reject { |s| s.empty? }
+                qty_list = async_doc.css('.extended__kit table tbody tr td:first-child').text.strip.split("\n").reject { |s| s.empty? }
                 sku_list.each_with_index do |product_sku,index3|
-                  prod = category.fcp_products.find_or_create_by(sku: product_sku)
+                  prod = category.fcp_products.find_or_create_by(sku: product_sku, qty: qty_list[index3])
                   pk = kit.fcp_product_kits.find_or_create_by(fcp_product: prod)
-                  # puts "#{index3} Product of kit inserted" if pk.present?
+                  puts "#{index3} Product of kit inserted" if pk.present?
                 end
               end
               add_fcp_fitments(async_doc, kit)
