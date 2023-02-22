@@ -47,12 +47,16 @@ task scrape_fcp_products: :environment do
               kit = category.kits.find_by(sku: sku)
               if kit.blank?
                 kit = category.kits.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
+              else
+                kit.update!(scrap_fcp_values(item_doc, desc, async_doc, item_url))
                 sku_list = async_doc.css('.extended__kit table tbody tr .extended__tableSku').text.strip.split("\n").reject { |s| s.empty? }
                 qty_list = async_doc.css('.extended__kit table tbody tr td:first-child').text.strip.split("\n").reject { |s| s.empty? }
                 sku_list.each_with_index do |product_sku,index3|
-                  prod = category.fcp_products.find_or_create_by(sku: product_sku, qty: qty_list[index3])
+                  prod = category.fcp_products.find_or_create_by(sku: product_sku)
+                  prod.update!(qty: qty_list[index3])
                   pk = kit.fcp_product_kits.find_or_create_by(fcp_product: prod)
                   puts "#{index3} Product of kit inserted" if pk.present?
+                  puts prod if pk.present?
                 end
               end
               add_fcp_fitments(async_doc, kit)
