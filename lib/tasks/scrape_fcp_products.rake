@@ -56,7 +56,7 @@ task scrape_fcp_products: :environment do
                   prod.update!(qty: qty_list[index3])
                   pk = kit.fcp_product_kits.find_or_create_by(fcp_product: prod)
                   puts "#{index3} Product of kit inserted" if pk.present?
-                  puts prod if pk.present?
+                  puts prod.inspect if pk.present?
                 end
               end
               add_fcp_fitments(async_doc, kit)
@@ -65,7 +65,10 @@ task scrape_fcp_products: :environment do
               product = category.fcp_products.find_by(sku: sku)
               if product.blank?
                 product = category.fcp_products.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
+              else
+                product.update!(scrap_fcp_values(item_doc, desc, async_doc, item_url))
               end
+              puts "==========#{product}========="
               add_fcp_fitments(async_doc, product)
             end
           end
@@ -114,8 +117,6 @@ def scrap_fcp_values item_doc, desc, async_doc, item_url
       mfg_numbers: async_doc.at('.extended__mfgNumbers').text.strip.split("MFG Numbers\n")[1].strip,
       href: item_url
     }
-    puts params
-    params
   rescue
     continue
   end
