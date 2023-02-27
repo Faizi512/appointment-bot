@@ -114,7 +114,7 @@ task scrape_fcp_products: :environment do
   end
 
   threads.each(&:join)  # wait for all threads to finish
-  byebug
+  # byebug
 # ======================================================================
 
   # sections.each do |section|
