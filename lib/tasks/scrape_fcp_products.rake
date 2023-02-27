@@ -5,13 +5,15 @@ task scrape_fcp_products: :environment do
   sections << Section.find_by(section_id: "Volkswagen-parts")
   sections.each do |section|
     puts "====================================================="
-    puts "Section: #{section.section_id}"
+    puts "              Section: #{section.section_id}"
     puts "====================================================="
     page = 1
     until page.blank?
       begin
         puts "====================================================="
-        puts "page # #{page}"
+        puts "                    page # #{page}"
+        puts "====================================================="
+        puts "href:  #{section.href}?page=#{page}"
         puts "====================================================="
         file = Curb.open_uri(section.href + "?page=#{page}")
         begin
@@ -27,7 +29,7 @@ task scrape_fcp_products: :environment do
             category_name = group.css('.group__heading .crumbs__item span').text.split("Home").second rescue nil
           end
           category = section.categories.find_or_create_by(name: category_name)
-          # puts "Category #{index1} Name: #{category.name}"
+          puts "Category #{index1} Name: #{category.name}"
           group.css('.grid-x.hit').each_with_index do |item,index2|
             item_url = "#{ENV['FCP_STORE']}#{item['data-href']}"
             item_doc = Nokogiri::HTML(Curb.open_uri(item_url)) 
@@ -51,9 +53,11 @@ task scrape_fcp_products: :environment do
                 kit.update!(scrap_fcp_values(item_doc, desc, async_doc, item_url))
                 sku_list = async_doc.css('.extended__kit table tbody tr .extended__tableSku').text.strip.split("\n").reject { |s| s.empty? }
                 qty_list = async_doc.css('.extended__kit table tbody tr td:first-child').text.strip.split("\n").reject { |s| s.empty? }
+                price_list = async_doc.css('.extended__kit table tbody tr td:last-child').text.strip.gsub("$", "").split("\n").reject { |s| s.empty? }
+                href_list= async_doc.css('.extended__kit table tbody tr td[2]').collect {|n| ENV["FCP_STORE"]+n.children[1].values.first}
                 sku_list.each_with_index do |product_sku,index3|
                   prod = category.fcp_products.find_or_create_by(sku: product_sku)
-                  prod.update!(qty: qty_list[index3])
+                  prod.update!(price: price_list[index3], qty: qty_list[index3], href: href_list[index3])
                   pk = kit.fcp_product_kits.find_or_create_by(fcp_product: prod)
                   puts "#{index3} Product of kit inserted" if pk.present?
                   puts prod.inspect if pk.present?
@@ -64,9 +68,9 @@ task scrape_fcp_products: :environment do
               puts "#{index2} Product single inserted"
               product = category.fcp_products.find_by(sku: sku)
               if product.blank?
-                product = category.fcp_products.create(scrap_fcp_values(item_doc, desc, async_doc, item_url))
+                product = category.fcp_products.find_or_create_by(scrap_fcp_values(item_doc, desc, async_doc, item_url))
               else
-                product.update!(scrap_fcp_values(item_doc, desc, async_doc, item_url))
+                product = category.fcp_products.find_or_create_by(scrap_fcp_values(item_doc, desc, async_doc, item_url))
               end
               puts "==========#{product}========="
               add_fcp_fitments(async_doc, product)
