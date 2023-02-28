@@ -104,10 +104,10 @@ task scrape_fcp_products: :environment do
 end
 
 def add_fcp_fitments doc, product
-  # doc.at('#fitment').css('.fitmentGuide .fitmentGuide__models .fitmentGuide__applicationGroup').css('ul').css('li').each do |li| 
-  #   model = li.at('div').text.strip
-  #   product.fitments.find_or_create_by(fitment_model: model)
-  # end
+  doc.at('#fitment').css('.fitmentGuide .fitmentGuide__models .fitmentGuide__applicationGroup').css('ul').css('li').each do |li| 
+    model = li.at('div').text.strip
+    product.fitments.find_or_create_by(fitment_model: model)
+  end
 end
 
 def scrap_fcp_values item_doc, desc, async_doc, item_url
