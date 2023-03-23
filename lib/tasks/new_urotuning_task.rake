@@ -16,7 +16,7 @@ task new_urotuning_task: :environment do
         browser = Watir::Browser.new :chrome, args: %w[ --headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
         raise Exception.new "Browser not found" if !browser.present?
         browser.goto store.href
-        total_product=browser.element(xpath: "/html/body/div[1]/div[2]/main/div[2]/div[3]/div/div[2]/div[4]/div[2]/span").text.split.last.to_i  
+        total_product = browser.element(xpath: '//*[@id="collection-contianer"]/div[3]/div/div[1]/div[1]/div/button[1]/span[2]').text.gsub("(","").gsub(")", "").to_i
         raise Exception.new "Data not found" if !total_product.present? 
         offset=UrotuningFtimentsPageLog.last.present? ? UrotuningFtimentsPageLog.last['offset'].to_i : 0
         # offset=51840
