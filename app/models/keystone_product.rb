@@ -1,0 +1,2 @@
+class KeystoneProduct < ApplicationRecord
+end
