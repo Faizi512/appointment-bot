@@ -27,7 +27,8 @@ class ImplicitFtp < Net::FTP
 end
 
 task keystone: :environment do
-    byebug
+    # byebug
+    
     response = Net::HTTP.get_response(URI('https://ifconfig.co/json'))
     puts = "===================================================================="
     puts JSON.parse(response.read_body)
