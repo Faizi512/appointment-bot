@@ -1,6 +1,7 @@
 require 'openssl'
 require 'net/ftp'
 require 'socket'
+require 'zip'
 desc 'To scrape keystone, ftp catalog'
 class ImplicitFtp < Net::FTP
   FTP_PORT = 990
