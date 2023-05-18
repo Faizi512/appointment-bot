@@ -9,7 +9,6 @@ require 'openssl'
 task sync_with_store: :environment do
 
   store = Store.find_by(store_id: ENV['STORE_ID'])
-  byebug
   # browser = get_browser store if store.store_id.eql?("silver_suspension")
 
   product_collection="collections/all/products"
