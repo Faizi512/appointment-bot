@@ -153,9 +153,12 @@ class Parser
     # browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
     # browser.button(xpath: '//*[@id="customer_login"]/p/button').click
     # browser.goto @variant["variant_href"]
+    puts="=-========================================================================================"
+    puts doc
+    puts="=-========================================================================================"
     @stock = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/div[2]/div[2]/p/b').text
     @title = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/h1').text
-    @price = doc.xpath('//*[@id="ComparePrice-7187668795445"]').text.split(" ")[1]
+    @price = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div').text.split(" ")[1]
     @mpn = doc.xpath('//*[@id="Sku-7187668795445"]').text
     # browser.close
     data_points_hash
