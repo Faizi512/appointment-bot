@@ -2,10 +2,16 @@ require 'uri'
 require 'net/http'
 require 'nokogiri'
 require 'open-uri'
+require 'watir'
+require 'webdrivers/chromedriver'
+require 'openssl'
 
 task sync_with_store: :environment do
 
   store = Store.find_by(store_id: ENV['STORE_ID'])
+  byebug
+  # browser = get_browser store if store.store_id.eql?("silver_suspension")
+
   product_collection="collections/all/products"
   page_number = 0
   temp=0
@@ -39,13 +45,19 @@ task sync_with_store: :environment do
           # add_offset_of_maperformance(temp) 
       elsif store.store_id.eql?("maxtondesignusa")
          products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_number}")
+      elsif store.store_id.eql?("silver_suspension")
+        # byebug
+        # pp = Curb.open_uri("#{store.href}.json?limit=99999&page=#{page_number}")
+        products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+        # pp = pp.open.readlines
+        # products = JSON.parse(pp[0])
       else
-          products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+        products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
       end
     rescue StandardError => e
       puts 'Exception throws getting products'
-      logger.error e.message
-      e.backtrace.each { |line| logger.error line }
+      # logger.error e.message
+      # e.backtrace.each { |line| logger.error line }
       sleep 60
       retry
     end
@@ -76,7 +88,7 @@ task sync_with_store: :environment do
       product_slug = product['handle']
       product_brand = product['vendor']
       product['variants'].each do |variant|
-       if store.store_id.eql?("maxtondesignusa") 
+       if store.store_id.eql?("maxtondesignusa")
         variant_href = "#{store.href}/#{product_collection}/#{product_slug}?variant=#{variant['id']}"
        else
         variant_href = "#{store.href}/#{product_slug}?variant=#{variant['id']}"
@@ -106,6 +118,7 @@ task sync_with_store: :environment do
             end
           else
             puts variant_href
+            variant = variant.merge({"variant_href"=>variant_href}) if (store.store_id=="silver_suspension")
             data = Parser.new(file, store.store_id, variant, product_brand).parse
             if !data[:price].blank?
               data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]

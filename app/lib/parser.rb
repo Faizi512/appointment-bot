@@ -39,6 +39,8 @@ class Parser
       spa_turbo_usa(doc)
     when 'fastmods'
       fastmods_data_points(doc)
+    when 'silver_suspension'
+      silver_suspension_data_points(doc)
     end
   end
 
@@ -134,6 +136,28 @@ class Parser
     txt = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text
     @stock = !txt.scan(/\d/).empty? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[2]/p').text.split("(")[1].split(" ")[0] : "0"
     @mpn = doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.present? ? doc.xpath('//*[@id="shopify-section-product"]/div/div/div/div/div/div/div/div[2]/div[1]/div[4]/div[1]/p').text.split(":")[1] : ""
+    data_points_hash
+  end
+
+  def silver_suspension_data_points doc
+    # for local browser
+    # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # browser = Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
+    # for live browser
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    # browser.goto @variant["variant_href"]
+    # browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
+    # browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
+    # browser.button(xpath: '//*[@id="customer_login"]/p/button').click
+    # browser.goto @variant["variant_href"]
+    @stock = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/div[2]/div[2]/p/b').text
+    @title = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/h1').text
+    @price = doc.xpath('//*[@id="ComparePrice-7187668795445"]').text.split(" ")[1]
+    @mpn = doc.xpath('//*[@id="Sku-7187668795445"]').text
+    # browser.close
     data_points_hash
   end
 

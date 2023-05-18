@@ -12,7 +12,7 @@ Store.find_or_create_by(store_id: 'maperformance').update(name: 'MA Performance'
 Store.find_or_create_by(store_id: 'spaturbousa').update(name: 'Spa Turbo Usa', href: 'https://spaturbousa.com/products')
 Store.find_or_create_by(store_id: 'throtl').update(name: 'Throtl', href: 'https://throtl.com/products')
 Store.find_or_create_by(store_id: 'fastmods').update(name: 'Fastmods', href: 'https://fastmodz.com/products')
-
+Store.find_or_create_by(store_id: 'silver_suspension').update(name: 'Silver Suspension', href: 'https://nahmindustries.com/products')
 #end shopify stores
 
 Store.find_or_create_by(store_id: 'turn14').update(name: 'turn14', href: 'https://api.turn14.com')
