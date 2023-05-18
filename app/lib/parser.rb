@@ -1,4 +1,6 @@
 require 'nokogiri'
+require 'watir'
+require 'webdrivers/chromedriver'
 class Parser
   attr_reader :file, :store
   @index = 1
@@ -14,6 +16,7 @@ class Parser
     @features = ""
     @benefits = ""
     @included = ""
+    @map_price = ""
   end
 
   def parse
@@ -40,7 +43,7 @@ class Parser
     when 'fastmods'
       fastmods_data_points(doc)
     when 'silver_suspension'
-      silver_suspension_data_points(doc)
+      silver_suspension_data_points
     end
   end
 
@@ -139,28 +142,40 @@ class Parser
     data_points_hash
   end
 
-  def silver_suspension_data_points doc
+  def silver_suspension_data_points
     # for local browser
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
     # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
-    # browser = Watir::Browser.new :chrome, args: %w[--no-sandbox --disable-blink-features=AutomationControlled --use-automation-extension=true --exclude-switches=enable-automation --ignore-certificate-errors '--user-agent=%s' % ua]
+    # chrome_options = {
+    #   'goog:chromeOptions' => {
+    #     'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
+    #   }
+    # }
+    # browser = Watir::Browser.new :chrome, options: chrome_options
     # for live browser
-    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-    # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    browser.goto "https://www.google.com"
+    sleep(5)
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    sleep(5)
+    browser.goto @variant["variant_href"]
+    sleep(3)
+    browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
+    sleep(2)
+    browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
+    sleep(3)
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    sleep(3)
+    browser.button(xpath: '//*[@id="customer_login"]/p/button').click
     # browser.goto @variant["variant_href"]
-    # browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
-    # browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
-    # browser.button(xpath: '//*[@id="customer_login"]/p/button').click
-    # browser.goto @variant["variant_href"]
-    puts="=-========================================================================================"
-    puts doc
-    puts="=-========================================================================================"
-    @stock = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/div[2]/div[2]/p/b').text
-    @title = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div/h1').text
-    @price = doc.xpath('//*[@id="ProductSection-7187668795445"]/div/div/div/div[1]/div').text.split(" ")[1]
-    @mpn = doc.xpath('//*[@id="Sku-7187668795445"]').text
-    # browser.close
+    @stock = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4) > div:nth-child(9) > p > b').text
+    @title = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > h1').text
+    @map_price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[5].text.split(" ")[1]
+    @price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[6].text.split(" ")[2]
+    @mpn = browser.element(css: 'div.grid__item.medium-up--three-fifths > div').children[2].text    
+    browser.close
     data_points_hash
   end
 
@@ -347,7 +362,8 @@ class Parser
       stock: @stock, mpn: @mpn, brand: @brand,
       sku: @sku, price: @price, title: @title,
       description: @description, features: @features,
-      benefits: @benefits, included: @included
+      benefits: @benefits, included: @included,
+      map_price: @map_price
     }
   end
 end

@@ -45,11 +45,10 @@ task sync_with_store: :environment do
       elsif store.store_id.eql?("maxtondesignusa")
          products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_number}")
       elsif store.store_id.eql?("silver_suspension")
-        # byebug
-        # pp = Curb.open_uri("#{store.href}.json?limit=99999&page=#{page_number}")
-        products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
-        # pp = pp.open.readlines
-        # products = JSON.parse(pp[0])
+        pp = Curb.open_uri("#{store.href}.json?limit=99999&page=#{page_number}")
+        # products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
+        pp = pp.open.readlines
+        products = JSON.parse(pp[0])
       else
         products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
       end
