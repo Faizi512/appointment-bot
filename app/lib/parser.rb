@@ -145,18 +145,19 @@ class Parser
   def silver_suspension_data_points
     # for local browser
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
-    # chrome_options = {
-    #   'goog:chromeOptions' => {
-    #     'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
-    #   }
-    # }
-    # browser = Watir::Browser.new :chrome, options: chrome_options
+    Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    chrome_options = {
+      'goog:chromeOptions' => {
+        'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
+      }
+    }
+    browser = Watir::Browser.new :chrome, options: chrome_options
     # for live browser
-    Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
-    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
-    browser.goto "https://www.google.com"
+    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    arr = ["https://www.google.com", "https://www.instagram.com/", "https://www.facebook.com/", "https://www.udemy.com/", "https://www.coursera.org/"]
+    browser.goto arr[rand(5)]
     sleep(5)
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     sleep(5)
