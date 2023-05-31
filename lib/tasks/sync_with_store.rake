@@ -5,6 +5,7 @@ require 'open-uri'
 require 'watir'
 require 'webdrivers/chromedriver'
 require 'openssl'
+require 'selenium-webdriver'
 
 task sync_with_store: :environment do
 
@@ -33,10 +34,7 @@ task sync_with_store: :environment do
       else
         temp = last_offset + 1
       end
-    # else
-    #   page_number += 1
     end
-    # temp = 0
     begin
       if store.store_id.eql?("maperformance") || store.store_id.eql?("throtl")
         puts "=============================== #{temp} ==============================="
@@ -45,10 +43,8 @@ task sync_with_store: :environment do
       elsif store.store_id.eql?("maxtondesignusa")
          products = get_request("#{store.href}/#{product_collection}.json?limit=99999&page=#{page_number}")
       elsif store.store_id.eql?("silver_suspension")
-        pp = Curb.open_uri("#{store.href}.json?limit=99999&page=#{page_number}")
-        # products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
-        pp = pp.open.readlines
-        products = JSON.parse(pp[0])
+        # pp = Curb.open_uri("#{store.href}.json?limit=99999&page=#{page_number}")
+        products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
       else
         products = get_request("#{store.href}.json?limit=99999&page=#{page_number}")
       end

@@ -46,6 +46,7 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'curb'
 
+gem 'faker'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

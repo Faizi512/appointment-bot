@@ -1,6 +1,8 @@
 require 'nokogiri'
 require 'watir'
 require 'webdrivers/chromedriver'
+require 'selenium-webdriver'
+require 'faker'
 class Parser
   attr_reader :file, :store
   @index = 1
@@ -145,31 +147,48 @@ class Parser
   def silver_suspension_data_points
     # for local browser
     # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
-    Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
-    chrome_options = {
-      'goog:chromeOptions' => {
-        'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
-      }
-    }
-    browser = Watir::Browser.new :chrome, options: chrome_options
-    # for live browser
-    # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
-    # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+    # Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+    # chrome_options = {
+    #   'goog:chromeOptions' => {
+    #     'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
+    #   }
+    # }
+    # browser = Watir::Browser.new :chrome, options: chrome_options
     # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+    # for live browser
+     Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+     Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+
+    user_agent = Faker::Internet.user_agent
+    browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu, --user-agent="#{user_agent}" ]
     arr = ["https://www.google.com", "https://www.instagram.com/", "https://www.facebook.com/", "https://www.udemy.com/", "https://www.coursera.org/"]
     browser.goto arr[rand(5)]
+    puts browser.url
+    browser.execute_script("window.scrollBy(0, 400);")
+    browser.goto arr[rand(5)]
+    puts browser.url
     sleep(5)
-    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    sleep(5)
+    browser.execute_script("window.scrollBy(0, 400);")
+    sleep(15)
     browser.goto @variant["variant_href"]
-    sleep(3)
+    puts browser.url
+    sleep(13)
     browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
     sleep(2)
     browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
-    sleep(3)
+    sleep(8)
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    browser.execute_script("$('#customer_login')[0].onsubmit()") if browser.button(xpath: '//*[@id="customer_login"]/p/button').present?
     sleep(3)
-    browser.button(xpath: '//*[@id="customer_login"]/p/button').click
+    browser.button(xpath: '//*[@id="customer_login"]/p/button').click if browser.button(xpath: '//*[@id="customer_login"]/p/button').present?
+    sleep(3)
+
+    if browser.url.eql?("https://nahmindustries.com/challenge")
+      browser.close
+      puts "------------- browser close (challenge) -----------------"
+      sleep(300)
+      silver_suspension_data_points
+    end
     # browser.goto @variant["variant_href"]
     @stock = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4) > div:nth-child(9) > p > b').text
     @title = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > h1').text
