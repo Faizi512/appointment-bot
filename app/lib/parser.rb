@@ -3,6 +3,7 @@ require 'watir'
 require 'webdrivers/chromedriver'
 require 'selenium-webdriver'
 require 'faker'
+
 class Parser
   attr_reader :file, :store
   @index = 1
@@ -145,49 +146,39 @@ class Parser
     data_points_hash
   end
 
-  # def silver_suspension_data_points
-  #   browser = @variant["browser"]
-  #   # arr = ["https://www.google.com", "https://www.instagram.com/", "https://www.facebook.com/", "https://www.udemy.com/", "https://www.coursera.org/"]
-  #   # browser.goto arr[rand(5)]
-  #   # puts browser.url
-  #   #  browser.execute_script("window.scrollBy(0, 400);")
-  #   # browser.goto arr[rand(5)]
-  #   # puts browser.url
-  #   #  browser.execute_script("window.scrollBy(0, 400);")
-  #   # sleep(15)
-  #   browser.goto @variant["variant_href"]
-  #   puts browser.url
-  #   if browser.url.include?("/login?")
-  #     sleep(5)
-  #     #sleep(13)
-  #     browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
-  #     sleep(2)
-  #     browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
-  #     #sleep(8)
-  #     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-  #     #browser.execute_script("$('#customer_login')[0].onsubmit()") if browser.button(xpath: '//*[@id="customer_login"]/p/button').present?
-  #     sleep(3)
-  #     browser.button(xpath: '//*[@id="customer_login"]/p/button').click if browser.button(xpath: '//*[@id="customer_login"]/p/button').present?
-  #   end
-  #   # sleep(60)
+  def silver_suspension_data_points
+    browser = @variant["browser"]
+    # arr = ["https://www.google.com", "https://www.instagram.com/", "https://www.facebook.com/", "https://www.udemy.com/", "https://www.coursera.org/"]
+    # browser.goto arr[rand(5)]
+    # puts browser.url
+    #  browser.execute_script("window.scrollBy(0, 400);")
+    # browser.goto arr[rand(5)]
+    # puts browser.url
+    #  browser.execute_script("window.scrollBy(0, 400);")
+    # sleep(15)
+    browser.goto @variant["variant_href"]
+    puts browser.url
+    if browser.url.include?("/login?")
+      sleep(5)
+      browser.text_field(xpath: '//*[@id="CustomerEmail"]').set 'orders@moddedeuros.com'
+      sleep(2)
+      browser.text_field(xpath: '//*[@id="CustomerPassword"]').set 'f0B1$I!J56&m'
+      browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+      sleep(3)
+      browser.button(xpath: '//*[@id="customer_login"]/p/button').click if browser.button(xpath: '//*[@id="customer_login"]/p/button').present?
+    end
 
-  #   # if browser.url.eql?("https://nahmindustries.com/challenge")
-  #   #   puts "------------- browser (challenge) -----------------"
-  #   #   browser.close
-  #   #   sleep(3)
-  #   #   silver_suspension_data_points
-  #   # end
-  #   # browser.goto @variant["variant_href"]
-  #   if !browser.element(xpath: '//*[@id="wlmpnf"]/div/div/div/div[1]/h1/span').present?
-  #     @stock = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4) > div:nth-child(9) > p > b').text
-  #     @title = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > h1').text
-  #     @map_price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[5].text.split(" ")[1]
-  #     @price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[6].text.split(" ")[2]
-  #     @mpn = browser.element(css: 'div.grid__item.medium-up--three-fifths > div').children[2].text    
-  #     # browser.close
-  #     data_points_hash
-  #   end
-  # end
+    # browser.goto @variant["variant_href"]
+    if !browser.element(xpath: '//*[@id="wlmpnf"]/div/div/div/div[1]/h1/span').present?
+      @stock = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4) > div:nth-child(9) > p > b').text
+      @title = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > h1').text
+      @map_price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[5].text.split(" ")[1]
+      @price = browser.element(css: 'div.grid__item.medium-up--three-fifths > div > div:nth-child(4)').children[6].text.split(" ")[2]
+      @mpn = browser.element(css: 'div.grid__item.medium-up--three-fifths > div').children[2].text    
+      # browser.close
+      data_points_hash
+    end
+  end
 
   def throtl_data_points doc
     @title = doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").present? ? doc.xpath("/html/body/main/section[1]/section/div/div[1]/div[2]/div[1]/div[1]/h1").text.strip : nil

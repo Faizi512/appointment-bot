@@ -78,7 +78,26 @@ task sync_with_store: :environment do
         break
       end
     end
-    products['products'].each do |product|
+    browser = nil
+    if(store.store_id == 'silver_suspension')
+      # for local browser
+      # Selenium::WebDriver::Chrome.path = "#{Rails.root}#{ENV['GOOGLE_CHROME_PATH']}"
+      Selenium::WebDriver::Chrome::Service.driver_path = "#{Rails.root}#{ENV['GOOGLE_CHROME_DRIVER_PATH']}"
+      # chrome_options = {
+      #   'goog:chromeOptions' => {
+      #     'args' => %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu]
+      #   }
+      # }
+      # browser = Watir::Browser.new :chrome, options: chrome_options
+      # browser = Watir::Browser.new :chrome, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu ]
+      # for live browser
+      # Selenium::WebDriver::Chrome.path = ENV['GOOGLE_CHROME_PATH'] 
+      # Selenium::WebDriver::Chrome.driver_path = ENV['GOOGLE_CHROME_DRIVER_PATH']
+  
+      user_agent = Faker::Internet.user_agent
+      browser = Watir::Browser.new :chrome#, args: %w[--headless --no-sandbox --disable-dev-shm-usage --disable-gpu, --user-agent="#{user_agent}" ]
+    end
+    products['products'].each_with_index do |product, index|
       product_slug = product['handle']
       product_brand = product['vendor']
       product['variants'].each do |variant|
@@ -92,6 +111,7 @@ task sync_with_store: :environment do
         file = begin
           retry_uri ||= 0
           URI.open(variant_href)
+
         rescue OpenURI::HTTPError => e
           puts "Exception in method OpenURI #{e} for #{store.name} URL:#{variant_href}" if retry_uri.positive?
           removed_product = store.latest_products.find_by(variant_id: variant['id'], product_id: variant['product_id']) if retry_uri.positive?
@@ -111,8 +131,12 @@ task sync_with_store: :environment do
               puts "#{store}, #{data[:brand]}, #{data[:mpn]}, #{data[:sku]}, #{data[:stock]}, #{product_slug}, #{variant['id']}, #{variant['product_id']}, #{variant_href}, #{data[:price]}, #{data[:title]}"
             end
           else
-            puts variant_href
-            variant = variant.merge({"variant_href"=>variant_href}) if (store.store_id=="silver_suspension")
+            if(store.store_id == 'silver_suspension')
+              puts variant_href
+              variant = variant.merge({"variant_href"=>variant_href})
+              variant = variant.merge({"browser"=>browser})
+              puts "Product count================================#{index+1}"
+            end
             data = Parser.new(file, store.store_id, variant, product_brand).parse
             if !data[:price].blank?
               data[:price] = data[:price].include?(',') || data[:price].include?('$') ? '%.2f' % data[:price].tr('$ ,', '') : '%.2f' % data[:price]
@@ -149,7 +173,6 @@ def get_request(urll)
   url = URI(urll)
   https = Net::HTTP.new(url.host, url.port)
   https.use_ssl = true
-
   request = Net::HTTP::Get.new(url)
   response = https.request(request)
   JSON.parse response.read_body
