@@ -1,11 +1,11 @@
 require 'net/ftp'
 require 'zip'
 require 'skylight'
-Skylight.start!
+# Skylight.start!
 
 desc 'To scrape parts authority products catalog'
 
-Skylight.instrument(title: 'parts_autority span') do
+# Skylight.instrument(title: 'parts_autority span') do
   task parts_authority_catalog: :environment do
     begin
       # store = Store.find_by(store_id: 'vividracing')
@@ -36,4 +36,4 @@ Skylight.instrument(title: 'parts_autority span') do
       UserMailer.with(user: e, script: "parts_authority_catalog").issue_in_script.deliver_now
     end
   end
-end
+# end

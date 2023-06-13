@@ -3,11 +3,11 @@ require 'net/ftp'
 require 'socket'
 require 'zip'
 require 'skylight'
-Skylight.start!
+# Skylight.start!
 
 desc 'To scrape keystone, ftp catalog'
 
-Skylight.instrument(title: 'Keystone span') do
+# Skylight.instrument(title: 'Keystone span') do
   class ImplicitFtp < Net::FTP
     FTP_PORT = 990
     def connect(host , port = FTP_PORT)
@@ -102,4 +102,4 @@ Skylight.instrument(title: 'Keystone span') do
       end
     end
   end
-end
+# end

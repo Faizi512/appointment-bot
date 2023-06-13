@@ -2,5 +2,8 @@
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
 require_relative 'config/application'
-
-Rails.application.load_tasks
+require 'skylight'
+Skylight.start!
+Skylight.instrument(title: 'Modded-Inventory span') do
+    Rails.application.load_tasks
+end

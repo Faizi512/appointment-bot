@@ -3,11 +3,11 @@ require 'webdrivers/chromedriver'
 require 'timeout'
 require 'uri'
 require 'skylight'
-Skylight.start!
+# Skylight.start!
 
 desc 'To scrape inventory urotuning data'
 
-Skylight.instrument(title: 'new_urotuning span') do
+# Skylight.instrument(title: 'new_urotuning span') do
     task new_urotuning_task: :environment do
         begin
             store = Store.find_by(store_id: 'urotuning')
@@ -124,4 +124,4 @@ Skylight.instrument(title: 'new_urotuning span') do
         inventory_quantity: stock, slug: slug, variant_id: variant_id, product_id: product_id,
         href: href, price: price, product_title: title)
     end
-end
+# end
