@@ -1,7 +1,6 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.skylight.environments << 'production'
-  config.skylight.probes += ['active_record', 'action_view']
   config.skylight.app_name = 'modded-inventory'
   config.skylight.authentication = 'nCMPHczL423TpYXHbG0GvWyms-DwZhKV1UOjijw7GAQ'
   # Code is not reloaded between requests.
