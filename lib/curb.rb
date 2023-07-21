@@ -9,9 +9,17 @@ module Curb
   end
 
   def self.t14_auth_token
+    token = nil
+    response = nil
     token = begin
-      response = Curl.post("#{ENV['TURN14_STORE']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
-      JSON.parse response.body_str
+      if Turn14Token.last.present? && (Turn14Token.last.created_at + 1.hour) >= (DateTime.now )
+        response = Turn14Token.last.token
+        JSON.parse response
+      else
+        response = Curl.post("#{ENV['TURN14_STORE']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
+        Turn14Token.create!(token: response.body_str)
+        JSON.parse response.body_str
+      end
     end
   end
 
