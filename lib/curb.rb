@@ -13,9 +13,9 @@ module Curb
     response = nil
     token = begin
       if Turn14Token.last.present? && (Turn14Token.last.created_at + 1.hour) >= (DateTime.now )
+        puts"========================================================Stored: #{Turn14Token.last.token}"
         response = Turn14Token.last.token
         JSON.parse response
-        puts"========================================================Stored: #{Turn14Token.last.token}"
       else
         response = Curl.post("#{ENV['TURN14_STORE']}/v1/token", "client_id=#{ENV['CLIENT_ID']}&client_secret=#{ENV['CLIENT_SECRET']}&grant_type=client_credentials")
         res = Turn14Token.create!(token: response.body_str)
