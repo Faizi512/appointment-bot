@@ -15,7 +15,17 @@ task t14_items_eta: :environment do
   finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   itemsCount = 0
+  store = Store.find_by(store_id: 'turn14')
+  log_url = LoggingTable.where(store_id: store.id).last.url if LoggingTable.where(store_id: store.id).last.present?
+  if log_url.present?
+    items_url = log_url
+    #items_url = log_url.gsub(/page=\d+/, "page=#{log_page_number}")
+  end
+
   loop do
+    byebug
+    current_page = items_url.split("=")[1].to_i
+    puts "========== Page: #{current_page} ============"
     items = Curb.make_get_request items_url, token
     if items['data'].present?
       # For Catalog check
@@ -51,8 +61,15 @@ task t14_items_eta: :environment do
     end
     puts "#{itemsCount} Items processed"
     puts "Items found: #{finalItems.count}"
-    exit if items['links']['next'].nil?
-    items_url = ENV['TURN14_STORE'] + items['links']['next']
+    if items['links']['next'].nil?
+      LoggingTable.where(store_id: store.id).destroy_all
+      exit
+    else
+      log_url = items_url
+      current_page = log_url.split("=")[1].to_i
+      LoggingTable.create!(url: log_url, store_id: store.id, page_number: current_page)
+      items_url = ENV['TURN14_STORE'] + items['links']['next']
+    end
   rescue StandardError => e
     puts "exception #{e}"
     sleep 1
