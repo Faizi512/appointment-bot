@@ -23,7 +23,6 @@ task t14_items_eta: :environment do
   end
 
   loop do
-    byebug
     current_page = items_url.split("=")[1].to_i
     puts "========== Page: #{current_page} ============"
     items = Curb.make_get_request items_url, token
