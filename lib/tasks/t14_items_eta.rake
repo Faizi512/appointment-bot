@@ -60,7 +60,7 @@ task t14_items_eta: :environment do
     end
     puts "#{itemsCount} Items processed"
     puts "Items found: #{finalItems.count}"
-    if items['links']['next'].nil?
+    if items['data'].nil? || items['links']['next'].nil?
       LoggingTable.where(store_id: store.id).destroy_all
       exit
     else
