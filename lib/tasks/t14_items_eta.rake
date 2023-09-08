@@ -12,6 +12,7 @@ task t14_items_eta: :environment do
   puts "Destroying the manufacturer data daily "
   Manufacturer.destroy_all
   puts "Ready to load new data"
+
   finalItems = []
   items_url = "#{ENV['TURN14_STORE']}/v1/inventory?page=1"
   itemsCount = 0
@@ -22,45 +23,55 @@ task t14_items_eta: :environment do
     #items_url = log_url.gsub(/page=\d+/, "page=#{log_page_number}")
   end
 
+  items_count = Curb.make_get_request items_url, token
+  total_pages = items_count['links']['last'].split("=")[1].to_i
+  page_count = items_url.split("=")[1].to_i
+
+  puts "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Total Page: #{total_pages} !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   loop do
     current_page = items_url.split("=")[1].to_i
     puts "========== Page: #{current_page} ============"
     items = Curb.make_get_request items_url, token
-    if items['data'].present?
-      # For Catalog check
-      mpn_numbers = []
-      sku_numbers = {}
-      get_Dopbox_Mpn_Sku(mpn_numbers, sku_numbers)
-      catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items["data"], finalItems)
-      if finalItems.count == mpn_numbers.count || items['links']['next'].nil? 
-        finalItems.each do |item|
-          product = Turn14Product.find_by(item_id: item['id'])
-          quantity = item['attributes']['inventory']['01'] + t14_item['attributes']['inventory']['02'] + t14_item['attributes']['inventory']['59']
-          next unless t14_item
-          Store.t14_items_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
-        end
-      end
-      # To scrape mfr count of turn14 products'
-      manufacturer_and_purchase_order(items["data"])
-      # To scrape eta of turn14 products'
-      itemsCount += items["data"].count
-      items['data'].each do |item|
-        mpn = item["id"]
-        if item["attributes"]["eta"].present? && item["attributes"]["eta"]["qty_on_order"].present?
-          item["attributes"]["eta"]["qty_on_order"].each do |element|
-            location = element[0]
-            qty_on_order = element[1]
-            est_availability = get_est_date(location, item)
-            add_to_table(mpn, location, qty_on_order, est_availability)
+    if items.present?
+      if items['data'].present?
+        # For Catalog check
+        mpn_numbers = []
+        sku_numbers = {}
+        get_Dopbox_Mpn_Sku(mpn_numbers, sku_numbers)
+        catalog_check_against_turn14_table(mpn_numbers, sku_numbers, items["data"], finalItems)
+        
+        if finalItems.count == mpn_numbers.count || items['links']['next'].nil?
+          finalItems.each do |item|
+            product = Turn14Product.find_by(item_id: item['id'])
+            quantity = item['attributes']['inventory']['01'] + item['attributes']['inventory']['02'] + item['attributes']['inventory']['59']
+            next unless item
+            Store.t14_items_insert_in_latest_and_archieve_table(product["item_id"], product['brand_id'], product['mfr_part_number'], quantity, sku_numbers[item.part_number], product['price'])
           end
-        else
-            next
+        end
+        manufacturer_and_purchase_order(items["data"])
+        itemsCount += items["data"].count
+        items['data'].each do |item|
+          mpn = item["id"]
+          if item["attributes"]["eta"].present? && item["attributes"]["eta"]["qty_on_order"].present?
+            item["attributes"]["eta"]["qty_on_order"].each do |element|
+              location = element[0]
+              qty_on_order = element[1]
+              est_availability = get_est_date(location, item)
+              add_to_table(mpn, location, qty_on_order, est_availability)
+            end
+          else
+              next
+          end
         end
       end
     end
     puts "#{itemsCount} Items processed"
     puts "Items found: #{finalItems.count}"
-    if items['data'].nil? || items['links']['next'].nil?
+
+    page_count = page_count + 1
+
+    # if items['links']['next'].nil?
+    if total_pages < page_count
       LoggingTable.where(store_id: store.id).destroy_all
       exit
     else
@@ -69,6 +80,7 @@ task t14_items_eta: :environment do
       LoggingTable.create!(url: log_url, store_id: store.id, page_number: current_page)
       items_url = ENV['TURN14_STORE'] + items['links']['next']
     end
+
   rescue StandardError => e
     puts "exception #{e}"
     sleep 1
