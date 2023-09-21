@@ -13,18 +13,22 @@ desc 'To scrape parts authority products catalog'
       ftp = Net::FTP.new('pareps.panetny.com')
       ftp.login('moddeurospf','DmZ7e44k')
       raise Exception.new "Login failed" if !ftp.welcome.present?
+      count = 0
       ftp.passive = true
+      puts "----- Getting Zip file -----"
       ftp.getbinaryfile('partsauthority.zip', 'zip_parts_authority', 1024) # 1024 is representing blocksize
       Zip::File.open('zip_parts_authority') do |zip_file|
         raise Exception.new "Date not found" if !zip_file.present?
         zip_file.each do |entry|
           puts "Unzip #{entry.name}"
-          content = entry.get_input_stream.read
+          content = entry.get_input_stream.read.force_encoding('ISO-8859-1').encode('UTF-8')
           CSV.parse(content, headers: true, header_converters: :symbol) do |row|
             # puts "Line #{row[:line]} Part #{row[:part]} Cost #{row[:cost]} Count #{row[:qtyonhand]} Packs #{row[:packs]} Brand: #{row[:brand]}"
             product = PartAuthorityProduct.find_or_create_by(part_number: row[:part], product_line: row[:line])
             product.update(product_line: row[:line], price: row[:cost], core_price: row[:coreprice], qty_on_hand: row[:qtyonhand], packs: row[:packs], brand: row[:brand], present_in_file: true)
-            puts product.inspect
+            #puts product.inspect
+            count = count + 1
+            puts count
           end
         end
       end 
