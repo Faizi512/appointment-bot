@@ -9,6 +9,7 @@ desc 'To scrape parts authority products catalog'
   task parts_authority_catalog: :environment do
     begin
       # store = Store.find_by(store_id: 'vividracing')
+      PartAuthorityProduct.update_all(present_in_file: false)
       arr = []
       ftp = Net::FTP.new('pareps.panetny.com')
       ftp.login('moddeurospf','DmZ7e44k')
