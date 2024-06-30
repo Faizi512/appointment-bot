@@ -1,0 +1,2 @@
+app/.apt/usr/bin/chrome-linux64.zip filter=lfs diff=lfs merge=lfs -text
+app/.apt/usr/bin/google-chrome-stable_current_amd64.deb filter=lfs diff=lfs merge=lfs -text

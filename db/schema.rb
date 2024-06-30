@@ -10,14 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< Updated upstream
-ActiveRecord::Schema.define(version: 20221226133304) do
-=======
-ActiveRecord::Schema.define(version: 20221104112737) do
->>>>>>> Stashed changes
+ActiveRecord::Schema.define(version: 20240629122008) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "active_admin_comments", force: :cascade do |t|
+    t.string "namespace"
+    t.text "body"
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "author_type"
+    t.bigint "author_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id"
+    t.index ["namespace"], name: "index_active_admin_comments_on_namespace"
+    t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
+  end
+
+  create_table "admin_users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_admin_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
 
   create_table "archive_products", force: :cascade do |t|
     t.string "brand"
@@ -61,6 +83,40 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.string "offset"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "customers", force: :cascade do |t|
+    t.string "appointment_type"
+    t.boolean "is_family"
+    t.integer "family_id"
+    t.integer "number_of_appointments"
+    t.string "centre_city"
+    t.string "appointment_category"
+    t.string "phone_number"
+    t.string "verification_code"
+    t.date "appointment_date"
+    t.time "appointment_time"
+    t.string "visa_type"
+    t.string "first_name"
+    t.string "last_name"
+    t.date "birth_date"
+    t.string "customer_phone_number"
+    t.string "nationality"
+    t.string "passport_type"
+    t.string "passport_number"
+    t.date "passport_issue_date"
+    t.date "passport_expiry_date"
+    t.string "passport_issue_place"
+    t.boolean "is_sms"
+    t.boolean "is_prime_time_service"
+    t.boolean "is_form_filling"
+    t.boolean "is_photocopy_b_w"
+    t.boolean "is_photograph"
+    t.boolean "is_premium_lounge"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "email"
+    t.boolean "is_appointment_booked"
   end
 
   create_table "ebay_products", force: :cascade do |t|
@@ -130,6 +186,15 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "family_members", force: :cascade do |t|
+    t.string "name"
+    t.string "relationship"
+    t.bigint "customer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_family_members_on_customer_id"
+  end
+
   create_table "fcp_product_kits", force: :cascade do |t|
     t.integer "fcp_product_id"
     t.integer "kit_id"
@@ -149,6 +214,7 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.bigint "category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "qty"
     t.index ["category_id"], name: "index_fcp_products_on_category_id"
   end
 
@@ -176,6 +242,27 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_inventories_on_product_id"
     t.index ["supplier_id"], name: "index_inventories_on_supplier_id"
+  end
+
+  create_table "keystone_products", force: :cascade do |t|
+    t.string "vendor_name"
+    t.string "vcpn"
+    t.string "vendor_code"
+    t.string "part_number"
+    t.string "manufacturer_part_no"
+    t.string "long_description"
+    t.string "jobber_price"
+    t.string "cost"
+    t.string "ups_able"
+    t.string "core_charge"
+    t.integer "case_qty"
+    t.string "is_non_returnable"
+    t.string "upc_code"
+    t.integer "total_qty"
+    t.string "kit_components"
+    t.string "is_kit"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "last_visited_pages", force: :cascade do |t|
@@ -213,16 +300,15 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.index ["turn14_product_id"], name: "index_latest_purchase_orders_on_turn14_product_id"
   end
 
-  create_table "logging_tables", force: :cascade do |t|
-    t.bigint "store_id"
-    t.string "url"
-    t.integer "page_number"
-    t.integer "offset"
+  create_table "ma_performance_details", force: :cascade do |t|
+    t.string "variant_id"
+    t.text "description"
+    t.text "features"
+    t.text "benefits"
+    t.text "included"
+    t.string "variant_href"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "last_page"
-    t.string "temp"
-    t.index ["store_id"], name: "index_logging_tables_on_store_id"
   end
 
   create_table "manufacturers", force: :cascade do |t|
@@ -254,57 +340,6 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "updated_at", null: false
   end
 
-<<<<<<< Updated upstream
-=======
-  create_table "me_new_products", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "brand", limit: 255
-    t.integer "brand_id"
-    t.text "product_name"
-    t.text "slug"
-    t.string "sku", limit: 255
-    t.string "price", limit: 255
-    t.integer "cost"
-    t.string "retail", limit: 255
-    t.string "mpn", limit: 255
-    t.text "taxon_ids"
-    t.text "taxon_name"
-    t.string "fcpeuro_id", limit: 255
-    t.string "fcpeuro_productsid", limit: 255
-    t.string "fcpeuro_quality", limit: 255
-    t.text "fcpeuro_oenumbers"
-    t.text "fcpeuro_mfgnumbers"
-    t.string "status"
-  end
-
-  create_table "me_purchase_orders", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "modded_po", limit: 255
-    t.string "vendor", limit: 255
-    t.string "brand", limit: 255
-    t.string "mpn", limit: 255
-    t.integer "qty"
-    t.string "sku", limit: 255
-    t.string "stock_state", limit: 255
-    t.string "tracking", limit: 255
-    t.string "product_name", limit: 255
-  end
-
-  create_table "milltekcorp_kits", force: :cascade do |t|
-    t.string "kit_name"
-    t.integer "primary_stock"
-    t.integer "secondary_stock"
-    t.string "kit_part_number"
-    t.string "price_MAP"
-    t.string "dealer_cost"
-    t.string "href"
-    t.string "brand"
-    t.string "model"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
->>>>>>> Stashed changes
   create_table "milltekcorp_products", force: :cascade do |t|
     t.bigint "milltekcorp_kit_id"
     t.integer "us_local_stock"
@@ -316,26 +351,6 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["milltekcorp_kit_id"], name: "index_milltekcorp_products_on_milltekcorp_kit_id"
-<<<<<<< Updated upstream
-=======
-  end
-
-  create_table "new_product_db", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "product_name", limit: 255
-    t.integer "sku"
-    t.string "brand", limit: 255
-    t.integer "price"
-    t.integer "cost_price"
-    t.integer "retail_price"
-    t.string "mpn", limit: 255
-    t.text "description"
-    t.text "image"
-    t.text "features"
-    t.text "warranty"
-    t.text "installation"
-    t.text "notes"
->>>>>>> Stashed changes
   end
 
   create_table "part_authority_brands_mpns", force: :cascade do |t|
@@ -360,6 +375,7 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "brand"
+    t.boolean "present_in_file"
     t.index ["part_number"], name: "index_part_authority_products_on_part_number"
     t.index ["product_line"], name: "index_part_authority_products_on_product_line"
   end
@@ -553,6 +569,12 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.index ["supplier_id"], name: "index_turn14_products_on_supplier_id"
   end
 
+  create_table "turn14_tokens", force: :cascade do |t|
+    t.json "token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "uro_tuning_fitments", force: :cascade do |t|
     t.string "mpn"
     t.string "fitment"
@@ -581,35 +603,15 @@ ActiveRecord::Schema.define(version: 20221104112737) do
     t.datetime "updated_at", null: false
   end
 
-<<<<<<< Updated upstream
   add_foreign_key "archived_purchase_orders", "turn14_products"
   add_foreign_key "categories", "sections"
   add_foreign_key "ecs_fitments", "ecs_products"
   add_foreign_key "ecs_taxons", "ecs_products"
+  add_foreign_key "family_members", "customers"
   add_foreign_key "fcp_products", "categories"
   add_foreign_key "fitments", "fcp_products"
   add_foreign_key "latest_purchase_orders", "turn14_products"
-  add_foreign_key "logging_tables", "stores"
   add_foreign_key "manufacturers", "turn14_products"
-=======
-  create_table "wufoo_rma", id: false, force: :cascade do |t|
-    t.serial "id", null: false
-    t.string "order_id", limit: 255
-    t.string "first_name", limit: 255
-    t.string "last_name", limit: 255
-    t.string "email", limit: 255
-    t.string "reason_contact", limit: 255
-    t.string "reason_return", limit: 255
-    t.string "have_installed", limit: 255
-    t.string "year", limit: 255
-    t.string "make", limit: 255
-    t.string "model", limit: 255
-    t.text "cancel_exp"
-    t.text "return_exp"
-    t.datetime "submitted_at"
-  end
-
->>>>>>> Stashed changes
   add_foreign_key "milltekcorp_products", "milltekcorp_kits"
   add_foreign_key "turn14_product_data_descriptions", "suppliers"
   add_foreign_key "turn14_product_data_files", "suppliers"

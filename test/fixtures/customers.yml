@@ -1,0 +1,59 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  appointment_type: MyString
+  is_family: false
+  family_id: 1
+  number_of_appointments: 1
+  centre_city: MyString
+  appointment_category: MyString
+  phone_number: MyString
+  verification_code: MyString
+  appointment_date: 2024-06-14
+  appointment_time: 2024-06-14 15:46:11
+  visa_type: MyString
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2024-06-14
+  customer_phone_number: MyString
+  nationality: MyString
+  passport_type: MyString
+  passport_number: MyString
+  passport_issue_date: 2024-06-14
+  passport_expiry_date: 2024-06-14
+  passport_issue_place: MyString
+  is_sms: false
+  is_prime_time_service: false
+  is_form_filling: false
+  is_photocopy_b_w: false
+  is_photograph: false
+  is_premium_lounge: false
+
+two:
+  appointment_type: MyString
+  is_family: false
+  family_id: 1
+  number_of_appointments: 1
+  centre_city: MyString
+  appointment_category: MyString
+  phone_number: MyString
+  verification_code: MyString
+  appointment_date: 2024-06-14
+  appointment_time: 2024-06-14 15:46:11
+  visa_type: MyString
+  first_name: MyString
+  last_name: MyString
+  birth_date: 2024-06-14
+  customer_phone_number: MyString
+  nationality: MyString
+  passport_type: MyString
+  passport_number: MyString
+  passport_issue_date: 2024-06-14
+  passport_expiry_date: 2024-06-14
+  passport_issue_place: MyString
+  is_sms: false
+  is_prime_time_service: false
+  is_form_filling: false
+  is_photocopy_b_w: false
+  is_photograph: false
+  is_premium_lounge: false

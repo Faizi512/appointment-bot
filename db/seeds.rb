@@ -50,3 +50,4 @@ Store.find_or_create_by(store_id: 'cts_xml').update(name: 'cts_xml', href: 'http
 # Wordpress websites
 Store.find_or_create_by(store_id: 'vargas_turbo').update(name: 'vargas_turbo', href: 'https://vargasturbo.com/product-search/')
 
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?

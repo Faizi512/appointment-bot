@@ -18,6 +18,14 @@ gem 'google_drive'
 # Use Puma as the app server
 gem 'puma', '~> 3.7'
 
+gem 'ruby-2captcha'
+
+gem 'rtesseract'
+
+gem 'activeadmin'
+
+gem 'devise'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 
