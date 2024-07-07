@@ -1,0 +1,10 @@
+<!-- app/views/admin/customers/_otp_form.html.erb -->
+<%= form_for [:admin, customer], url: get_otp_admin_customer_path(customer), method: :post do |f| %>
+  <div class="form-group">
+    <%= f.label :verification_code, 'Enter OTP' %>
+    <%= f.text_field :verification_code, class: 'form-control' %>
+  </div>
+  <div class="actions">
+    <%= f.submit 'Save OTP', class: 'btn btn-primary' %>
+  </div>
+<% end %>

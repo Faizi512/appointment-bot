@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
+  namespace :admin do
+    resources :customers do
+      member do
+        get :get_otp
+        post :get_otp
+      end
+    end
+  end
   resources :retool_test_api_controllers
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   namespace :api do

@@ -9,7 +9,7 @@ class AppointmentBookingService
   attr_reader :batch, :errors
 
   def initialize(batch)
-    # #byebug
+    # byebug
     @batch = batch
     @errors = []
   end
@@ -29,7 +29,7 @@ class AppointmentBookingService
   private
 
   def book_appointment(customer)
-    # #byebug
+    # byebug
     # Example booking logic - adjust this to your needs
     
     puts "I'm in"
@@ -68,9 +68,53 @@ class AppointmentBookingService
       browser.text_field(xpath: '//*[@id="email"]').set customer.email
       # browser.text_field(xpath: '//*[@id="phone"]').set customer.phone
       # #byebug
+      wait_for_otp = false
       loop do
         if browser.element(xpath: '//*[@id="verification_code"]').exists?
-          sleep 2
+          if customer.is_family?
+            browser.element(xpath: '//*[@id="app_type2"]').click
+          end
+          if wait_for_otp == false
+            sleep 1
+            browser.element(xpath: '//*[@id="member"]').click
+            sleep 1
+            if customer.number_of_appointments.eql?(2)
+              browser.element(xpath: '//*[@id="member"]/option[1]').click
+              sleep 1
+            else
+              browser.element(xpath: '//*[@id="member"]/option[2]').click
+              sleep 1
+            end
+            browser.element(xpath: '//*[@id="centre"]').click
+            sleep 1
+            browser.element(xpath: '//*[@id="centre"]').children.select{|e| e.text.eql?(customer.centre_city)}[0].click
+            sleep 1
+            browser.element(xpath: '//*[@id="category"]').click
+            sleep 1
+            browser.element(xpath: '//*[@id="category"]').children.select{|e| e.text.eql?(customer.appointment_category)}[0].click
+            sleep 1
+            browser.text_field(xpath: '//*[@id="phone"]').set customer.phone_number[3..]
+            sleep 1
+            # byebug
+            browser.element(xpath: '//*[@id="verification_code"]').click
+            if browser.element(xpath: '//*[@id="slideup_div"]/div[3]/p').exists? && browser.element(xpath: '//*[@id="slideup_div"]/div[3]/p').text.eql?("Captcha verification failed.")
+              browser.refresh
+              wait_for_otp = false
+            else
+              wait_for_otp = true
+              get_otp(customer)
+            end
+            # byebug
+          end
+          customer.reload
+          if customer.verification_code.eql?("")
+            sleep 2
+          else
+            browser.text_field(xpath: '//*[@id="otp"]').set customer.verification_code
+            browser.element(xpath: '//*[@id="em_tr"]/div[3]/input').click
+            wait_for_otp = false
+            customer.update!(verification_code: "")
+          end
         else
           break
         end
@@ -304,5 +348,11 @@ class AppointmentBookingService
         slot.click
       end
     end
+  end
+
+  def get_otp(customer)
+    # byebug
+    puts "Get otp"
+    customer.update!(verification_code: "")
   end
 end

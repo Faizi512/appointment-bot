@@ -65,19 +65,30 @@ ActiveAdmin.register Customer do
     f.actions
   end
 
+  action_item :get_otp, only: :show do
+    link_to 'Enter OTP', get_otp_admin_customer_path(customer)
+  end
+
+  member_action :get_otp, method: [:get, :post] do
+    @customer = Customer.find(params[:id])
+    if request.post?
+      if @customer.update(verification_code: params[:customer][:verification_code])
+        redirect_to admin_customer_path(@customer), notice: 'OTP saved successfully!'
+      else
+        flash[:error] = 'Failed to save OTP!'
+      end
+    end
+  end
+
+  sidebar "OTP", only: :show do
+    render 'admin/customers/otp_form', customer: customer
+  end
+
 
 
   batch_action :book_appointment do |selection|
-    customers = Customer.where(id: selection)
-
     # Use the service to book appointments
-    service = AppointmentBookingService.new(customers)
-
-    if service.call
-      flash[:notice] = "#{customers.count} appointments booking service called!"
-    else
-      error_messages = service.errors.map { |error| "Appointment #{error[:appointment_id]}: #{error[:error]}" }.join(", ")
-      flash[:error] = "Booking failed for some appointments: #{error_messages}"
-    end
+    job = BookAppointmentJob.perform_later(selection.map(&:to_s))
+    redirect_to admin_customers_path, notice: "Appointment booking job has been enqueued for #{selection.size} customers!"
   end
 end
