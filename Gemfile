@@ -67,6 +67,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'pry'
   gem 'rubocop-rails', require: false
+  gem 'fileutils'
 end
 
 group :development do
